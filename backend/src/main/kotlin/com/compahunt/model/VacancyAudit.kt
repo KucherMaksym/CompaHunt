@@ -1,0 +1,42 @@
+package com.compahunt.model
+
+import jakarta.persistence.*
+import java.time.LocalDateTime
+
+@Entity
+@Table(name = "vacancy_audit")
+data class VacancyAudit(
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long = 0,
+
+    @Column(nullable = false)
+    val vacancyId: Long,
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    val action: AuditAction,
+
+    @Column(columnDefinition = "TEXT")
+    val fieldName: String? = null,
+
+    @Column(columnDefinition = "TEXT")
+    val oldValue: String? = null,
+
+    @Column(columnDefinition = "TEXT")
+    val newValue: String? = null,
+
+    @Column(columnDefinition = "TEXT")
+    val changes: String? = null,
+
+    val timestamp: LocalDateTime = LocalDateTime.now(),
+
+    val reason: String? = null
+)
+
+enum class AuditAction {
+    CREATED,
+    UPDATED,
+    ARCHIVED,
+    FIELD_CHANGED
+}
