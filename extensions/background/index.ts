@@ -50,13 +50,55 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
 })
 
-async function sendJobToServer(jobData: any, repeated: boolean = false) {
+async function isTokenValid(token: string): Promise<boolean> {
     try {
-        let token = await storage.get("authToken")
+        const response = await fetch("http://localhost:8080/api/auth/validate", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        })
+        return response.ok
+    } catch (error) {
+        console.error("Token validation failed:", error)
+        return false
+    }
+}
 
-        if (!token) {
-            token = await fetchAuthToken()
+async function getValidToken(): Promise<string | null> {
+    let token = await storage.get("authToken")
+    const tokenExpiry = await storage.get("tokenExpiry")
+    
+    // Check if token exists and hasn't expired
+    if (token && tokenExpiry && Date.now() < tokenExpiry) {
+        return token
+    }
+    
+    // If token exists but might be expired, validate it
+    if (token) {
+        const isValid = await isTokenValid(token)
+        if (isValid) {
+            // Token is still valid, extend expiry
+            await storage.set("tokenExpiry", Date.now() + 30 * 60 * 1000) // 30 minutes
+            return token
         }
+    }
+    
+    // Token invalid or expired, fetch new one
+    await storage.remove("authToken")
+    await storage.remove("tokenExpiry")
+    token = await fetchAuthToken()
+    
+    if (token) {
+        await storage.set("tokenExpiry", Date.now() + 30 * 60 * 1000) // 30 minutes
+    }
+    
+    return token
+}
+
+async function sendJobToServer(jobData: any) {
+    try {
+        const token = await getValidToken()
 
         if (!token) {
             throw new Error("No auth token available")
@@ -71,13 +113,25 @@ async function sendJobToServer(jobData: any, repeated: boolean = false) {
             body: JSON.stringify(jobData)
         })
 
-        if (response.status === 401 && !repeated) {
-            // Expired Token
+        if (response.status === 401 || response.status === 403) {
+            // Token became invalid during request, clear cache and retry once
             await storage.remove("authToken")
-            token = await fetchAuthToken()
-
-            if (token) {
-                return sendJobToServer(jobData, true)
+            await storage.remove("tokenExpiry")
+            
+            const newToken = await fetchAuthToken()
+            if (newToken) {
+                await storage.set("tokenExpiry", Date.now() + 30 * 60 * 1000)
+                
+                const retryResponse = await fetch("http://localhost:8080/api/vacancies", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${newToken}`
+                    },
+                    body: JSON.stringify(jobData)
+                })
+                
+                return await retryResponse.json()
             }
         }
 

@@ -32,6 +32,7 @@ public class JwtUtils {
     }
 
     fun validateToken(token: String): Boolean {
+        println("token $token")
         return try {
             val publicKey = getPublicKey();
 

@@ -19,5 +19,10 @@
       "~lib/*": ["./lib/*"]
     },
     "allowSyntheticDefaultImports": true
+  },
+  "ts-node": {
+    "compilerOptions": {
+      "skipLibCheck": true
+    }
   }
 }
