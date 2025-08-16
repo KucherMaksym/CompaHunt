@@ -28,7 +28,43 @@ export enum VacancyStatus {
   PHONE_SCREEN = 'PHONE_SCREEN',
   INTERVIEW = 'INTERVIEW',
   OFFER = 'OFFER',
-  REJECTED = 'REJECTED'
+  REJECTED = 'REJECTED',
+  ARCHIVED = 'ARCHIVED'
 }
 
 export type ViewMode = 'table' | 'cards';
+
+export interface Interview {
+  id: string;
+  vacancyId: string;
+  scheduledAt: string;
+  type: InterviewType;
+  status: InterviewStatus;
+  notes?: string;
+  feedback?: string;
+  duration?: number;
+  meetingLink?: string;
+  location?: string;
+  interviewerName?: string;
+  interviewerEmail?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export enum InterviewType {
+  PHONE_SCREEN = 'PHONE_SCREEN',
+  VIDEO_CALL = 'VIDEO_CALL',
+  ON_SITE = 'ON_SITE',
+  TECHNICAL = 'TECHNICAL',
+  BEHAVIORAL = 'BEHAVIORAL',
+  FINAL_ROUND = 'FINAL_ROUND',
+  HR_INTERVIEW = 'HR_INTERVIEW'
+}
+
+export enum InterviewStatus {
+  SCHEDULED = 'SCHEDULED',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
+  RESCHEDULED = 'RESCHEDULED',
+  NO_SHOW = 'NO_SHOW'
+}

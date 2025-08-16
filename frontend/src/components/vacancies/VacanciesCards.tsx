@@ -3,6 +3,12 @@
 import { Vacancy, VacancyStatus } from '@/types/vacancy'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { 
   ExternalLink, 
   MapPin, 
@@ -10,13 +16,19 @@ import {
   DollarSign, 
   Building2,
   Clock,
-  Briefcase
+  Briefcase,
+  MoreHorizontal,
+  Edit,
+  Archive
 } from 'lucide-react'
 import { formatDistanceToNow, format } from 'date-fns'
 import {getStatusColor} from "@/utils/vacancy-utils";
 
 interface VacanciesCardsProps {
   vacancies: Vacancy[]
+  onEditVacancy?: (vacancy: Vacancy) => void
+  onArchiveVacancy?: (vacancyId: string) => void
+  onViewVacancy?: (vacancy: Vacancy) => void
 }
 
 function getStatusLabel(status: VacancyStatus): string {
@@ -40,11 +52,17 @@ function getStatusLabel(status: VacancyStatus): string {
 
 interface VacancyCardProps {
   vacancy: Vacancy
+  onEditVacancy?: (vacancy: Vacancy) => void
+  onArchiveVacancy?: (vacancyId: string) => void
+  onViewVacancy?: (vacancy: Vacancy) => void
 }
 
-function VacancyCard({ vacancy }: VacancyCardProps) {
+function VacancyCard({ vacancy, onEditVacancy, onArchiveVacancy, onViewVacancy }: VacancyCardProps) {
   return (
-    <div className="group bg-background-surface border border-border rounded-lg p-6 hover:shadow-custom-md transition-all duration-200 hover:border-border/80">
+    <div 
+      className="group bg-background-surface border border-border rounded-lg p-6 hover:shadow-custom-md transition-all duration-200 hover:border-border/80 cursor-pointer"
+      onClick={() => onViewVacancy?.(vacancy)}
+    >
       {/* Header */}
       <div className="flex justify-between items-start mb-4">
         <div className="flex-1 min-w-0">
@@ -126,25 +144,57 @@ function VacancyCard({ vacancy }: VacancyCardProps) {
             </div>
           )}
           
-          {vacancy.jobUrl && (
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              asChild
-              className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0"
-            >
-              <a href={vacancy.jobUrl} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="h-4 w-4" />
-              </a>
-            </Button>
-          )}
+          <div className="flex items-center gap-1">
+            {vacancy.jobUrl && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                asChild
+                className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0"
+              >
+                <a href={vacancy.jobUrl} target="_blank" rel="noopener noreferrer">
+                  <ExternalLink className="h-4 w-4" />
+                </a>
+              </Button>
+            )}
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {onEditVacancy && (
+                  <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onEditVacancy(vacancy); }}>
+                    <Edit className="mr-2 h-4 w-4" />
+                    Edit
+                  </DropdownMenuItem>
+                )}
+                {onArchiveVacancy && vacancy.status !== VacancyStatus.ARCHIVED && (
+                  <DropdownMenuItem 
+                    onClick={(e) => { e.stopPropagation(); onArchiveVacancy(vacancy.id); }}
+                    className="text-orange-600 focus:text-orange-600"
+                  >
+                    <Archive className="mr-2 h-4 w-4" />
+                    Archive
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
     </div>
   )
 }
 
-export function VacanciesCards({ vacancies }: VacanciesCardsProps) {
+export function VacanciesCards({ vacancies, onEditVacancy, onArchiveVacancy, onViewVacancy }: VacanciesCardsProps) {
   if (vacancies.length === 0) {
     return (
       <div className="text-center py-12 bg-background-surface rounded-lg border border-border">
@@ -162,7 +212,13 @@ export function VacanciesCards({ vacancies }: VacanciesCardsProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
       {vacancies.map((vacancy) => (
-        <VacancyCard key={vacancy.id} vacancy={vacancy} />
+        <VacancyCard 
+          key={vacancy.id} 
+          vacancy={vacancy} 
+          onEditVacancy={onEditVacancy}
+          onArchiveVacancy={onArchiveVacancy}
+          onViewVacancy={onViewVacancy}
+        />
       ))}
     </div>
   )

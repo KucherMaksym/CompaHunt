@@ -1,10 +1,15 @@
 'use client'
 
-import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import apiClient from "@/lib/api-client";
 import dynamic from 'next/dynamic'
 import { VacanciesList } from "@/components/vacancies/VacanciesList"
+import { VacancyModal } from "@/components/vacancies/VacancyModal"
+import { VacancyDetailModal } from "@/components/vacancies/VacancyDetailModal"
+import { InterviewDashboard } from "@/components/dashboard/InterviewDashboard"
 import { Vacancy, VacancyStatus } from "@/types/vacancy"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 const DynamicHome = dynamic(() => Promise.resolve(Home), {
     ssr: false
@@ -44,9 +49,57 @@ function Home() {
         queryFn: fetchApplications,
     })
 
+    const queryClient = useQueryClient()
+    const [modalState, setModalState] = useState<{
+        isOpen: boolean
+        mode: 'create' | 'edit'
+        vacancy?: Vacancy
+    }>({ isOpen: false, mode: 'create' })
+    
+    const [detailModalState, setDetailModalState] = useState<{
+        isOpen: boolean
+        vacancy?: Vacancy
+    }>({ isOpen: false })
+
+    const archiveMutation = useMutation({
+        mutationFn: async (vacancyId: string) => {
+            return await apiClient.patch(`/api/vacancies/${vacancyId}/status`, {
+                status: VacancyStatus.ARCHIVED
+            })
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['applications'] })
+        }
+    })
+
     const handleAddVacancy = () => {
-        // TODO: Implement add vacancy functionality
-        console.log("Add vacancy clicked")
+        setModalState({ isOpen: true, mode: 'create' })
+    }
+
+    const handleEditVacancy = (vacancy: Vacancy) => {
+        setModalState({ isOpen: true, mode: 'edit', vacancy })
+    }
+
+    const handleArchiveVacancy = (vacancyId: string) => {
+        archiveMutation.mutate(vacancyId)
+    }
+
+    const handleCloseModal = () => {
+        setModalState({ isOpen: false, mode: 'create' })
+    }
+
+    const handleViewVacancy = (vacancy: Vacancy) => {
+        setDetailModalState({ isOpen: true, vacancy })
+    }
+
+    const handleCloseDetailModal = () => {
+        setDetailModalState({ isOpen: false })
+    }
+
+    const handleAddInterview = () => {
+        // This could open a separate interview creation modal
+        // For now, we'll just handle it by opening the vacancy modal in create mode
+        setModalState({ isOpen: true, mode: 'create' })
     }
 
     if (isLoading) {
@@ -78,8 +131,8 @@ function Home() {
 
     return (
         <main className="min-h-screen bg-background">
-            <div className="container mx-auto p-6 lg:p-8 max-w-7xl">
-                <div className="mb-8">
+            <div className="container mx-auto p-6 lg:p-8 flex flex-col gap-y-6 max-w-7xl">
+                <div>
                     <h1 className="text-3xl lg:text-4xl font-bold text-foreground mb-2">
                         Dashboard
                     </h1>
@@ -88,9 +141,28 @@ function Home() {
                     </p>
                 </div>
 
-                <VacanciesList 
-                    vacancies={applications || []} 
+                <InterviewDashboard onAddInterview={handleAddInterview} />
+
+                <VacanciesList
+                    vacancies={applications || []}
                     onAddVacancy={handleAddVacancy}
+                    onEditVacancy={handleEditVacancy}
+                    onArchiveVacancy={handleArchiveVacancy}
+                    onViewVacancy={handleViewVacancy}
+                />
+
+                <VacancyModal
+                    isOpen={modalState.isOpen}
+                    onClose={handleCloseModal}
+                    mode={modalState.mode}
+                    vacancy={modalState.vacancy}
+                />
+
+                <VacancyDetailModal
+                    isOpen={detailModalState.isOpen}
+                    vacancy={detailModalState.vacancy}
+                    onClose={handleCloseDetailModal}
+                    onEdit={handleEditVacancy}
                 />
             </div>
         </main>

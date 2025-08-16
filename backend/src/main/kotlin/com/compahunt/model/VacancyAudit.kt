@@ -13,6 +13,9 @@ data class VacancyAudit(
     @Column(nullable = false)
     val vacancyId: Long,
 
+    @Column(nullable = false)
+    val userId: Long,
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     val action: AuditAction,
@@ -31,7 +34,11 @@ data class VacancyAudit(
 
     val timestamp: LocalDateTime = LocalDateTime.now(),
 
-    val reason: String? = null
+    val reason: String? = null,
+
+    val userAgent: String? = null,
+
+    val ipAddress: String? = null
 )
 
 enum class AuditAction {

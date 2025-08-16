@@ -2,6 +2,8 @@
 
 @plugin 'tailwindcss-animate';
 
+@source "../shared/src/**/*.{js,ts,jsx,tsx}";
+
 @custom-variant dark (&:is(class *));
 
 @theme {
@@ -191,21 +193,21 @@
   * {
     box-sizing: border-box;
   }
-  
+
   .line-clamp-1 {
     overflow: hidden;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 1;
   }
-  
+
   .line-clamp-2 {
     overflow: hidden;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
   }
-  
+
   .line-clamp-3 {
     overflow: hidden;
     display: -webkit-box;

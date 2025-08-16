@@ -16,12 +16,12 @@ interface TitleProps extends React.HTMLAttributes<HTMLElement> {
 }
 
 const titleSizeClasses: Record<TitleLevel, string> = {
-    1: 'text-2xl sm:text-4xl lg:text-5xl',  // 24px -> 36px -> 48px
-    2: 'text-xl sm:text-3xl lg:text-4xl',   // 20px -> 30px -> 36px
-    3: 'text-lg sm:text-2xl lg:text-3xl',   // 18px -> 24px -> 30px
-    4: 'text-base sm:text-xl lg:text-2xl',  // 16px -> 20px -> 24px
-    5: 'text-sm sm:text-lg lg:text-xl',     // 14px -> 18px -> 20px
-    6: 'text-sm sm:text-base lg:text-lg',   // 14px -> 16px -> 18px
+    1: 'text-2xl',
+    2: 'text-xl',
+    3: 'text-lg',
+    4: 'text-base',
+    5: 'text-sm',
+    6: 'text-xs',
 };
 
 const titleVariantClasses: Record<TitleVariant, string> = {

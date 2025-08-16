@@ -19,6 +19,10 @@ data class Vacancy(
     @JoinColumn(name = "company_id", nullable = false)
     val company: Company,
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    val user: User,
+
     @Column(nullable = false)
     val location: String,
 
@@ -39,11 +43,17 @@ data class Vacancy(
     @Column(name = "skill")
     val skills: List<String> = listOf(),
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    val status: VacancyStatus = VacancyStatus.APPLIED,
+
+    val appliedAt: LocalDateTime = LocalDateTime.now(),
+
     val postedDate: String? = null,
 
     val applicantCount: Int? = null,
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 1024)
     val url: String,
 
     @Embedded
@@ -53,6 +63,18 @@ data class Vacancy(
     val remoteness: String? = null,
 
     val industry: String? = null,
+
+    val benefits: String? = null,
+
+    val workType: String? = null,
+
+    val experience: String? = null,
+
+    @OneToMany(mappedBy = "vacancy", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    val interviews: List<Interview> = listOf(),
+
+    @OneToMany(mappedBy = "vacancy", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    val notes: List<VacancyNote> = listOf(),
 
     @Column(nullable = false)
     val deleted: Boolean = false,
@@ -75,4 +97,14 @@ enum class JobType {
     ON_SITE,
     REMOTE,
     HYBRID
+}
+
+enum class VacancyStatus {
+    APPLIED,
+    VIEWED,
+    PHONE_SCREEN,
+    INTERVIEW,
+    OFFER,
+    REJECTED,
+    ARCHIVED
 }

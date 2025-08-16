@@ -15,11 +15,11 @@ interface TextProps extends React.HTMLAttributes<HTMLElement> {
 }
 
 const textSizeClasses: Record<TextSize, string> = {
-    xs: 'text-xs sm:text-xs',     // 12px -> 12px
-    sm: 'text-sm sm:text-sm',     // 14px -> 14px
-    base: 'text-sm sm:text-base', // 14px -> 16px
-    lg: 'text-base sm:text-lg',   // 16px -> 18px
-    xl: 'text-lg sm:text-xl',     // 18px -> 20px
+    xs: 'text-xs',
+    sm: 'text-sm',
+    base: 'text-sm',
+    lg: 'text-base',
+    xl: 'text-lg',
 };
 
 const textVariantClasses: Record<TextVariant, string> = {

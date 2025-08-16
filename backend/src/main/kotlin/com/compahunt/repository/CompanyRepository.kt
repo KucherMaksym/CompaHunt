@@ -8,7 +8,7 @@ import java.util.Optional
 @Repository
 interface CompanyRepository : JpaRepository<Company, Long> {
 
-    fun findByName(name: String): Optional<Company>
+    fun findByName(name: String): Company?
 
     fun existsByName(name: String): Boolean
 }

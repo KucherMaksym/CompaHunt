@@ -10,12 +10,22 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { ExternalLink, MapPin, Calendar, DollarSign } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { ExternalLink, MapPin, Calendar, DollarSign, MoreHorizontal, Edit, Archive } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import {getStatusColor} from "@/utils/vacancy-utils";
 
 interface VacanciesTableProps {
   vacancies: Vacancy[]
+  onEditVacancy?: (vacancy: Vacancy) => void
+  onArchiveVacancy?: (vacancyId: string) => void
+  onViewVacancy?: (vacancy: Vacancy) => void
 }
 
 function getStatusLabel(status: VacancyStatus): string {
@@ -42,7 +52,7 @@ function truncateText(text: string | undefined, maxLength: number): string {
   return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text
 }
 
-export function VacanciesTable({ vacancies }: VacanciesTableProps) {
+export function VacanciesTable({ vacancies, onEditVacancy, onArchiveVacancy, onViewVacancy }: VacanciesTableProps) {
   if (vacancies.length === 0) {
     return (
       <div className="text-center py-12 bg-background-surface rounded-lg border border-border">
@@ -67,12 +77,16 @@ export function VacanciesTable({ vacancies }: VacanciesTableProps) {
             <TableHead className="font-semibold">Salary</TableHead>
             <TableHead className="font-semibold">Status</TableHead>
             <TableHead className="font-semibold">Applied</TableHead>
-            <TableHead className="font-semibold w-12"></TableHead>
+            <TableHead className="font-semibold w-12">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {vacancies.map((vacancy) => (
-            <TableRow key={vacancy.id} className="group">
+            <TableRow 
+              key={vacancy.id} 
+              className="group cursor-pointer hover:bg-muted/30"
+              onClick={() => onViewVacancy?.(vacancy)}
+            >
               <TableCell className="min-w-[280px]">
                 <div className="space-y-1">
                   <h3 className="font-semibold text-foreground text-sm leading-tight">
@@ -101,7 +115,7 @@ export function VacanciesTable({ vacancies }: VacanciesTableProps) {
               <TableCell>
                 {vacancy.salary ? (
                   <div className="flex items-center gap-1 text-foreground text-sm font-medium">
-                    <DollarSign className="h-3 w-3 text-muted-foreground" />
+                    {/*<DollarSign className="h-3 w-3 text-muted-foreground" />*/}
                     ${vacancy.salary.toLocaleString()}
                   </div>
                 ) : (
@@ -123,16 +137,47 @@ export function VacanciesTable({ vacancies }: VacanciesTableProps) {
                 </div>
               </TableCell>
               <TableCell>
-                {vacancy.jobUrl && (
-                  <a 
-                    href={vacancy.jobUrl} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                  </a>
-                )}
+                <div className="flex items-center gap-1">
+                  {vacancy.jobUrl && (
+                    <a 
+                      href={vacancy.jobUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground p-1"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </a>
+                  )}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      {onEditVacancy && (
+                        <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onEditVacancy(vacancy); }}>
+                          <Edit className="mr-2 h-4 w-4" />
+                          Edit
+                        </DropdownMenuItem>
+                      )}
+                      {onArchiveVacancy && vacancy.status !== VacancyStatus.ARCHIVED && (
+                        <DropdownMenuItem 
+                          onClick={(e) => { e.stopPropagation(); onArchiveVacancy(vacancy.id); }}
+                          className="text-orange-600 focus:text-orange-600"
+                        >
+                          <Archive className="mr-2 h-4 w-4" />
+                          Archive
+                        </DropdownMenuItem>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               </TableCell>
             </TableRow>
           ))}

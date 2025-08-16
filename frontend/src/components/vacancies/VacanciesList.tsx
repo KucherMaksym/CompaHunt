@@ -7,13 +7,17 @@ import { VacanciesTable } from './VacanciesTable'
 import { VacanciesCards } from './VacanciesCards'
 import { Button } from '@/components/ui/button'
 import { Plus, Filter, Search } from 'lucide-react'
+import {Title} from "@/components/ui/Title";
 
 interface VacanciesListProps {
   vacancies: Vacancy[]
   onAddVacancy?: () => void
+  onEditVacancy?: (vacancy: Vacancy) => void
+  onArchiveVacancy?: (vacancyId: string) => void
+  onViewVacancy?: (vacancy: Vacancy) => void
 }
 
-export function VacanciesList({ vacancies, onAddVacancy }: VacanciesListProps) {
+export function VacanciesList({ vacancies, onAddVacancy, onEditVacancy, onArchiveVacancy, onViewVacancy }: VacanciesListProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('table')
   const [searchQuery, setSearchQuery] = useState('')
 
@@ -29,9 +33,9 @@ export function VacanciesList({ vacancies, onAddVacancy }: VacanciesListProps) {
       {/* Header */}
       <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
         <div>
-          <h2 className="text-2xl font-semibold text-foreground">
+          <Title level={4}>
             Job Applications
-          </h2>
+          </Title>
           <p className="text-muted-foreground text-sm mt-1">
             {vacancies.length === 0 
               ? 'No applications yet' 
@@ -116,9 +120,19 @@ export function VacanciesList({ vacancies, onAddVacancy }: VacanciesListProps) {
       {filteredVacancies.length > 0 && (
         <div className="animate-in fade-in-50 duration-200">
           {viewMode === 'table' ? (
-            <VacanciesTable vacancies={filteredVacancies} />
+            <VacanciesTable 
+              vacancies={filteredVacancies} 
+              onEditVacancy={onEditVacancy}
+              onArchiveVacancy={onArchiveVacancy}
+              onViewVacancy={onViewVacancy}
+            />
           ) : (
-            <VacanciesCards vacancies={filteredVacancies} />
+            <VacanciesCards 
+              vacancies={filteredVacancies}
+              onEditVacancy={onEditVacancy}
+              onArchiveVacancy={onArchiveVacancy}
+              onViewVacancy={onViewVacancy}
+            />
           )}
         </div>
       )}

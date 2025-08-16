@@ -2,6 +2,7 @@ package com.compahunt.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +14,8 @@ import java.util.Date;
 
 @Component
 public class JwtUtils {
+
+    private val log = LoggerFactory.getLogger(JwtUtils::class.java);
 
     @Value("\${app.jwt.public-key}")
     private lateinit var publicKeyString: String;
@@ -32,7 +35,6 @@ public class JwtUtils {
     }
 
     fun validateToken(token: String): Boolean {
-        println("token $token")
         return try {
             val publicKey = getPublicKey();
 
@@ -46,26 +48,25 @@ public class JwtUtils {
             val audience = claims.audience;
 
             if (issuer != "nextauth") {
-                println("Invalid issuer: $issuer");
+                log.error("Invalid issuer found: $issuer");
                 return false;
             }
 
             if (!audience.contains("compahunt-api")) {
-                println("Invalid audience: $audience");
+                log.error("Invalid audience found: $audience");
                 return false;
             }
 
             // expiration
             val expiration = claims.expiration;
             if (expiration.before(Date())) {
-                println("Token expired: $expiration");
+                log.error("Token expired: $expiration");
                 return false;
             }
 
-            println("Token validation successful");
             true;
         } catch (ex: Exception) {
-            println("Token validation failed: ${ex.message}");
+            log.error("Token validation failed: ${ex.message}");
             false;
         }
     }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react"
 import { LinkedInJobParser } from "~/lib/linkedin-parser"
 import type { JobData, ParseResult } from "~/lib/types"
+import "./compahunt-styles.css"
 
 const LinkedInOverlay = () => {
     const [isVisible, setIsVisible] = useState(true)
@@ -8,7 +9,7 @@ const LinkedInOverlay = () => {
     const [lastParsedData, setLastParsedData] = useState<JobData | null>(null)
     const [showResult, setShowResult] = useState(false)
 
-    // Check if we're on a valid LinkedIn job page
+  // Check if we're on a valid LinkedIn job page
     useEffect(() => {
         const checkJobPage = () => {
             const isJobPage = window.location.href.includes('linkedin.com/jobs/')
@@ -90,7 +91,7 @@ const LinkedInOverlay = () => {
                     top: '20px',
                     right: '20px',
                     zIndex: 10000,
-                    backgroundColor: '#0066cc',
+                    backgroundColor: 'var(--compahunt-primary)',
                     color: 'white',
                     border: 'none',
                     borderRadius: '50%',
@@ -111,7 +112,7 @@ const LinkedInOverlay = () => {
                     e.currentTarget.style.transform = 'scale(1.1)'
                 }}
                 onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#0066cc'
+                    e.currentTarget.style.backgroundColor = 'var(--compahunt-primary)'
                     e.currentTarget.style.transform = 'scale(1)'
                 }}
                 title="Parse LinkedIn Job"
@@ -167,7 +168,7 @@ const LinkedInOverlay = () => {
                             ×
                         </button>
 
-                        <h3 style={{ color: '#0066cc', marginTop: '0', marginBottom: '20px' }}>
+                        <h3 style={{ color: 'var(--compahunt-primary)', marginTop: '0', marginBottom: '20px' }}>
                             📋 Parsed Job Data
                         </h3>
 
@@ -200,7 +201,7 @@ const LinkedInOverlay = () => {
                                                 style={{
                                                     display: 'inline-block',
                                                     backgroundColor: '#e8f4fd',
-                                                    color: '#0066cc',
+                                                    color: 'var(--compahunt-primary)',
                                                     padding: '4px 8px',
                                                     borderRadius: '12px',
                                                     fontSize: '12px',
@@ -239,7 +240,7 @@ const LinkedInOverlay = () => {
                         <div style={{ marginTop: '20px', textAlign: 'center' }}>
                             <button
                                 style={{
-                                    backgroundColor: '#0066cc',
+                                    backgroundColor: 'var(--compahunt-primary)',
                                     color: 'white',
                                     border: 'none',
                                     padding: '12px 24px',
@@ -256,7 +257,7 @@ const LinkedInOverlay = () => {
                             </button>
                             <button
                                 style={{
-                                    backgroundColor: '#0066cc',
+                                    backgroundColor: 'var(--compahunt-primary)',
                                     color: 'white',
                                     border: 'none',
                                     padding: '12px 24px',

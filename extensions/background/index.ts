@@ -66,8 +66,8 @@ async function isTokenValid(token: string): Promise<boolean> {
 }
 
 async function getValidToken(): Promise<string | null> {
-    let token = await storage.get("authToken")
-    const tokenExpiry = await storage.get("tokenExpiry")
+    let token = await storage.get("authToken");
+    const tokenExpiry = Number(await storage.get("tokenExpiry"));
     
     // Check if token exists and hasn't expired
     if (token && tokenExpiry && Date.now() < tokenExpiry) {

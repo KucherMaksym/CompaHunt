@@ -7,22 +7,28 @@ import jakarta.validation.Valid
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
+import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import com.compahunt.util.JwtUtils
 
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = ["http://localhost:3000"])
 class AuthController(
     private val userRepository: UserRepository,
-    private val passwordEncoder: PasswordEncoder
+    private val passwordEncoder: PasswordEncoder,
+    private val jwtUtils: JwtUtils
 ) {
+
+    private val log = LoggerFactory.getLogger(AuthController::class.java);
 
     @PostMapping("/validate-credentials")
     fun validateCredentials(@RequestBody request: LoginRequest): ResponseEntity<*> {
@@ -82,15 +88,15 @@ class AuthController(
                     provider = AuthProvider.GOOGLE,
                     providerId = request.googleId
                 )
-                userRepository.save(user)
-                println("Created new Google user: ${request.email}")
+                val userDb = userRepository.save(user)
+                log.info("Created new Google user: ${userDb.id}")
             } else {
                 if (user.provider != AuthProvider.GOOGLE) {
                     user.provider = AuthProvider.GOOGLE
                     user.providerId = request.googleId
-                    userRepository.save(user)
+                    val userDb = userRepository.save(user)
+                    log.info("Synced existing Google user: ${userDb.id}")
                 }
-                println("Synced existing Google user: ${request.email}")
             }
 
             ResponseEntity.ok(mapOf(
@@ -99,10 +105,41 @@ class AuthController(
                 "name" to user.name
             ))
         } catch (ex: Exception) {
-            println("Error syncing Google user: ${ex.message}")
+            log.error("Error syncing Google user: ${ex.message}")
             ex.printStackTrace()
             ResponseEntity.badRequest()
                 .body(mapOf("message" to "Failed to sync user"))
+        }
+    }
+
+    @GetMapping("/validate")
+    fun validateToken(@RequestHeader("Authorization") authHeader: String): ResponseEntity<*> {
+        return try {
+            val token = authHeader.removePrefix("Bearer ").trim()
+            
+            if (jwtUtils.validateToken(token)) {
+                val userId = jwtUtils.getUserIdFromToken(token)
+                val email = jwtUtils.getEmailFromToken(token)
+                val name = jwtUtils.getNameFromToken(token)
+                
+                ResponseEntity.ok(mapOf(
+                    "valid" to true,
+                    "userId" to userId,
+                    "email" to email,
+                    "name" to name
+                ))
+            } else {
+                ResponseEntity.status(401).body(mapOf(
+                    "valid" to false,
+                    "message" to "Invalid token"
+                ))
+            }
+        } catch (ex: Exception) {
+            log.error("Token validation error: ${ex.message}")
+            ResponseEntity.status(401).body(mapOf(
+                "valid" to false,
+                "message" to "Token validation failed"
+            ))
         }
     }
 
