@@ -19,8 +19,6 @@
       }
     ],
     "paths": {
-      "@compahunt/shared": ["../shared/index"],
-      "@compahunt/shared/*": ["../shared/*"],
       "@/*": ["./src/*"]
     }
   },

@@ -40,6 +40,7 @@ import {getInterviewStatusColor} from "@/utils/interview-utils";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
 import { interviewApi } from '@/lib/api/interviews';
 import EditInterviewModal from '@/components/interviews/EditInterviewModal';
+import {formatMeetingLink} from "@/utils/url-utils";
 
 interface VacancyModalProps {
   isOpen: boolean
@@ -816,7 +817,7 @@ export function VacancyModal({ isOpen, onClose, vacancy, mode }: VacancyModalPro
                                             <div className="flex items-center gap-2">
                                               <Video className="h-4 w-4" />
                                               <a 
-                                                href={interview.meetingLink} 
+                                                href={formatMeetingLink(interview.meetingLink)}
                                                 target="_blank" 
                                                 rel="noopener noreferrer"
                                                 className="text-primary hover:underline"

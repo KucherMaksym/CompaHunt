@@ -51,7 +51,7 @@ export function VacancyDetailModal({ vacancy, isOpen, onClose, onEdit }: Vacancy
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-6xl min-w-[calc(100vw-2rem)] lg:min-w-[700px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-start justify-between">
             <div className="flex-1 min-w-0">
