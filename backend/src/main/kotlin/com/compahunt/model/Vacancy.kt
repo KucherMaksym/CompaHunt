@@ -53,7 +53,7 @@ data class Vacancy(
 
     val applicantCount: Int? = null,
 
-    @Column(nullable = false, unique = true, length = 1024)
+    @Column(nullable = false, length = 1024)
     val url: String,
 
     @Embedded
@@ -75,6 +75,9 @@ data class Vacancy(
 
     @OneToMany(mappedBy = "vacancy", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     val notes: List<VacancyNote> = listOf(),
+
+    @Column(name = "manual", nullable = false, columnDefinition = "boolean default true")
+    val manual: Boolean = false,
 
     @Column(nullable = false)
     val deleted: Boolean = false,

@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import jakarta.servlet.http.HttpServletRequest
+import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -23,6 +24,8 @@ class VacancyService(
     private val vacancyAuditRepository: VacancyAuditRepository,
     private val userRepository: UserRepository
 ) {
+
+    private val log = LoggerFactory.getLogger(VacancyService::class.java)
 
     private val objectMapper = jacksonObjectMapper()
     private val dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
@@ -36,7 +39,8 @@ class VacancyService(
             .orElseThrow { UnauthorizedException("User not found") }
 
         // Check for duplicate URL for this user
-        if (vacancyRepository.findByUserIdAndUrl(userId, request.url).isPresent) {
+        if (request.url.trim().isNotEmpty() && vacancyRepository.findByUserIdAndUrl(userId, request.url).isPresent) {
+            log.error("")
             throw DuplicateVacancyException("Vacancy with this URL already exists for user")
         }
 
@@ -61,7 +65,8 @@ class VacancyService(
             industry = request.industry,
             benefits = request.benefits,
             workType = request.workType,
-            experience = request.experience
+            experience = request.experience,
+            manual = request.manual,
         )
 
         val savedVacancy = vacancyRepository.save(vacancy)
@@ -330,7 +335,8 @@ class VacancyService(
             experience = vacancy.experience,
             createdAt = vacancy.createdAt.format(dateFormatter),
             updatedAt = vacancy.updatedAt.format(dateFormatter),
-            lastUpdated = vacancy.updatedAt.format(dateFormatter)
+            lastUpdated = vacancy.updatedAt.format(dateFormatter),
+            manual = vacancy.manual
         )
     }
 

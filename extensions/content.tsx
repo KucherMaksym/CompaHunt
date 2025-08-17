@@ -37,7 +37,7 @@ const LinkedInOverlay = () => {
             const result: ParseResult = parser.parseJobPage()
 
             if (result.success && result.data) {
-                setLastParsedData(result.data)
+                setLastParsedData({ manual: false,  ...result.data })
                 setShowResult(true)
 
                 // Save to browser storage

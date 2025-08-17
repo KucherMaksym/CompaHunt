@@ -15,7 +15,8 @@ import {
   User,
   FileText,
   Star,
-  Edit
+  Edit,
+  MousePointer
 } from 'lucide-react'
 import { formatDistanceToNow, format } from 'date-fns'
 import { getStatusColor } from "@/utils/vacancy-utils"
@@ -51,7 +52,7 @@ function getStatusLabel(status: VacancyStatus): string {
 
 export function VacancyDetailModal({ vacancy, isOpen, onClose, onEdit }: VacancyDetailModalProps) {
   if (!vacancy) return null
-
+false
   const handleEdit = () => {
     if (onEdit) {
       onEdit(vacancy)
@@ -152,6 +153,18 @@ export function VacancyDetailModal({ vacancy, isOpen, onClose, onEdit }: Vacancy
                     </Text>
                     <Text size="base">
                       {vacancy.experience || "N/A"}
+                    </Text>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <MousePointer className="h-5 w-5 text-muted-foreground mt-0.5 flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <Text size="sm" variant="muted" weight="medium" className="mb-1">
+                      Added Method
+                    </Text>
+                    <Text size="base">
+                      {vacancy.manual === true ? "Manual Entry" : "Parsed from Website"}
                     </Text>
                   </div>
                 </div>

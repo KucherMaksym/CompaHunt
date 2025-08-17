@@ -13,6 +13,7 @@ export interface JobData {
     salary?: Salary
     remoteness?: string
     industry?: string
+    manual: boolean
 }
 
 export interface ParseResult {

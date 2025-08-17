@@ -20,6 +20,7 @@ export interface Vacancy {
   experience?: string;
   url?: string;
   lastUpdated?: string;
+  manual?: boolean;
 }
 
 export enum VacancyStatus {

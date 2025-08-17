@@ -45,7 +45,9 @@ data class CreateVacancyRequest(
 
     val workType: String? = null,
 
-    val experience: String? = null
+    val experience: String? = null,
+
+    val manual: Boolean = false
 )
 
 data class UpdateVacancyRequest(
@@ -90,6 +92,7 @@ data class VacancyResponse(
     val benefits: String?,
     val workType: String?,
     val experience: String?,
+    val manual: Boolean,
     val createdAt: String,
     val updatedAt: String,
     val lastUpdated: String?

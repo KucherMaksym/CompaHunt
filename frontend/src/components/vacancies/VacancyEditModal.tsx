@@ -60,7 +60,7 @@ interface VacancyFormData {
   benefits: string
   workType: 'remote' | 'office' | 'hybrid' | ''
   experience: string
-  jobUrl: string
+  url: string
 }
 
 interface InterviewFormData {
@@ -87,7 +87,7 @@ const getInterviewTypeIcon = (type: InterviewType) => {
   return iconMap[type] || Calendar
 }
 
-export function VacancyModal({ isOpen, onClose, vacancy, mode }: VacancyModalProps) {
+export function VacancyEditModal({ isOpen, onClose, vacancy, mode }: VacancyModalProps) {
   const queryClient = useQueryClient()
   const [activeTab, setActiveTab] = useState('details')
   const [showInterviewForm, setShowInterviewForm] = useState(false)
@@ -104,7 +104,7 @@ export function VacancyModal({ isOpen, onClose, vacancy, mode }: VacancyModalPro
     benefits: '',
     workType: '',
     experience: '',
-    jobUrl: ''
+    url: ''
   })
 
   const [interviewData, setInterviewData] = useState<InterviewFormData>({
@@ -142,7 +142,7 @@ export function VacancyModal({ isOpen, onClose, vacancy, mode }: VacancyModalPro
         benefits: vacancy.benefits || '',
         workType: vacancy.workType || '',
         experience: vacancy.experience || '',
-        jobUrl: vacancy.jobUrl || ''
+        url: vacancy.url || ''
       })
     } else {
       setFormData({
@@ -156,7 +156,7 @@ export function VacancyModal({ isOpen, onClose, vacancy, mode }: VacancyModalPro
         benefits: '',
         workType: '',
         experience: '',
-        jobUrl: ''
+        url: ''
       })
     }
     setActiveTab('details')
@@ -176,7 +176,8 @@ export function VacancyModal({ isOpen, onClose, vacancy, mode }: VacancyModalPro
         benefits: data.benefits || null,
         workType: data.workType || null,
         experience: data.experience || null,
-        url: data.jobUrl
+        url: data.url,
+        manual: true, // manually added
       }
       return await apiClient.post('/api/vacancies', payload)
     },
@@ -321,9 +322,9 @@ export function VacancyModal({ isOpen, onClose, vacancy, mode }: VacancyModalPro
                 )}
               </div>
             </div>
-            {vacancy?.jobUrl && (
+            {vacancy?.url && (
               <Button variant="outline" size="sm" asChild>
-                <a href={vacancy.jobUrl} target="_blank" rel="noopener noreferrer">
+                <a href={vacancy.url} target="_blank" rel="noopener noreferrer">
                   <ExternalLink className="h-4 w-4 mr-2" />
                   View Job
                 </a>
@@ -460,15 +461,15 @@ export function VacancyModal({ isOpen, onClose, vacancy, mode }: VacancyModalPro
                         </div>
 
                         <div className="space-y-2">
-                          <Label htmlFor="jobUrl" className="text-sm font-medium flex items-center gap-1">
+                          <Label htmlFor="url" className="text-sm font-medium flex items-center gap-1">
                             <Link className="h-4 w-4" />
                             Job URL
                           </Label>
                           <Input
-                            id="jobUrl"
+                            id="url"
                             type="url"
-                            value={formData.jobUrl}
-                            onChange={(e) => handleInputChange('jobUrl', e.target.value)}
+                            value={formData.url}
+                            onChange={(e) => handleInputChange('url', e.target.value)}
                             placeholder="https://..."
                             className="h-10"
                           />

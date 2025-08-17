@@ -50,57 +50,44 @@ class VacancyController(
         authentication: Authentication,
         request: HttpServletRequest
     ): ResponseEntity<Map<String, Any>> {
-        return try {
-            val userId = getUserId(authentication)
-            val vacancyRequest = CreateVacancyRequest(
-                title = (jobData["title"] as? Map<String, Any?>)?.get("name") as? String ?: jobData["title"] as String,
-                company = (jobData["company"] as? Map<String, Any?>)?.get("name") as? String ?: jobData["company"] as String,
-                location = jobData["location"] as? String ?: "",
-                jobType = jobData["jobType"] as? String,
-                experienceLevel = jobData["experienceLevel"] as? String,
-                description = jobData["description"] as? String ?: "",
-                requirements = (jobData["requirements"] as? List<*>)?.filterIsInstance<String>() ?: listOf(),
-                skills = (jobData["skills"] as? List<*>)?.filterIsInstance<String>() ?: listOf(),
-                status = VacancyStatus.valueOf((jobData["status"] as? String) ?: "APPLIED"),
-                postedDate = jobData["postedDate"] as? String,
-                applicantCount = (jobData["applicantCount"] as? Number)?.toInt(),
-                url = jobData["jobUrl"] as? String ?: jobData["url"] as String,
-                salary = (jobData["salary"] as? Map<String, Any?>)?.let { salaryData ->
-                    Salary(
-                        range = salaryData["range"] as? String ?: "",
-                        currency = salaryData["currency"] as? String ?: "USD",
-                        period = salaryData["period"] as? String ?: "year",
-                        type = salaryData["type"] as? String ?: "gross",
-                        location = salaryData["location"] as? String ?: (jobData["location"] as? String ?: "")
-                    )
-                },
-                remoteness = jobData["remoteness"] as? String,
-                industry = jobData["industry"] as? String,
-                benefits = jobData["benefits"] as? String,
-                workType = jobData["workType"] as? String,
-                experience = jobData["experience"] as? String
-            )
+        val userId = getUserId(authentication)
+        val vacancyRequest = CreateVacancyRequest(
+            title = (jobData["title"] as? Map<String, Any?>)?.get("name") as? String ?: jobData["title"] as String,
+            company = (jobData["company"] as? Map<String, Any?>)?.get("name") as? String ?: jobData["company"] as String,
+            location = jobData["location"] as? String ?: "",
+            jobType = jobData["jobType"] as? String,
+            experienceLevel = jobData["experienceLevel"] as? String,
+            description = jobData["description"] as? String ?: "",
+            requirements = (jobData["requirements"] as? List<*>)?.filterIsInstance<String>() ?: listOf(),
+            skills = (jobData["skills"] as? List<*>)?.filterIsInstance<String>() ?: listOf(),
+            status = VacancyStatus.valueOf((jobData["status"] as? String) ?: "APPLIED"),
+            postedDate = jobData["postedDate"] as? String,
+            applicantCount = (jobData["applicantCount"] as? Number)?.toInt(),
+            url = jobData["jobUrl"] as? String ?: jobData["url"] as String,
+            salary = (jobData["salary"] as? Map<String, Any?>)?.let { salaryData ->
+                Salary(
+                    range = salaryData["range"] as? String ?: "",
+                    currency = salaryData["currency"] as? String ?: "USD",
+                    period = salaryData["period"] as? String ?: "year",
+                    type = salaryData["type"] as? String ?: "gross",
+                    location = salaryData["location"] as? String ?: (jobData["location"] as? String ?: "")
+                )
+            },
+            remoteness = jobData["remoteness"] as? String,
+            industry = jobData["industry"] as? String,
+            benefits = jobData["benefits"] as? String,
+            workType = jobData["workType"] as? String,
+            experience = jobData["experience"] as? String,
+            manual = jobData["manual"] as? Boolean ?: true,
+        )
 
-            val vacancy = vacancyService.createVacancy(vacancyRequest, userId, request)
-            ResponseEntity.status(HttpStatus.CREATED).body(mapOf(
-                "success" to true,
-                "message" to "Application saved successfully",
-                "id" to vacancy.id,
-                "vacancy" to vacancy
-            ))
-        } catch (e: IllegalArgumentException) {
-            ResponseEntity.badRequest().body(mapOf(
-                "success" to false,
-                "message" to e.message,
-                "error" to "DUPLICATE_URL"
-            ))
-        } catch (e: Exception) {
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(mapOf(
-                "success" to false,
-                "message" to "Failed to save application",
-                "error" to e.message
-            ))
-        } as ResponseEntity<Map<String, Any>>
+        val vacancy = vacancyService.createVacancy(vacancyRequest, userId, request)
+        return ResponseEntity.status(HttpStatus.CREATED).body(mapOf(
+            "success" to true,
+            "message" to "Application saved successfully",
+            "id" to vacancy.id,
+            "vacancy" to vacancy
+        ))
     }
 
     @GetMapping("/{id}")
@@ -108,13 +95,9 @@ class VacancyController(
         @PathVariable id: Long,
         authentication: Authentication
     ): ResponseEntity<VacancyResponse> {
-        return try {
-            val userId = getUserId(authentication)
-            val vacancy = vacancyService.getVacancy(id, userId)
-            ResponseEntity.ok(vacancy)
-        } catch (e: Exception) {
-            ResponseEntity.notFound().build()
-        }
+        val userId = getUserId(authentication)
+        val vacancy = vacancyService.getVacancy(id, userId)
+        return ResponseEntity.ok(vacancy)
     }
 
     @PutMapping("/{id}")
@@ -124,13 +107,9 @@ class VacancyController(
         authentication: Authentication,
         request: HttpServletRequest
     ): ResponseEntity<VacancyResponse> {
-        return try {
-            val userId = getUserId(authentication)
-            val vacancy = vacancyService.updateVacancy(id, updateRequest, userId, request)
-            ResponseEntity.ok(vacancy)
-        } catch (e: Exception) {
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
-        }
+        val userId = getUserId(authentication)
+        val vacancy = vacancyService.updateVacancy(id, updateRequest, userId, request)
+        return ResponseEntity.ok(vacancy)
     }
 
     @PatchMapping("/{id}/status")
@@ -140,13 +119,9 @@ class VacancyController(
         authentication: Authentication,
         request: HttpServletRequest
     ): ResponseEntity<VacancyResponse> {
-        return try {
-            val userId = getUserId(authentication)
-            val vacancy = vacancyService.updateStatus(id, statusRequest.status, userId, request)
-            ResponseEntity.ok(vacancy)
-        } catch (e: Exception) {
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
-        }
+        val userId = getUserId(authentication)
+        val vacancy = vacancyService.updateStatus(id, statusRequest.status, userId, request)
+        return ResponseEntity.ok(vacancy)
     }
 
     @DeleteMapping("/{id}")
@@ -156,26 +131,19 @@ class VacancyController(
         authentication: Authentication,
         request: HttpServletRequest
     ): ResponseEntity<Map<String, Any>> {
-        return try {
-            val userId = getUserId(authentication)
-            val success = vacancyService.archiveVacancy(id, userId, reason ?: "Archived from dashboard", request)
-            if (success) {
-                ResponseEntity.ok(mapOf(
-                    "success" to true,
-                    "message" to "Application archived successfully"
-                ))
-            } else {
-                ResponseEntity.badRequest().body(mapOf(
-                    "success" to false,
-                    "message" to "Failed to archive application"
-                ))
-            }
-        } catch (e: Exception) {
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(mapOf(
-                "success" to false,
-                "message" to e.message
+        val userId = getUserId(authentication)
+        val success = vacancyService.archiveVacancy(id, userId, reason ?: "Archived from dashboard", request)
+        return if (success) {
+            ResponseEntity.ok(mapOf(
+                "success" to true,
+                "message" to "Application archived successfully"
             ))
-        } as ResponseEntity<Map<String, Any>>
+        } else {
+            ResponseEntity.badRequest().body(mapOf(
+                "success" to false,
+                "message" to "Failed to archive application"
+            ))
+        }
     }
 
     @GetMapping("/{id}/audit")
@@ -183,13 +151,9 @@ class VacancyController(
         @PathVariable id: Long,
         authentication: Authentication
     ): ResponseEntity<List<VacancyAuditResponse>> {
-        return try {
-            val userId = getUserId(authentication)
-            val auditHistory = vacancyService.getAuditHistory(id, userId)
-            ResponseEntity.ok(auditHistory)
-        } catch (e: Exception) {
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
-        }
+        val userId = getUserId(authentication)
+        val auditHistory = vacancyService.getAuditHistory(id, userId)
+        return ResponseEntity.ok(auditHistory)
     }
 
     @GetMapping("/{id}/interviews")
@@ -197,13 +161,9 @@ class VacancyController(
         @PathVariable id: Long,
         authentication: Authentication
     ): ResponseEntity<List<InterviewResponse>> {
-        return try {
-            val userId = getUserId(authentication)
-            val interviews = interviewService.getInterviewsByVacancy(id, userId)
-            ResponseEntity.ok(interviews)
-        } catch (e: Exception) {
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
-        }
+        val userId = getUserId(authentication)
+        val interviews = interviewService.getInterviewsByVacancy(id, userId)
+        return ResponseEntity.ok(interviews)
     }
 
     @PostMapping("/{id}/interviews")
@@ -212,19 +172,12 @@ class VacancyController(
         @RequestBody interviewRequest: CreateInterviewRequest,
         authentication: Authentication
     ): ResponseEntity<Map<String, Any>> {
-        return try {
-            val userId = getUserId(authentication)
-            val interview = interviewService.createInterview(interviewRequest, userId)
-            ResponseEntity.status(HttpStatus.CREATED).body(mapOf(
-                "success" to true,
-                "interview" to interview
-            ))
-        } catch (e: Exception) {
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(mapOf(
-                "success" to false,
-                "message" to e.message
-            ))
-        } as ResponseEntity<Map<String, Any>>
+        val userId = getUserId(authentication)
+        val interview = interviewService.createInterview(interviewRequest, userId)
+        return ResponseEntity.status(HttpStatus.CREATED).body(mapOf(
+            "success" to true,
+            "interview" to interview
+        ))
     }
 
     @PostMapping("/{id}/notes")
@@ -233,19 +186,12 @@ class VacancyController(
         @RequestBody noteRequest: CreateNoteRequest,
         authentication: Authentication
     ): ResponseEntity<Map<String, Any>> {
-        return try {
-            val userId = getUserId(authentication)
-            val note = vacancyNoteService.createNote(noteRequest, userId)
-            ResponseEntity.status(HttpStatus.CREATED).body(mapOf(
-                "success" to true,
-                "note" to note
-            ))
-        } catch (e: Exception) {
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(mapOf(
-                "success" to false,
-                "message" to e.message
-            ))
-        } as ResponseEntity<Map<String, Any>>
+        val userId = getUserId(authentication)
+        val note = vacancyNoteService.createNote(noteRequest, userId)
+        return ResponseEntity.status(HttpStatus.CREATED).body(mapOf(
+            "success" to true,
+            "note" to note
+        ))
     }
 
     private fun getUserId(authentication: Authentication): Long {

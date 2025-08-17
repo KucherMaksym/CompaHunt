@@ -5,7 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import apiClient from "@/lib/api-client";
 import dynamic from 'next/dynamic'
 import { VacanciesList } from "@/components/vacancies/VacanciesList"
-import { VacancyModal } from "@/components/vacancies/VacancyModal"
+import { VacancyEditModal } from "@/components/vacancies/VacancyEditModal"
 import { VacancyDetailModal } from "@/components/vacancies/VacancyDetailModal"
 import { InterviewDashboard } from "@/components/dashboard/InterviewDashboard"
 import { Vacancy, VacancyStatus } from "@/types/vacancy"
@@ -20,27 +20,7 @@ async function fetchApplications(): Promise<Vacancy[]> {
     const response = await apiClient.getD<any[]>("/api/vacancies");
     
     // Transform API response to match our Vacancy type
-    return (response || []).map((app: any): Vacancy => ({
-        id: app.id || Math.random().toString(36),
-        title: app.title || 'Unknown Position',
-        company: {
-            id: app.company?.id || Math.random().toString(36),
-            name: app.company?.name || 'Unknown Company',
-            website: app.company?.website,
-            logoUrl: app.company?.logoUrl
-        },
-        location: app.location,
-        salary: app.salary,
-        status: app.status as VacancyStatus || VacancyStatus.APPLIED,
-        appliedAt: app.appliedAt || app.createdAt || new Date().toISOString(),
-        description: app.description,
-        requirements: app.requirements,
-        benefits: app.benefits,
-        workType: app.workType,
-        experience: app.experience,
-        url: app.url,
-        lastUpdated: app.lastUpdated || app.updatedAt
-    }));
+    return response || [];
 }
 
 function Home() {
@@ -151,7 +131,7 @@ function Home() {
                     onViewVacancy={handleViewVacancy}
                 />
 
-                <VacancyModal
+                <VacancyEditModal
                     isOpen={modalState.isOpen}
                     onClose={handleCloseModal}
                     mode={modalState.mode}
