@@ -25,7 +25,7 @@ import { interviewApi } from "@/lib/api/interviews";
 import { getInterviewStatusColor } from "@/utils/interview-utils";
 import { Button } from "@/components/ui/button";
 import { InterviewDetailModal } from "@/components/interviews/InterviewDetailModal";
-import {formatMeetingLink} from "@/utils/url-utils";
+import {formatShortLink} from "@/utils/url-utils";
 
 interface InterviewCalendarProps {
   selectedDate?: Date;
@@ -227,7 +227,7 @@ export function InterviewCalendar({ selectedDate, onDateSelect, onAddInterview }
                                   <div className="flex items-center gap-2 text-xs">
                                     <Video className="h-3 w-3 flex-shrink-0 text-muted-foreground" />
                                     <a
-                                        href={formatMeetingLink(interview.meetingLink)}
+                                        href={formatShortLink(interview.meetingLink)}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="text-primary hover:underline truncate"

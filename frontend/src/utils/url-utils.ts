@@ -1,4 +1,4 @@
-export function formatMeetingLink(link: string | undefined): string {
+export function formatShortLink(link: string | undefined): string {
     if (!link) return ''
 
     if (link.startsWith('http://') || link.startsWith('https://')) {

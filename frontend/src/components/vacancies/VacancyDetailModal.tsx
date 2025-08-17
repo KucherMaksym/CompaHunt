@@ -4,10 +4,10 @@ import { Vacancy, VacancyStatus } from '@/types/vacancy'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
-import { 
-  MapPin, 
-  Calendar, 
-  DollarSign, 
+import {
+  MapPin,
+  Calendar,
+  DollarSign,
   Building2,
   Clock,
   Briefcase,
@@ -19,6 +19,9 @@ import {
 } from 'lucide-react'
 import { formatDistanceToNow, format } from 'date-fns'
 import { getStatusColor } from "@/utils/vacancy-utils"
+import { Title } from "@/components/ui/Title"
+import { Text } from "@/components/ui/Text"
+import {formatShortLink} from "@/utils/url-utils";
 
 interface VacancyDetailModalProps {
   vacancy: Vacancy | null
@@ -49,173 +52,214 @@ function getStatusLabel(status: VacancyStatus): string {
 export function VacancyDetailModal({ vacancy, isOpen, onClose, onEdit }: VacancyDetailModalProps) {
   if (!vacancy) return null
 
+  const handleEdit = () => {
+    if (onEdit) {
+      onEdit(vacancy)
+    }
+  }
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl min-w-[calc(100vw-2rem)] lg:min-w-[700px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <div className="flex items-start justify-between">
-            <div className="flex-1 min-w-0">
-              <DialogTitle className="text-2xl font-bold text-foreground mb-2 pr-8">
-                {vacancy.title}
-              </DialogTitle>
-              <DialogDescription className="flex items-center gap-2 text-lg text-muted-foreground">
-                <Building2 className="h-5 w-5" />
-                <span className="font-medium">{vacancy.company.name}</span>
-              </DialogDescription>
-            </div>
-            <div className="flex items-center gap-2">
-              <Badge 
-                variant="outline" 
-                className={`text-sm font-medium ${getStatusColor(vacancy.status)}`}
-              >
-                {getStatusLabel(vacancy.status)}
-              </Badge>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="max-w-[calc(100vw-2rem)] min-w-[calc(100vw-2rem)] md:min-w-[700px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="space-y-4">
+            {/* Header Section */}
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <DialogTitle className="text-2xl font-bold text-foreground mb-2 pr-8">
+                  {vacancy.title}
+                </DialogTitle>
+                <div className="flex items-center gap-2 mb-3">
+                  <Building2 className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                  <Text size="lg" variant="secondary" weight="medium">
+                    {vacancy.company.name}
+                  </Text>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Badge
+                      variant="outline"
+                      className={`text-sm font-medium ${getStatusColor(vacancy.status)}`}
+                  >
+                    {getStatusLabel(vacancy.status)}
+                  </Badge>
+                  <div className="flex items-center gap-1 text-muted-foreground">
+                    <Calendar className="h-4 w-4" />
+                    <Text size="sm" variant="muted">
+                      Applied {formatDistanceToNow(new Date(vacancy.appliedAt), { addSuffix: true })}
+                    </Text>
+                  </div>
+                </div>
+              </div>
               {onEdit && (
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => onEdit(vacancy)}
-                  className="flex items-center gap-2"
-                >
-                  <Edit className="h-4 w-4" />
-                  Edit
-                </Button>
+                  <button
+                      onClick={handleEdit}
+                      className="absolute right-10 top-4 text-primary cursor-pointer opacity-70 hover:opacity-100 transition duration-200"
+                  >
+                    <Edit className="h-4 w-4" />
+                  </button>
               )}
             </div>
+          </DialogHeader>
+
+          <div className="space-y-8 mt-6">
+            {/* Job Information Card */}
+            <div className="space-y-4">
+              <Title level={3} variant="primary">
+                Job Information
+              </Title>
+
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <MapPin className="h-5 w-5 text-muted-foreground mt-0.5 flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <Text size="sm" variant="muted" weight="medium" className="mb-1">
+                      Location
+                    </Text>
+                    <Text size="base">
+                      {vacancy.location || "N/A"}
+                    </Text>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <Briefcase className="h-5 w-5 text-muted-foreground mt-0.5 flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <Text size="sm" variant="muted" weight="medium" className="mb-1">
+                      Work Type
+                    </Text>
+                    <Text size="base" className="capitalize">
+                      {vacancy.workType || "N/A"}
+                    </Text>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <DollarSign className="h-5 w-5 text-muted-foreground mt-0.5 flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <Text size="sm" variant="muted" weight="medium" className="mb-1">
+                      Salary
+                    </Text>
+                    <Text size="base" weight="medium">
+                      {vacancy.salary ? `$${vacancy.salary.toLocaleString()}` : "N/A"}
+                    </Text>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <User className="h-5 w-5 text-muted-foreground mt-0.5 flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <Text size="sm" variant="muted" weight="medium" className="mb-1">
+                      Experience Required
+                    </Text>
+                    <Text size="base">
+                      {vacancy.experience || "N/A"}
+                    </Text>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Timeline Card */}
+            <div className="space-y-4">
+              <Title level={3} variant="primary">
+                Timeline
+              </Title>
+
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <Calendar className="h-5 w-5 text-muted-foreground mt-0.5 flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <Text size="sm" variant="muted" weight="medium" className="mb-1">
+                      Applied Date
+                    </Text>
+                    <Text size="base">
+                      {format(new Date(vacancy.appliedAt), 'PPP')}
+                    </Text>
+                    <Text size="sm" variant="muted">
+                      {formatDistanceToNow(new Date(vacancy.appliedAt), { addSuffix: true })}
+                    </Text>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <Clock className="h-5 w-5 text-muted-foreground mt-0.5 flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <Text size="sm" variant="muted" weight="medium" className="mb-1">
+                      Last Updated
+                    </Text>
+                    <Text size="base">
+                      {vacancy.lastUpdated ? format(new Date(vacancy.lastUpdated), 'PPP') : "N/A"}
+                    </Text>
+                    {vacancy.lastUpdated && (
+                        <Text size="sm" variant="muted">
+                          {formatDistanceToNow(new Date(vacancy.lastUpdated), { addSuffix: true })}
+                        </Text>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Job Description */}
+            {vacancy.description && (
+                <div className="space-y-3">
+                  <Title level={3} variant="primary" className="flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Job Description
+                  </Title>
+                  <div className="text-muted-foreground whitespace-pre-wrap leading-relaxed bg-background-surface p-4 rounded-lg border border-border">
+                    {vacancy.description}
+                  </div>
+                </div>
+            )}
+
+            {/* Requirements */}
+            {vacancy.requirements && (
+                <div className="space-y-3">
+                  <Title level={3} variant="primary" className="flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Requirements
+                  </Title>
+                  <div className="text-muted-foreground whitespace-pre-wrap leading-relaxed bg-background-surface p-4 rounded-lg border border-border">
+                    {vacancy.requirements}
+                  </div>
+                </div>
+            )}
+
+            {/* Benefits */}
+            {vacancy.benefits && (
+                <div className="space-y-3">
+                  <Title level={3} variant="primary" className="flex items-center gap-2">
+                    <Star className="h-5 w-5" />
+                    Benefits
+                  </Title>
+                  <div className="text-muted-foreground whitespace-pre-wrap leading-relaxed bg-background-surface p-4 rounded-lg border border-border">
+                    {vacancy.benefits}
+                  </div>
+                </div>
+            )}
+
+            {/* Actions */}
+            <div className="pt-6 border-t border-border">
+              <div className="flex flex-wrap gap-3">
+                <Button
+                    variant="default"
+                    className="gap-2"
+                    disabled={!vacancy.url}
+                >
+                  <a
+                      href={formatShortLink(vacancy.url) || '#'}
+                      className="flex gap-2 items-center"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                    <Text size="sm" weight="medium">View Original Posting</Text>
+                  </a>
+                </Button>
+              </div>
+            </div>
           </div>
-        </DialogHeader>
-
-        <div className="space-y-6 mt-6">
-          {/* Key Details */}
-          <div className=" grid grid-cols-2 md:grid-cols-4 gap-6">
-            {vacancy.location && (
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <MapPin className="h-4 w-4" />
-                  <span className="text-sm font-medium">Location</span>
-                </div>
-                <p className="text-foreground">{vacancy.location}</p>
-              </div>
-            )}
-            
-            {vacancy.workType && (
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Briefcase className="h-4 w-4" />
-                  <span className="text-sm font-medium">Work Type</span>
-                </div>
-                <p className="text-foreground capitalize">{vacancy.workType}</p>
-              </div>
-            )}
-            
-            {vacancy.salary && (
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <DollarSign className="h-4 w-4" />
-                  <span className="text-sm font-medium">Salary</span>
-                </div>
-                <p className="text-foreground font-medium">${vacancy.salary.toLocaleString()}</p>
-              </div>
-            )}
-            
-            {vacancy.experience && (
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <User className="h-4 w-4" />
-                  <span className="text-sm font-medium">Experience</span>
-                </div>
-                <p className="text-foreground">{vacancy.experience}</p>
-              </div>
-            )}
-          </div>
-
-          {/* Timeline */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Calendar className="h-4 w-4" />
-                <span className="text-sm font-medium">Applied</span>
-              </div>
-              <p className="text-foreground">
-                {format(new Date(vacancy.appliedAt), 'MMM d, yyyy')}
-                <span className="text-sm text-muted-foreground ml-2">
-                  ({formatDistanceToNow(new Date(vacancy.appliedAt), { addSuffix: true })})
-                </span>
-              </p>
-            </div>
-            
-            {vacancy.lastUpdated && (
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Clock className="h-4 w-4" />
-                  <span className="text-sm font-medium">Last Updated</span>
-                </div>
-                <p className="text-foreground">
-                  {format(new Date(vacancy.lastUpdated), 'MMM d, yyyy')}
-                  <span className="text-sm text-muted-foreground ml-2">
-                    ({formatDistanceToNow(new Date(vacancy.lastUpdated), { addSuffix: true })})
-                  </span>
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* Description */}
-          {vacancy.description && (
-            <div className="space-y-3">
-              <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
-                <FileText className="h-5 w-5" />
-                Job Description
-              </h3>
-              <div className="text-muted-foreground whitespace-pre-wrap leading-relaxed">
-                {vacancy.description}
-              </div>
-            </div>
-          )}
-
-          {/* Requirements */}
-          {vacancy.requirements && vacancy.requirements.length > 0 && (
-            <div className="space-y-3">
-              <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
-                <FileText className="h-5 w-5" />
-                Requirements
-              </h3>
-              <div className="text-muted-foreground whitespace-pre-wrap leading-relaxed">
-                {vacancy.requirements}
-              </div>
-            </div>
-          )}
-
-          {/* Benefits */}
-          {vacancy.benefits && (
-            <div className="space-y-3">
-              <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
-                <Star className="h-5 w-5" />
-                Benefits
-              </h3>
-              <div className="text-muted-foreground whitespace-pre-wrap leading-relaxed">
-                {vacancy.benefits}
-              </div>
-            </div>
-          )}
-
-          {/* Actions */}
-          {vacancy.jobUrl && (
-            <div className="pt-4 border-t border-border">
-              <Button 
-                variant="outline" 
-                className="gap-2"
-                asChild
-              >
-                <a href={vacancy.jobUrl} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="h-4 w-4" />
-                  View Original Posting
-                </a>
-              </Button>
-            </div>
-          )}
-        </div>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
   )
 }

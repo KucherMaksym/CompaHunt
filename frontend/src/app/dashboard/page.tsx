@@ -38,7 +38,7 @@ async function fetchApplications(): Promise<Vacancy[]> {
         benefits: app.benefits,
         workType: app.workType,
         experience: app.experience,
-        jobUrl: app.jobUrl,
+        url: app.url,
         lastUpdated: app.lastUpdated || app.updatedAt
     }));
 }
