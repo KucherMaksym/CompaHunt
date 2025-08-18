@@ -13,6 +13,9 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
 import jakarta.servlet.http.HttpServletRequest
+import java.math.BigDecimal
+import kotlin.math.max
+import kotlin.math.min
 
 @RestController
 @RequestMapping("/api/vacancies")
@@ -67,9 +70,10 @@ class VacancyController(
             salary = (jobData["salary"] as? Map<String, Any?>)?.let { salaryData ->
                 Salary(
                     range = salaryData["range"] as? String ?: "",
-                    currency = salaryData["currency"] as? String ?: "USD",
+                    min = (salaryData["min"] as? Number)?.let { BigDecimal(it.toString()) },
+                    max = (salaryData["max"] as? Number)?.let { BigDecimal(it.toString()) },
+                    currency = salaryData["currency"] as? String ?: "$",
                     period = salaryData["period"] as? String ?: "year",
-                    type = salaryData["type"] as? String ?: "gross",
                     location = salaryData["location"] as? String ?: (jobData["location"] as? String ?: "")
                 )
             },

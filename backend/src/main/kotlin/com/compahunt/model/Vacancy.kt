@@ -2,6 +2,7 @@ package com.compahunt.model
 
 import jakarta.persistence.*
 import org.hibernate.annotations.SQLRestriction
+import java.math.BigDecimal
 import java.time.LocalDateTime
 
 @Entity
@@ -90,9 +91,10 @@ data class Vacancy(
 @Embeddable
 data class Salary(
     val range: String,
-    val currency: String,
-    val period: String,
-    val type: String,
+    val min: BigDecimal?,
+    val max: BigDecimal?,
+    val currency: String?,
+    val period: String?,
     val location: String
 )
 

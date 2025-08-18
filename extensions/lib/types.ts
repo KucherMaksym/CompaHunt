@@ -30,6 +30,8 @@ export enum JobType {
 
 export interface Salary {
     range: string,
+    min: number,
+    max: number,
     currency: string,
     period: string,
     type: string,

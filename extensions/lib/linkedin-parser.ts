@@ -175,7 +175,8 @@ export class LinkedInJobParser {
                 url: window.location.href,
                 salary,
                 remoteness: this.extractJobPreferences().remoteness,
-                industry
+                industry,
+                manual: false
             }
 
             // Validate that we have essential data
@@ -229,6 +230,8 @@ export class LinkedInJobParser {
                 if (parsed) {
                     return {
                         range: text,
+                        min: parsed.minAmount,
+                        max: parsed.maxAmount,
                         currency: parsed.currency,
                         period: parsed.period,
                         type: 'Preference',
@@ -270,6 +273,8 @@ export class LinkedInJobParser {
                 if (salaryData) {
                     return {
                         range: match[0],
+                        min: salaryData.minAmount,
+                        max: salaryData.maxAmount,
                         currency: salaryData.currency,
                         period: salaryData.period,
                         type: 'Description',

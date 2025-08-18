@@ -7,6 +7,7 @@ import com.compahunt.repository.VacancyRepository
 import com.compahunt.repository.CompanyRepository
 import com.compahunt.repository.VacancyAuditRepository
 import com.compahunt.repository.UserRepository
+import com.compahunt.util.formatSalaryToString
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
@@ -327,7 +328,7 @@ class VacancyService(
             postedDate = vacancy.postedDate,
             applicantCount = vacancy.applicantCount,
             url = vacancy.url,
-            salary = vacancy.salary?.range,
+            salary = formatSalaryToString(vacancy.salary),
             remoteness = vacancy.remoteness,
             industry = vacancy.industry,
             benefits = vacancy.benefits,

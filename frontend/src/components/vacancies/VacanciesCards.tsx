@@ -105,7 +105,7 @@ function VacancyCard({ vacancy, onEditVacancy, onArchiveVacancy, onViewVacancy }
           <div className="flex items-center gap-1">
             <DollarSign className="h-4 w-4 text-muted-foreground" />
             <span className="text-sm font-medium text-foreground">
-              ${vacancy.salary.toLocaleString()}
+              {vacancy.salary.toLocaleString()}
             </span>
           </div>
         )}

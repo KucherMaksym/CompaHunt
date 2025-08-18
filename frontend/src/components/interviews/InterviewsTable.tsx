@@ -226,7 +226,7 @@ export function InterviewsTable({ interviews, onEditInterview, onDeleteInterview
                       {onDeleteInterview && (
                         <DropdownMenuItem 
                           onClick={(e) => { e.stopPropagation(); onDeleteInterview(interview.id); }}
-                          className="text-red-600 focus:text-red-600"
+                          className="text-error/70 focus:text-error/100"
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
                           Delete

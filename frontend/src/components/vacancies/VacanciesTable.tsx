@@ -116,7 +116,7 @@ export function VacanciesTable({ vacancies, onEditVacancy, onArchiveVacancy, onV
                 {vacancy.salary ? (
                   <div className="flex items-center gap-1 text-foreground text-sm font-medium">
                     {/*<DollarSign className="h-3 w-3 text-muted-foreground" />*/}
-                    ${vacancy.salary.toLocaleString()}
+                    {vacancy.salary.toLocaleString()}
                   </div>
                 ) : (
                   <span className="text-muted-foreground/50 text-sm">—</span>
