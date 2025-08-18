@@ -220,3 +220,129 @@
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
 }
+
+/* Enhanced Extension Styles */
+.compahunt-fab {
+  --compahunt-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Animations for modal and FAB */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Grid utilities */
+.compahunt-grid {
+  display: grid;
+}
+
+.compahunt-grid-cols-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.compahunt-gap-4 {
+  gap: 1rem;
+}
+
+/* Flexbox utilities */
+.compahunt-flex {
+  display: flex;
+}
+
+.compahunt-items-center {
+  align-items: center;
+}
+
+.compahunt-justify-center {
+  justify-content: center;
+}
+
+.compahunt-gap-2 {
+  gap: 0.5rem;
+}
+
+.compahunt-gap-3 {
+  gap: 0.75rem;
+}
+
+/* Enhanced modal overlay */
+.compahunt-modal-overlay {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Enhanced modal content */
+.compahunt-modal-content {
+  scrollbar-width: thin;
+  scrollbar-color: var(--compahunt-border) transparent;
+}
+
+.compahunt-modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.compahunt-modal-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.compahunt-modal-content::-webkit-scrollbar-thumb {
+  background: var(--compahunt-border);
+  border-radius: 3px;
+}
+
+.compahunt-modal-content::-webkit-scrollbar-thumb:hover {
+  background: var(--compahunt-muted-foreground);
+}
+
+/* Close button hover effects */
+.compahunt-close-btn:hover {
+  transform: rotate(90deg);
+}
+
+/* Enhanced button styles */
+.compahunt-btn-secondary:hover {
+  box-shadow: var(--compahunt-shadow-md);
+}
+
+.compahunt-btn-primary:hover {
+  box-shadow: var(--compahunt-shadow-lg);
+}
+
+/* Responsive grid */
+@media (max-width: 640px) {
+  .compahunt-modal-content {
+    margin: 20px;
+    padding: 24px;
+    width: calc(100% - 40px);
+    max-height: calc(100vh - 40px);
+  }
+  
+  .compahunt-grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+}

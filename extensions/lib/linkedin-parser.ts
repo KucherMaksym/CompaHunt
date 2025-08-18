@@ -77,7 +77,7 @@ export class LinkedInJobParser {
                     !text.includes('Reposted') &&
                     !text.includes('Promoted') &&
                     !text.includes('Responses') &&
-                    text.length > 5) {
+                    text.length > 4) {
                     data.location = text;
                 }
             }
@@ -163,7 +163,10 @@ export class LinkedInJobParser {
 
             // Extract skills and requirements
             const skills = this.extractSkills(description)
-            const requirements = this.extractRequirements(description)
+
+            // Hard to implement correctly without AI. Maybe later
+            // const requirements = this.extractRequirements(description)
+            const requirements = [];
 
             const jobData: JobData = {
                 title,
@@ -349,16 +352,18 @@ export class LinkedInJobParser {
 
         // Regex for salary parsing
         const patterns = [
+            // $155K/yr - $339.5K/yr (with decimals and K included)
+            /([€$£¥₹₽])([\d,]+\.?\d*K)\/(\w+)\s*-\s*([€$£¥₹₽])([\d,]+\.?\d*K)\/(\w+)/,
             // $250K/yr - $500K/yr
-            /([€$£¥₹₽])([\d,]+)K\/(\w+)\s*-\s*([€$£¥₹₽])([\d,]+)K\/(\w+)/,
+            /([€$£¥₹₽])([\d,]+K)\/(\w+)\s*-\s*([€$£¥₹₽])([\d,]+K)\/(\w+)/,
             // €80,000/yr - €650,000/yr
             /([€$£¥₹₽])([\d,]+)\/(\w+)\s*-\s*([€$£¥₹₽])([\d,]+)\/(\w+)/,
             // $50,000 - $80,000 per year
             /([€$£¥₹₽])([\d,]+)\s*-\s*([€$£¥₹₽])([\d,]+)\s*per\s*(\w+)/,
-            // €80K - €650K annually
-            /([€$£¥₹₽])([\d,]+)K?\s*-\s*([€$£¥₹₽])([\d,]+)K?\s*(\w+)/,
-            // $75K/year
-            /([€$£¥₹₽])([\d,]+)K\/(\w+)/,
+            // €80K - €650K annually (with K included)
+            /([€$£¥₹₽])([\d,]+\.?\d*K?)\s*-\s*([€$£¥₹₽])([\d,]+\.?\d*K?)\s*(\w+)/,
+            // $75K/year (with K included)
+            /([€$£¥₹₽])([\d,]+\.?\d*K)\/(\w+)/,
             // $75,000/year
             /([€$£¥₹₽])([\d,]+)\/(\w+)/,
             // €80,000 per year
@@ -423,9 +428,13 @@ export class LinkedInJobParser {
         let cleaned = amountStr.replace(/,/g, '')
 
         if (cleaned.includes('K')) {
-            return parseFloat(cleaned.replace('K', '')) * 1000
+            // Handle cases like "155K" or "339.5K"
+            const numberPart = cleaned.replace('K', '')
+            const result = parseFloat(numberPart) * 1000
+            return result
         }
 
-        return parseFloat(cleaned)
+        const result = parseFloat(cleaned)
+        return result
     }
 }

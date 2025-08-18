@@ -101,7 +101,12 @@ async function sendJobToServer(jobData: any) {
         const token = await getValidToken()
 
         if (!token) {
-            throw new Error("No auth token available")
+            return {
+                success: false,
+                status: 401,
+                error: "No auth token available",
+                message: "Authentication required. Please log in to CompaHunt."
+            }
         }
 
         const response = await fetch("http://localhost:8080/api/vacancies", {
@@ -131,13 +136,39 @@ async function sendJobToServer(jobData: any) {
                     body: JSON.stringify(jobData)
                 })
                 
-                return await retryResponse.json()
+                const retryData = await retryResponse.json()
+                return {
+                    success: retryResponse.ok,
+                    status: retryResponse.status,
+                    data: retryResponse.ok ? retryData : null,
+                    error: retryResponse.ok ? null : retryData.message || 'Server error',
+                    message: retryResponse.ok ? 'Vacancy saved successfully!' : retryData.message || 'Failed to save vacancy'
+                }
+            } else {
+                return {
+                    success: false,
+                    status: 401,
+                    error: "Authentication failed",
+                    message: "Unable to authenticate. Please log in to CompaHunt."
+                }
             }
         }
 
-        return await response.json()
+        const responseData = await response.json()
+        return {
+            success: response.ok,
+            status: response.status,
+            data: response.ok ? responseData : null,
+            error: response.ok ? null : responseData.message || 'Server error',
+            message: response.ok ? 'Vacancy saved successfully!' : responseData.message || 'Failed to save vacancy'
+        }
     } catch (error) {
         console.error("Failed to send job data:", error)
-        throw error
+        return {
+            success: false,
+            status: 0,
+            error: (error as Error).message,
+            message: "Network error. Please check your connection."
+        }
     }
 }
