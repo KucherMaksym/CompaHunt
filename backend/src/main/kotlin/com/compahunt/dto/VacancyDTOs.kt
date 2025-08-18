@@ -23,6 +23,8 @@ data class CreateVacancyRequest(
     @field:NotBlank(message = "Description is required")
     val description: String,
 
+    val htmlDescription: String? = null,
+
     val requirements: List<String> = listOf(),
 
     val skills: List<String> = listOf(),
@@ -57,6 +59,7 @@ data class UpdateVacancyRequest(
     val jobType: String? = null,
     val experienceLevel: String? = null,
     val description: String? = null,
+    val htmlDescription: String? = null,
     val requirements: List<String>? = null,
     val skills: List<String>? = null,
     val status: VacancyStatus? = null,
@@ -79,6 +82,7 @@ data class VacancyResponse(
     val jobType: String?,
     val experienceLevel: String?,
     val description: String,
+    val htmlDescription: String?,
     val requirements: List<String>,
     val skills: List<String>,
     val status: VacancyStatus,

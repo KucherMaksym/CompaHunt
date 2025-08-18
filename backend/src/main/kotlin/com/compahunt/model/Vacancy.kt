@@ -34,6 +34,9 @@ data class Vacancy(
     @Column(columnDefinition = "TEXT")
     val description: String,
 
+    @Column(name = "html_description", columnDefinition = "TEXT")
+    val htmlDescription: String? = null,
+
     @ElementCollection
     @CollectionTable(name = "vacancy_requirements", joinColumns = [JoinColumn(name = "vacancy_id")])
     @Column(name = "requirement", columnDefinition = "TEXT")

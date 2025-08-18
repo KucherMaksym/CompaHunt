@@ -1,4 +1,5 @@
 import {type JobData, type ParseResult, type Salary} from "./types"
+import {HtmlProcessor} from "./html-utils"
 
 export class LinkedInJobParser {
     private getCleanText(element: Element | null): string {
@@ -148,6 +149,9 @@ export class LinkedInJobParser {
             const descriptionElement = document.querySelector('#job-details')
             console.log(descriptionElement);
             const description = this.getCleanText(descriptionElement)
+            
+            // Extract HTML description with formatting
+            const htmlDescription = HtmlProcessor.extractLinkedInJobHtml(descriptionElement)
 
             // Industry (if available)
             const industryElement = document.querySelector('.jobs-unified-top-card__industry')
@@ -168,6 +172,7 @@ export class LinkedInJobParser {
                 jobType: this.extractJobPreferences().jobType,
                 // experienceLevel,
                 description,
+                htmlDescription,
                 requirements,
                 skills,
                 postedDate,

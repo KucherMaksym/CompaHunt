@@ -61,6 +61,7 @@ class VacancyController(
             jobType = jobData["jobType"] as? String,
             experienceLevel = jobData["experienceLevel"] as? String,
             description = jobData["description"] as? String ?: "",
+            htmlDescription = jobData["htmlDescription"] as? String ?: "",
             requirements = (jobData["requirements"] as? List<*>)?.filterIsInstance<String>() ?: listOf(),
             skills = (jobData["skills"] as? List<*>)?.filterIsInstance<String>() ?: listOf(),
             status = VacancyStatus.valueOf((jobData["status"] as? String) ?: "APPLIED"),

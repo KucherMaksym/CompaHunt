@@ -14,6 +14,7 @@ export interface Vacancy {
   status: VacancyStatus;
   appliedAt: string;
   description?: string;
+  htmlDescription?: string;
   requirements?: string;
   benefits?: string;
   workType?: 'remote' | 'office' | 'hybrid';

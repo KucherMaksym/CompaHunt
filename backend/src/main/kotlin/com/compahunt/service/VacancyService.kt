@@ -55,6 +55,7 @@ class VacancyService(
             jobType = request.jobType,
             experienceLevel = request.experienceLevel,
             description = request.description,
+            htmlDescription = request.htmlDescription,
             requirements = request.requirements,
             skills = request.skills,
             status = request.status,
@@ -120,13 +121,23 @@ class VacancyService(
         val oldVacancy = vacancy.copy()
         val company = request.company?.let { findOrCreateCompany(it) } ?: vacancy.company
 
+        // Handle HTML description and sync plain text when HTML changes
+        val newHtmlDescription = request.htmlDescription ?: vacancy.htmlDescription
+        val newDescription = if (request.htmlDescription != null && request.htmlDescription != vacancy.htmlDescription) {
+            // HTML description changed, convert to plain text
+            htmlToPlainText(request.htmlDescription)
+        } else {
+            request.description ?: vacancy.description
+        }
+
         val updatedVacancy = vacancy.copy(
             title = request.title ?: vacancy.title,
             company = company,
             location = request.location ?: vacancy.location,
             jobType = request.jobType ?: vacancy.jobType,
             experienceLevel = request.experienceLevel ?: vacancy.experienceLevel,
-            description = request.description ?: vacancy.description,
+            description = newDescription,
+            htmlDescription = newHtmlDescription,
             requirements = request.requirements ?: vacancy.requirements,
             skills = request.skills ?: vacancy.skills,
             status = request.status ?: vacancy.status,
@@ -263,6 +274,9 @@ class VacancyService(
         if (old.description != new.description) {
             changes["description"] = mapOf("old" to old.description, "new" to new.description)
         }
+        if (old.htmlDescription != new.htmlDescription) {
+            changes["htmlDescription"] = mapOf("old" to old.htmlDescription, "new" to new.htmlDescription)
+        }
         if (old.salary != new.salary) {
             changes["salary"] = mapOf("old" to old.salary, "new" to new.salary)
         }
@@ -321,6 +335,7 @@ class VacancyService(
             jobType = vacancy.jobType,
             experienceLevel = vacancy.experienceLevel,
             description = vacancy.description,
+            htmlDescription = vacancy.htmlDescription,
             requirements = vacancy.requirements,
             skills = vacancy.skills,
             status = vacancy.status,
@@ -339,6 +354,26 @@ class VacancyService(
             lastUpdated = vacancy.updatedAt.format(dateFormatter),
             manual = vacancy.manual
         )
+    }
+
+    private fun htmlToPlainText(html: String?): String {
+        if (html.isNullOrBlank()) return ""
+        
+        return html
+            .replace("<br\\s*/?>".toRegex(RegexOption.IGNORE_CASE), "\n")
+            .replace("<li\\b[^>]*>".toRegex(RegexOption.IGNORE_CASE), "• ")
+            .replace("<p\\b[^>]*>".toRegex(RegexOption.IGNORE_CASE), "\n")
+            .replace("</p>", "\n")
+            .replace("<[^>]+>".toRegex(), "")
+            .replace("&nbsp;", " ")
+            .replace("&amp;", "&")
+            .replace("&lt;", "<")
+            .replace("&gt;", ">")
+            .replace("&quot;", "\"")
+            .replace("&#39;", "'")
+            .replace("\\s+".toRegex(), " ")
+            .replace("\\n\\s*\\n".toRegex(), "\n")
+            .trim()
     }
 
     private fun mapToVacancyAuditResponse(audit: VacancyAudit): VacancyAuditResponse {

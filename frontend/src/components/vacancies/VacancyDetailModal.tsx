@@ -23,6 +23,7 @@ import { getStatusColor } from "@/utils/vacancy-utils"
 import { Title } from "@/components/ui/Title"
 import { Text } from "@/components/ui/Text"
 import {formatShortLink} from "@/utils/url-utils";
+import { RichTextEditor } from '@/components/ui/rich-text-editor'
 
 interface VacancyDetailModalProps {
   vacancy: Vacancy | null
@@ -52,7 +53,7 @@ function getStatusLabel(status: VacancyStatus): string {
 
 export function VacancyDetailModal({ vacancy, isOpen, onClose, onEdit }: VacancyDetailModalProps) {
   if (!vacancy) return null
-false
+
   const handleEdit = () => {
     if (onEdit) {
       onEdit(vacancy)
@@ -213,15 +214,23 @@ false
             </div>
 
             {/* Job Description */}
-            {vacancy.description && (
+            {(vacancy.htmlDescription || vacancy.description) && (
                 <div className="space-y-3">
                   <Title level={3} variant="primary" className="flex items-center gap-2">
                     <FileText className="h-5 w-5" />
                     Job Description
                   </Title>
-                  <div className="text-muted-foreground whitespace-pre-wrap leading-relaxed bg-background-surface p-4 rounded-lg border border-border">
-                    {vacancy.description}
-                  </div>
+                  {vacancy.htmlDescription ? (
+                    <RichTextEditor
+                      content={vacancy.htmlDescription}
+                      readOnly={true}
+                      className="bg-background-surface"
+                    />
+                  ) : (
+                    <div className="text-muted-foreground whitespace-pre-wrap leading-relaxed bg-background-surface p-4 rounded-lg border border-border">
+                      {vacancy.description}
+                    </div>
+                  )}
                 </div>
             )}
 

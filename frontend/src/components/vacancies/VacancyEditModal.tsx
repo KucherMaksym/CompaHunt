@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { RichTextEditor } from '@/components/ui/rich-text-editor'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
@@ -56,6 +57,7 @@ interface VacancyFormData {
   salary: string
   status: VacancyStatus
   description: string
+  htmlDescription: string
   requirements: string
   benefits: string
   workType: 'remote' | 'office' | 'hybrid' | ''
@@ -100,6 +102,7 @@ export function VacancyEditModal({ isOpen, onClose, vacancy, mode }: VacancyModa
     salary: '',
     status: VacancyStatus.APPLIED,
     description: '',
+    htmlDescription: '',
     requirements: '',
     benefits: '',
     workType: '',
@@ -138,6 +141,7 @@ export function VacancyEditModal({ isOpen, onClose, vacancy, mode }: VacancyModa
         salary: vacancy.salary?.toString() || '',
         status: vacancy.status,
         description: vacancy.description || '',
+        htmlDescription: vacancy.htmlDescription || '',
         requirements: vacancy.requirements || '',
         benefits: vacancy.benefits || '',
         workType: vacancy.workType || '',
@@ -152,6 +156,7 @@ export function VacancyEditModal({ isOpen, onClose, vacancy, mode }: VacancyModa
         salary: '',
         status: VacancyStatus.APPLIED,
         description: '',
+        htmlDescription: '',
         requirements: '',
         benefits: '',
         workType: '',
@@ -172,6 +177,7 @@ export function VacancyEditModal({ isOpen, onClose, vacancy, mode }: VacancyModa
         salary: data.salary ? parseInt(data.salary) : null,
         status: data.status,
         description: data.description || null,
+        htmlDescription: data.htmlDescription || null,
         requirements: data.requirements || null,
         benefits: data.benefits || null,
         workType: data.workType || null,
@@ -198,6 +204,7 @@ export function VacancyEditModal({ isOpen, onClose, vacancy, mode }: VacancyModa
         salary: data.salary ? parseInt(data.salary) : null,
         status: data.status,
         description: data.description || null,
+        htmlDescription: data.htmlDescription || null,
         requirements: data.requirements || null,
         benefits: data.benefits || null,
         workType: data.workType || null,
@@ -497,13 +504,17 @@ export function VacancyEditModal({ isOpen, onClose, vacancy, mode }: VacancyModa
                         <div className="space-y-4">
                           <div className="space-y-2">
                             <Label htmlFor="description" className="text-sm font-medium">Job Description</Label>
-                            <Textarea
-                              id="description"
-                              value={formData.description}
-                              onChange={(e) => handleInputChange('description', e.target.value)}
-                              rows={4}
+                            <RichTextEditor
+                              content={formData.htmlDescription || formData.description}
+                              onChange={(html) => {
+                                handleInputChange('htmlDescription', html)
+                                // Also update plain text for fallback
+                                const tempDiv = document.createElement('div')
+                                tempDiv.innerHTML = html
+                                handleInputChange('description', tempDiv.textContent?.trim() || '')
+                              }}
                               placeholder="Paste the job description here..."
-                              className="resize-none"
+                              className="min-h-[120px]"
                             />
                           </div>
 

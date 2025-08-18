@@ -5,6 +5,7 @@ export interface JobData {
     jobType?: string
     experienceLevel?: string
     description: string
+    htmlDescription?: string
     requirements: string[]
     skills: string[]
     postedDate?: string
