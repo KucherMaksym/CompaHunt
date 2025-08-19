@@ -9,11 +9,16 @@ import com.compahunt.repository.VacancyAuditRepository
 import com.compahunt.repository.UserRepository
 import com.compahunt.util.formatSalaryToString
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import jakarta.servlet.http.HttpServletRequest
 import org.slf4j.LoggerFactory
+import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -47,6 +52,10 @@ class VacancyService(
 
         val company = findOrCreateCompany(request.company)
 
+        val salaryWithMonthlyConversion = request.salary?.let { 
+            convertSalaryToMonthly(it)
+        }
+
         val vacancy = Vacancy(
             title = request.title,
             company = company,
@@ -62,11 +71,10 @@ class VacancyService(
             postedDate = request.postedDate,
             applicantCount = request.applicantCount,
             url = request.url,
-            salary = request.salary,
+            salary = salaryWithMonthlyConversion,
             remoteness = request.remoteness,
             industry = request.industry,
             benefits = request.benefits,
-            workType = request.workType,
             experience = request.experience,
             manual = request.manual,
         )
@@ -109,6 +117,59 @@ class VacancyService(
         return limitedVacancies.map { mapToVacancyResponse(it) }
     }
 
+    fun getVacanciesWithFilters(userId: Long, filterRequest: VacancyFilterRequest): VacancyPageResponse {
+        val status = filterRequest.status?.let { VacancyStatus.valueOf(it) }
+        
+        // Convert salary values to monthly amounts if period is provided
+        val minSalary = filterRequest.minSalary?.toBigDecimalOrNull()?.let { amount ->
+            if (filterRequest.salaryPeriod != null) {
+                convertToMonthly(amount, filterRequest.salaryPeriod)
+            } else {
+                amount // If no period provided, assume it's already monthly
+            }
+        }
+        val maxSalary = filterRequest.maxSalary?.toBigDecimalOrNull()?.let { amount ->
+            if (filterRequest.salaryPeriod != null) {
+                convertToMonthly(amount, filterRequest.salaryPeriod)
+            } else {
+                amount // If no period provided, assume it's already monthly
+            }
+        }
+        
+        val sort = if (filterRequest.sortDirection.lowercase() == "asc") {
+            Sort.by(Sort.Order.asc(filterRequest.sortBy))
+        } else {
+            Sort.by(Sort.Order.desc(filterRequest.sortBy))
+        }
+        
+        val pageable: Pageable = PageRequest.of(filterRequest.page, filterRequest.size, sort)
+        
+        val vacancyPage = vacancyRepository.findVacanciesWithFilters(
+            userId = userId,
+            status = status,
+            search = filterRequest.search?.takeIf { it.isNotBlank() },
+            minSalary = minSalary,
+            maxSalary = maxSalary,
+            location = filterRequest.location?.takeIf { it.isNotBlank() },
+            experienceLevel = filterRequest.experienceLevel?.takeIf { it.isNotBlank() },
+            jobType = filterRequest.jobType?.takeIf { it.isNotBlank() },
+            remoteness = filterRequest.remoteness?.takeIf { it.isNotBlank() },
+            pageable = pageable
+        )
+        
+        return VacancyPageResponse(
+            content = vacancyPage.content.map { mapToVacancyResponse(it) },
+            totalElements = vacancyPage.totalElements,
+            totalPages = vacancyPage.totalPages,
+            currentPage = vacancyPage.number,
+            size = vacancyPage.size,
+            hasNext = vacancyPage.hasNext(),
+            hasPrevious = vacancyPage.hasPrevious(),
+            isFirst = vacancyPage.isFirst,
+            isLast = vacancyPage.isLast
+        )
+    }
+
     fun updateVacancy(
         id: Long, 
         request: UpdateVacancyRequest, 
@@ -130,6 +191,10 @@ class VacancyService(
             request.description ?: vacancy.description
         }
 
+        val salaryWithMonthlyConversion = request.salary?.let { 
+            convertSalaryToMonthly(it)
+        } ?: vacancy.salary
+
         val updatedVacancy = vacancy.copy(
             title = request.title ?: vacancy.title,
             company = company,
@@ -143,11 +208,10 @@ class VacancyService(
             status = request.status ?: vacancy.status,
             postedDate = request.postedDate ?: vacancy.postedDate,
             applicantCount = request.applicantCount ?: vacancy.applicantCount,
-            salary = request.salary ?: vacancy.salary,
+            salary = salaryWithMonthlyConversion,
             remoteness = request.remoteness ?: vacancy.remoteness,
             industry = request.industry ?: vacancy.industry,
             benefits = request.benefits ?: vacancy.benefits,
-            workType = request.workType ?: vacancy.workType,
             experience = request.experience ?: vacancy.experience,
             updatedAt = LocalDateTime.now()
         )
@@ -347,7 +411,6 @@ class VacancyService(
             remoteness = vacancy.remoteness,
             industry = vacancy.industry,
             benefits = vacancy.benefits,
-            workType = vacancy.workType,
             experience = vacancy.experience,
             createdAt = vacancy.createdAt.format(dateFormatter),
             updatedAt = vacancy.updatedAt.format(dateFormatter),
@@ -391,5 +454,26 @@ class VacancyService(
             userAgent = audit.userAgent,
             ipAddress = audit.ipAddress
         )
+    }
+
+    private fun convertSalaryToMonthly(salary: Salary): Salary {
+        val monthMin = salary.min?.let { convertToMonthly(it, salary.period) }
+        val monthMax = salary.max?.let { convertToMonthly(it, salary.period) }
+        
+        return salary.copy(
+            monthMin = monthMin,
+            monthMax = monthMax
+        )
+    }
+
+    private fun convertToMonthly(amount: BigDecimal, period: String?): BigDecimal {
+        return when (period?.lowercase()) {
+            "hr", "hour", "hourly" -> amount.multiply(BigDecimal("160")) // 40 hours/week * 4 weeks
+            "day", "daily" -> amount.multiply(BigDecimal("22")) // ~22 working days per month
+            "week", "weekly" -> amount.multiply(BigDecimal("4.33")) // 52 weeks / 12 months
+            "month", "monthly" -> amount
+            "year", "yearly", "annual", "annually" -> amount.divide(BigDecimal("12"), 2, java.math.RoundingMode.HALF_UP)
+            else -> amount // Default to assuming it's monthly if unknown
+        }
     }
 }

@@ -9,7 +9,7 @@ export default withAuth(
     },
     {
         jwt: {
-            decode: async ({ token, secret }) => {
+            decode: async ({token, secret}) => {
                 if (!token) {
                     console.warn('🔐 No token provided')
                     return null
@@ -19,7 +19,7 @@ export default withAuth(
             }
         },
         callbacks: {
-            authorized: ({ token, req }) => {
+            authorized: ({token, req}) => {
                 const isProtectedRoute = [
                     '/dashboard',
                     '/profile',

@@ -1,6 +1,4 @@
-import { ApiClientConfig, RequestOptions, ApiResponse, ApiError, ApiValidationError } from '@/types/api';
-import { getToken } from 'next-auth/jwt';
-import {getRequestCookies} from "@/lib/serverApiUtils";
+import {ApiClientConfig, RequestOptions, ApiResponse, ApiError, ApiValidationError} from '@/types/api';
 
 export class ApiClient {
     private config: Required<ApiClientConfig>;
@@ -42,46 +40,8 @@ export class ApiClient {
             ...customHeaders,
         };
 
-        try {
-            let jwtToken: string | null = null;
-
-            if (this.isServer()) {
-                const headers = await getRequestCookies();
-
-                const tokenRes = await fetch(`${process.env.NEXTAUTH_URL}/api/auth/jwt`, {
-                    method: "GET",
-                    headers: {
-                        "Cookie": headers
-                    }
-                });
-
-                const {token} = await tokenRes.json();
-
-                if (token) {
-                    jwtToken = token as any;
-                }
-            } else {
-                const { getSession } = await import('next-auth/react');
-                const session = await getSession();
-
-                if (session) {
-                    const tokenRes = await fetch('/api/auth/jwt');
-                    if (tokenRes.ok) {
-                        const { token } = await tokenRes.json();
-                        jwtToken = token;
-                    }
-                }
-            }
-
-            if (jwtToken) {
-                headers['Authorization'] = `Bearer ${jwtToken}`;
-                console.log("✅ JWT token added to headers");
-            } else {
-                console.log("❌ No JWT token available");
-            }
-        } catch (error) {
-            console.warn('Failed to get JWT token:', error);
-        }
+        // No need to manually add JWT token - backend reads it from NextAuth cookies
+        // The credentials: 'include' option in fetch automatically sends the cookies
 
         return headers;
     }
@@ -218,7 +178,6 @@ export class ApiClient {
 
             if (process.env.NODE_ENV === 'development') {
                 console.log(`[${this.isServer() ? 'Server' : 'Client'}] ${method} ${url}`, {
-                    hasAuth: !!headers['Authorization'],
                     bodyType: preparedBody ? typeof preparedBody : 'none'
                 });
             }
@@ -251,23 +210,23 @@ export class ApiClient {
     }
 
     public async get<T = any>(endpoint: string, options: Omit<RequestOptions, 'method' | 'body'> = {}): Promise<ApiResponse<T>> {
-        return this.request<T>(endpoint, { ...options, method: 'GET' });
+        return this.request<T>(endpoint, {...options, method: 'GET'});
     }
 
     public async post<T = any>(endpoint: string, body?: any, options: Omit<RequestOptions, 'method' | 'body'> = {}): Promise<ApiResponse<T>> {
-        return this.request<T>(endpoint, { ...options, method: 'POST', body });
+        return this.request<T>(endpoint, {...options, method: 'POST', body});
     }
 
     public async put<T = any>(endpoint: string, body?: any, options: Omit<RequestOptions, 'method' | 'body'> = {}): Promise<ApiResponse<T>> {
-        return this.request<T>(endpoint, { ...options, method: 'PUT', body });
+        return this.request<T>(endpoint, {...options, method: 'PUT', body});
     }
 
     public async patch<T = any>(endpoint: string, body?: any, options: Omit<RequestOptions, 'method' | 'body'> = {}): Promise<ApiResponse<T>> {
-        return this.request<T>(endpoint, { ...options, method: 'PATCH', body });
+        return this.request<T>(endpoint, {...options, method: 'PATCH', body});
     }
 
     public async delete<T = any>(endpoint: string, options: Omit<RequestOptions, 'method' | 'body'> = {}): Promise<ApiResponse<T>> {
-        return this.request<T>(endpoint, { ...options, method: 'DELETE' });
+        return this.request<T>(endpoint, {...options, method: 'DELETE'});
     }
 
     // Methods to get only data
@@ -277,23 +236,23 @@ export class ApiClient {
     }
 
     public async getD<T = any>(endpoint: string, options: Omit<RequestOptions, 'method' | 'body'> = {}): Promise<T> {
-        return this.getData<T>(endpoint, { ...options, method: 'GET' });
+        return this.getData<T>(endpoint, {...options, method: 'GET'});
     }
 
     public async postD<T = any>(endpoint: string, body?: any, options: Omit<RequestOptions, 'method' | 'body'> = {}): Promise<T> {
-        return this.getData<T>(endpoint, { ...options, method: 'POST', body });
+        return this.getData<T>(endpoint, {...options, method: 'POST', body});
     }
 
     public async putD<T = any>(endpoint: string, body?: any, options: Omit<RequestOptions, 'method' | 'body'> = {}): Promise<T> {
-        return this.getData<T>(endpoint, { ...options, method: 'PUT', body });
+        return this.getData<T>(endpoint, {...options, method: 'PUT', body});
     }
 
     public async patchD<T = any>(endpoint: string, body?: any, options: Omit<RequestOptions, 'method' | 'body'> = {}): Promise<T> {
-        return this.getData<T>(endpoint, { ...options, method: 'PATCH', body });
+        return this.getData<T>(endpoint, {...options, method: 'PATCH', body});
     }
 
     public async deleteD<T = any>(endpoint: string, options: Omit<RequestOptions, 'method' | 'body'> = {}): Promise<T> {
-        return this.getData<T>(endpoint, { ...options, method: 'DELETE' });
+        return this.getData<T>(endpoint, {...options, method: 'DELETE'});
     }
 }
 

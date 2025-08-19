@@ -1,7 +1,7 @@
-import NextAuth, { NextAuthOptions } from 'next-auth'
+import NextAuth, {NextAuthOptions} from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { JWT } from 'next-auth/jwt'
+import {JWT} from 'next-auth/jwt'
 
 export const authOptions: NextAuthOptions = {
     providers: [
@@ -19,10 +19,10 @@ export const authOptions: NextAuthOptions = {
         CredentialsProvider({
             name: 'Email/Password',
             credentials: {
-                name: { label: 'Name', type: 'text' },
-                email: { label: 'Email', type: 'email' },
-                password: { label: 'Password', type: 'password' },
-                action: { label: 'Action', type: 'text' }
+                name: {label: 'Name', type: 'text'},
+                email: {label: 'Email', type: 'email'},
+                password: {label: 'Password', type: 'password'},
+                action: {label: 'Action', type: 'text'}
             },
             async authorize(credentials) {
                 if (!credentials?.email || !credentials?.password) {
@@ -38,7 +38,7 @@ export const authOptions: NextAuthOptions = {
                             `${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`,
                             {
                                 method: 'POST',
-                                headers: {'Content-Type':'application/json'},
+                                headers: {'Content-Type': 'application/json'},
                                 body: JSON.stringify({
                                     name: credentials.name,
                                     email: credentials.email,
@@ -71,7 +71,7 @@ export const authOptions: NextAuthOptions = {
                         `${process.env.NEXT_PUBLIC_API_URL}/api/auth/validate-credentials`,
                         {
                             method: 'POST',
-                            headers: {'Content-Type':'application/json'},
+                            headers: {'Content-Type': 'application/json'},
                             body: JSON.stringify({
                                 email: credentials.email,
                                 password: credentials.password
@@ -107,7 +107,7 @@ export const authOptions: NextAuthOptions = {
 
     jwt: {
         // Custom encoding logic ( RS256 )
-        encode: async ({ token, secret }) => {
+        encode: async ({token, secret}) => {
             const jwt = require('jsonwebtoken')
 
             const payload = {
@@ -127,12 +127,12 @@ export const authOptions: NextAuthOptions = {
             })
         },
 
-        decode: async ({ token, secret }) => {
+        decode: async ({token, secret}) => {
             const jwt = require('jsonwebtoken')
 
             try {
                 const pubKey = process.env.JWT_PUBLIC_KEY!.replace(/\\n/g, '\n')
-                const decoded = jwt.verify(token, pubKey, { algorithms: ['RS256'] })
+                const decoded = jwt.verify(token, pubKey, {algorithms: ['RS256']})
 
                 return decoded as JWT
             } catch (error) {
@@ -143,7 +143,7 @@ export const authOptions: NextAuthOptions = {
     },
 
     callbacks: {
-        async jwt({ token, user, account }) {
+        async jwt({token, user, account}) {
 
             if (user) {
                 token.sub = user.id;
@@ -159,7 +159,7 @@ export const authOptions: NextAuthOptions = {
                             `${process.env.NEXT_PUBLIC_API_URL}/api/auth/sync-google-user`,
                             {
                                 method: 'POST',
-                                headers: {'Content-Type':'application/json'},
+                                headers: {'Content-Type': 'application/json'},
                                 body: JSON.stringify({
                                     googleId: user.id,
                                     email: user.email,
@@ -182,7 +182,7 @@ export const authOptions: NextAuthOptions = {
             return token
         },
 
-        async session({ session, token }) {
+        async session({session, token}) {
             // Pass only user-friendly data.
             session.user.id = token.sub as string
             session.user.email = token.email as string

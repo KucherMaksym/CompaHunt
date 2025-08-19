@@ -74,9 +74,29 @@ class JwtAuthenticationFilter(
     }
 
     private fun getJwtFromRequest(request: HttpServletRequest): String? {
+        // First, try to get JWT from Authorization header
         val bearerToken = request.getHeader("Authorization")
-        return if (bearerToken?.startsWith("Bearer ") == true) {
-            bearerToken.substring(7)
-        } else null
+        if (bearerToken?.startsWith("Bearer ") == true) {
+            return bearerToken.substring(7)
+        }
+
+        // If not found in header, try to get from NextAuth cookie
+        val cookies = request.cookies
+        if (cookies != null) {
+            val possibleCookieNames = listOf(
+                "next-auth.session-token",           // Development (http)
+                "__Secure-next-auth.session-token"  // Production (https)
+            )
+
+            for (cookieName in possibleCookieNames) {
+                val sessionCookie = cookies.find { it.name == cookieName }
+                if (sessionCookie?.value != null) {
+                    log.debug("Found NextAuth session token in cookie: $cookieName")
+                    return sessionCookie.value
+                }
+            }
+        }
+
+        return null
     }
 }

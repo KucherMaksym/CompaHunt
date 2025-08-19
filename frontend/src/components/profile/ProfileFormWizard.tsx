@@ -99,35 +99,33 @@ export function ProfileFormWizard({
   const currentStepData = STEPS[currentStep];
   const StepComponent = currentStepData.component;
 
-  // Функция для сохранения данных текущего шага
   const saveCurrentStepData = () => {
     if (currentStep === 4) { // Preferences step index
       preferencesStepRef.current?.saveAllPreferences();
     }
-    // TODO: добавить сохранение для других шагов, если нужно
   };
 
   const goToStep = (stepIndex: number) => {
-    saveCurrentStepData(); // Сохраняем данные перед переходом
+    saveCurrentStepData();
     setCurrentStep(stepIndex);
   };
 
   const goToNextStep = () => {
     if (currentStep < STEPS.length - 1) {
-      saveCurrentStepData(); // Сохраняем данные перед переходом
+      saveCurrentStepData();
       setCurrentStep(currentStep + 1);
     }
   };
 
   const goToPreviousStep = () => {
     if (currentStep > 0) {
-      saveCurrentStepData(); // Сохраняем данные перед переходом
+      saveCurrentStepData();
       setCurrentStep(currentStep - 1);
     }
   };
 
   const onFormSubmit = async (data: ProfileFormData) => {
-    saveCurrentStepData(); // Сохраняем данные перед отправкой
+    saveCurrentStepData();
     await onSubmit(data);
   };
 

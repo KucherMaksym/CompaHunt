@@ -63,13 +63,9 @@ class UserProfileController(
     }
 
     private fun getUserIdFromAuth(authentication: Authentication): UUID {
-        // Предполагаем, что userId хранится в authentication name или details
-        // Это зависит от вашей реализации аутентификации
         return try {
             UUID.fromString(authentication.name)
         } catch (e: IllegalArgumentException) {
-            // Если authentication.name не UUID, попробуем получить из другого источника
-            // Это нужно адаптировать под вашу систему аутентификации
             throw IllegalStateException("Cannot extract user ID from authentication", e)
         }
     }

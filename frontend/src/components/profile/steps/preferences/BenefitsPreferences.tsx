@@ -36,15 +36,12 @@ export interface BenefitsPreferencesRef {
 export const BenefitsPreferences = memo(forwardRef<BenefitsPreferencesRef>((_props, ref) => {
   const { setValue, getValues } = useFormContext<ProfileFormData>();
 
-  // Локальное состояние для checkbox'ов
   const [selectedBenefits, setSelectedBenefits] = useState<BenefitType[]>(
       () => getValues('preferences.benefitsPreferences') || []
   );
 
-  // Ref для хранения актуального состояния
   const selectedBenefitsRef = useRef<BenefitType[]>(selectedBenefits);
 
-  // Обновляем ref при изменении состояния
   useEffect(() => {
     selectedBenefitsRef.current = selectedBenefits;
   }, [selectedBenefits]);
@@ -61,7 +58,6 @@ export const BenefitsPreferences = memo(forwardRef<BenefitsPreferencesRef>((_pro
       if (isSelected) {
         return prev.filter(b => b !== benefit);
       } else {
-        // Проверяем лимит
         if (prev.length >= 18) {
           return prev;
         }

@@ -70,8 +70,6 @@ data class Vacancy(
 
     val benefits: String? = null,
 
-    val workType: String? = null,
-
     val experience: String? = null,
 
     @OneToMany(mappedBy = "vacancy", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
@@ -98,10 +96,12 @@ data class Salary(
     val max: BigDecimal?,
     val currency: String?,
     val period: String?,
-    val location: String
+    val location: String,
+    val monthMin: BigDecimal? = null,
+    val monthMax: BigDecimal? = null
 )
 
-enum class JobType {
+enum class Remoteness {
     ON_SITE,
     REMOTE,
     HYBRID

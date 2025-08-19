@@ -47,6 +47,44 @@ class VacancyController(
         return ResponseEntity.ok(vacancies)
     }
 
+    @GetMapping("/filtered")
+    fun getFilteredApplications(
+        authentication: Authentication,
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "20") size: Int,
+        @RequestParam(defaultValue = "createdAt") sortBy: String,
+        @RequestParam(defaultValue = "desc") sortDirection: String,
+        @RequestParam(required = false) status: String?,
+        @RequestParam(required = false) search: String?,
+        @RequestParam(required = false) minSalary: String?,
+        @RequestParam(required = false) maxSalary: String?,
+        @RequestParam(required = false) salaryPeriod: String?,
+        @RequestParam(required = false) location: String?,
+        @RequestParam(required = false) experienceLevel: String?,
+        @RequestParam(required = false) jobType: String?,
+        @RequestParam(required = false) remoteness: String?
+    ): ResponseEntity<VacancyPageResponse> {
+        val userId = getUserId(authentication)
+        val filterRequest = VacancyFilterRequest(
+            page = page,
+            size = minOf(size, 100), // Limit max page size to 100
+            sortBy = sortBy,
+            sortDirection = sortDirection,
+            status = status,
+            search = search,
+            minSalary = minSalary,
+            maxSalary = maxSalary,
+            salaryPeriod = salaryPeriod,
+            location = location,
+            experienceLevel = experienceLevel,
+            jobType = jobType,
+            remoteness = remoteness
+        )
+        
+        val result = vacancyService.getVacanciesWithFilters(userId, filterRequest)
+        return ResponseEntity.ok(result)
+    }
+
     @PostMapping
     fun createApplication(
         @RequestBody jobData: Map<String, Any?>,
@@ -81,7 +119,6 @@ class VacancyController(
             remoteness = jobData["remoteness"] as? String,
             industry = jobData["industry"] as? String,
             benefits = jobData["benefits"] as? String,
-            workType = jobData["workType"] as? String,
             experience = jobData["experience"] as? String,
             manual = jobData["manual"] as? Boolean ?: true,
         )

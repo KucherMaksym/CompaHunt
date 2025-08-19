@@ -60,7 +60,7 @@ interface VacancyFormData {
   htmlDescription: string
   requirements: string
   benefits: string
-  workType: 'remote' | 'office' | 'hybrid' | ''
+  remoteness: 'Remote' | 'On-site' | 'Hybrid' | ''
   experience: string
   url: string
 }
@@ -105,7 +105,7 @@ export function VacancyEditModal({ isOpen, onClose, vacancy, mode }: VacancyModa
     htmlDescription: '',
     requirements: '',
     benefits: '',
-    workType: '',
+    remoteness: '',
     experience: '',
     url: ''
   })
@@ -144,7 +144,7 @@ export function VacancyEditModal({ isOpen, onClose, vacancy, mode }: VacancyModa
         htmlDescription: vacancy.htmlDescription || '',
         requirements: vacancy.requirements || '',
         benefits: vacancy.benefits || '',
-        workType: vacancy.workType || '',
+        remoteness: vacancy.remoteness || '',
         experience: vacancy.experience || '',
         url: vacancy.url || ''
       })
@@ -159,7 +159,7 @@ export function VacancyEditModal({ isOpen, onClose, vacancy, mode }: VacancyModa
         htmlDescription: '',
         requirements: '',
         benefits: '',
-        workType: '',
+        remoteness: '',
         experience: '',
         url: ''
       })
@@ -180,7 +180,7 @@ export function VacancyEditModal({ isOpen, onClose, vacancy, mode }: VacancyModa
         htmlDescription: data.htmlDescription || null,
         requirements: data.requirements || null,
         benefits: data.benefits || null,
-        workType: data.workType || null,
+        remoteness: data.remoteness || null,
         experience: data.experience || null,
         url: data.url,
         manual: true, // manually added
@@ -207,7 +207,7 @@ export function VacancyEditModal({ isOpen, onClose, vacancy, mode }: VacancyModa
         htmlDescription: data.htmlDescription || null,
         requirements: data.requirements || null,
         benefits: data.benefits || null,
-        workType: data.workType || null,
+        remoteness: data.remoteness || null,
         experience: data.experience || null
       }
       
@@ -450,11 +450,11 @@ export function VacancyEditModal({ isOpen, onClose, vacancy, mode }: VacancyModa
                           </div>
 
                           <div className="space-y-2">
-                            <Label htmlFor="workType" className="text-sm font-medium flex items-center gap-1">
+                            <Label htmlFor="remoteness" className="text-sm font-medium flex items-center gap-1">
                               <Globe className="h-4 w-4" />
                               Work Type
                             </Label>
-                            <Select value={formData.workType} onValueChange={(value) => handleInputChange('workType', value)}>
+                            <Select value={formData.remoteness} onValueChange={(value) => handleInputChange('remoteness', value)}>
                               <SelectTrigger className="h-10">
                                 <SelectValue placeholder="Select work type" />
                               </SelectTrigger>

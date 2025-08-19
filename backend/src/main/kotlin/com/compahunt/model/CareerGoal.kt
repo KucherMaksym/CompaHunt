@@ -52,9 +52,9 @@ data class CareerGoal(
 )
 
 enum class GoalType {
-    SHORT_TERM,    // до 1 года
-    MEDIUM_TERM,   // 1-3 года
-    LONG_TERM      // 3+ года
+    SHORT_TERM,    // < 1 year
+    MEDIUM_TERM,   // 1-3 years
+    LONG_TERM      // 3+ years
 }
 
 enum class ProgressStatus {

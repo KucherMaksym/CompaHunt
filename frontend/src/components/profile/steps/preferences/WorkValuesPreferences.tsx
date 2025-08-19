@@ -33,15 +33,12 @@ export interface WorkValuesPreferencesRef {
 export const WorkValuesPreferences = memo(forwardRef<WorkValuesPreferencesRef>((_props, ref) => {
   const { setValue, getValues } = useFormContext<ProfileFormData>();
 
-  // Локальное состояние для checkbox'ов
   const [selectedWorkValues, setSelectedWorkValues] = useState<WorkValue[]>(
       () => getValues('preferences.workValues') || []
   );
 
-  // Ref для хранения актуального состояния
   const selectedWorkValuesRef = useRef<WorkValue[]>(selectedWorkValues);
 
-  // Обновляем ref при изменении состояния
   useEffect(() => {
     selectedWorkValuesRef.current = selectedWorkValues;
   }, [selectedWorkValues]);
@@ -58,7 +55,6 @@ export const WorkValuesPreferences = memo(forwardRef<WorkValuesPreferencesRef>((
       if (isSelected) {
         return prev.filter(v => v !== value);
       } else {
-        // Проверяем лимит
         if (prev.length >= 15) {
           return prev;
         }

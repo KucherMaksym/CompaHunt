@@ -17,7 +17,7 @@ export interface Vacancy {
   htmlDescription?: string;
   requirements?: string;
   benefits?: string;
-  workType?: 'remote' | 'office' | 'hybrid';
+  remoteness?: 'Remote' | 'On-site' | 'Hybrid';
   experience?: string;
   url?: string;
   lastUpdated?: string;

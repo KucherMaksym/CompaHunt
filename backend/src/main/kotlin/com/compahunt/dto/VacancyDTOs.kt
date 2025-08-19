@@ -45,8 +45,6 @@ data class CreateVacancyRequest(
 
     val benefits: String? = null,
 
-    val workType: String? = null,
-
     val experience: String? = null,
 
     val manual: Boolean = false
@@ -69,7 +67,6 @@ data class UpdateVacancyRequest(
     val remoteness: String? = null,
     val industry: String? = null,
     val benefits: String? = null,
-    val workType: String? = null,
     val experience: String? = null,
     val reason: String? = null
 )
@@ -94,7 +91,6 @@ data class VacancyResponse(
     val remoteness: String?,
     val industry: String?,
     val benefits: String?,
-    val workType: String?,
     val experience: String?,
     val manual: Boolean,
     val createdAt: String,
@@ -145,4 +141,32 @@ data class UpdateNoteRequest(
 
 data class UpdateStatusRequest(
     val status: VacancyStatus
+)
+
+data class VacancyFilterRequest(
+    val page: Int = 0,
+    val size: Int = 20,
+    val sortBy: String = "createdAt",
+    val sortDirection: String = "desc",
+    val status: String? = null,
+    val search: String? = null,
+    val minSalary: String? = null,
+    val maxSalary: String? = null,
+    val salaryPeriod: String? = null,
+    val location: String? = null,
+    val experienceLevel: String? = null,
+    val jobType: String? = null,
+    val remoteness: String? = null
+)
+
+data class VacancyPageResponse(
+    val content: List<VacancyResponse>,
+    val totalElements: Long,
+    val totalPages: Int,
+    val currentPage: Int,
+    val size: Int,
+    val hasNext: Boolean,
+    val hasPrevious: Boolean,
+    val isFirst: Boolean,
+    val isLast: Boolean
 )

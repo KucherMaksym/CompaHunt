@@ -95,9 +95,9 @@ export function VacanciesTable({ vacancies, onEditVacancy, onArchiveVacancy, onV
                   <p className="text-muted-foreground text-xs">
                     {truncateText(vacancy.company.name, 40)}
                   </p>
-                  {vacancy.workType && (
+                  {vacancy.remoteness && (
                     <span className="inline-block px-2 py-0.5 bg-muted text-muted-foreground rounded text-xs font-medium capitalize">
-                      {vacancy.workType}
+                      {vacancy.remoteness}
                     </span>
                   )}
                 </div>

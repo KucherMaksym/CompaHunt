@@ -20,7 +20,6 @@ interface Job {
   remoteness: String;
   industry: String;
   benefits: String;
-  workType: String;
   experience: String;
   createdAt: String;
   updatedAt: String;

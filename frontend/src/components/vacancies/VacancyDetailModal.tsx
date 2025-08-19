@@ -129,7 +129,7 @@ export function VacancyDetailModal({ vacancy, isOpen, onClose, onEdit }: Vacancy
                       Work Type
                     </Text>
                     <Text size="base" className="capitalize">
-                      {vacancy.workType || "N/A"}
+                      {vacancy.remoteness || "N/A"}
                     </Text>
                   </div>
                 </div>
@@ -141,7 +141,7 @@ export function VacancyDetailModal({ vacancy, isOpen, onClose, onEdit }: Vacancy
                       Salary
                     </Text>
                     <Text size="base" weight="medium">
-                      {vacancy.salary ? `$${vacancy.salary.toLocaleString()}` : "N/A"}
+                      {vacancy.salary ? `${vacancy.salary.toLocaleString()}` : "N/A"}
                     </Text>
                   </div>
                 </div>

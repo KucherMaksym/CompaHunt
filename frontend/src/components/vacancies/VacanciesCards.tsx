@@ -92,10 +92,10 @@ function VacancyCard({ vacancy, onEditVacancy, onArchiveVacancy, onViewVacancy }
               <span className="text-sm">{vacancy.location}</span>
             </div>
           )}
-          {vacancy.workType && (
+          {vacancy.remoteness && (
             <div className="flex items-center gap-1 text-muted-foreground">
               <Briefcase className="h-4 w-4" />
-              <span className="text-sm capitalize">{vacancy.workType}</span>
+              <span className="text-sm capitalize">{vacancy.remoteness}</span>
             </div>
           )}
         </div>
