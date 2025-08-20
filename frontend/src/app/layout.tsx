@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { Header } from '@/components/Header'
 import {Providers} from "@/app/providers";
+import {Toaster} from "@/components/Toaster";
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -16,6 +17,7 @@ export default function RootLayout({children}: { children: React.ReactNode }) {
         <html lang="en" suppressHydrationWarning>
         <body className={inter.className} suppressHydrationWarning>
         <Providers>
+            <Toaster/>
             <Header />
             <div className="min-h-app-height">
                 {children}

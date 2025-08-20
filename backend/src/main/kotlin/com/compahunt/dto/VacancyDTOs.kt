@@ -122,22 +122,6 @@ data class VacancyAuditResponse(
 )
 
 
-data class CreateNoteRequest(
-    val vacancyId: Long,
-    val content: String,
-    val type: String,
-    val priority: String = "MEDIUM",
-    val tags: String? = null,
-    val isPrivate: Boolean = false
-)
-
-data class UpdateNoteRequest(
-    val content: String? = null,
-    val type: String? = null,
-    val priority: String? = null,
-    val tags: String? = null,
-    val isPrivate: Boolean? = null
-)
 
 data class UpdateStatusRequest(
     val status: VacancyStatus

@@ -6,7 +6,6 @@ import com.compahunt.model.VacancyStatus
 import com.compahunt.model.UserPrincipal
 import com.compahunt.model.Interview
 import com.compahunt.service.InterviewService
-import com.compahunt.service.VacancyNoteService
 import com.compahunt.service.VacancyService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -22,8 +21,7 @@ import kotlin.math.min
 @CrossOrigin(origins = ["*"])
 class VacancyController(
     private val vacancyService: VacancyService,
-    private val interviewService: InterviewService,
-    private val vacancyNoteService: VacancyNoteService
+    private val interviewService: InterviewService
 ) {
 
     @GetMapping
@@ -222,19 +220,6 @@ class VacancyController(
         ))
     }
 
-    @PostMapping("/{id}/notes")
-    fun createNote(
-        @PathVariable id: Long,
-        @RequestBody noteRequest: CreateNoteRequest,
-        authentication: Authentication
-    ): ResponseEntity<Map<String, Any>> {
-        val userId = getUserId(authentication)
-        val note = vacancyNoteService.createNote(noteRequest, userId)
-        return ResponseEntity.status(HttpStatus.CREATED).body(mapOf(
-            "success" to true,
-            "note" to note
-        ))
-    }
 
     private fun getUserId(authentication: Authentication): Long {
         return when (val principal = authentication.principal) {

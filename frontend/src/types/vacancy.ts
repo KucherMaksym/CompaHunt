@@ -70,3 +70,35 @@ export enum InterviewStatus {
   RESCHEDULED = 'RESCHEDULED',
   NO_SHOW = 'NO_SHOW'
 }
+
+export interface VacancyNote {
+  id: string;
+  vacancyId: string;
+  content: string;
+  type: NoteType;
+  priority: NotePriority;
+  tags?: string;
+  isPrivate: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export enum NoteType {
+  GENERAL = 'GENERAL',
+  OFFER_RECEIVED = 'OFFER_RECEIVED',
+  REJECTION_RECEIVED = 'REJECTION_RECEIVED',
+  INTERVIEW_FEEDBACK = 'INTERVIEW_FEEDBACK',
+  FOLLOW_UP = 'FOLLOW_UP',
+  RESEARCH = 'RESEARCH',
+  SALARY_NEGOTIATION = 'SALARY_NEGOTIATION',
+  CONTACT_INFO = 'CONTACT_INFO',
+  COMPANY_CULTURE = 'COMPANY_CULTURE',
+  NEXT_STEPS = 'NEXT_STEPS'
+}
+
+export enum NotePriority {
+  LOW = 'LOW',
+  MEDIUM = 'MEDIUM',
+  HIGH = 'HIGH',
+  URGENT = 'URGENT'
+}

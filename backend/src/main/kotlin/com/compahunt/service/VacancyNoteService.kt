@@ -32,6 +32,12 @@ class VacancyNoteService(
             throw IllegalArgumentException("Access denied")
         }
 
+        // Check if a note already exists for this vacancy (allowing only 1 note per vacancy)
+        val existingNotes = vacancyNoteRepository.findByVacancyIdOrderByCreatedAtDesc(request.vacancyId)
+        if (existingNotes.isNotEmpty()) {
+            throw IllegalArgumentException("A note already exists for this vacancy. Only one note per vacancy is allowed.")
+        }
+
         val note = VacancyNote(
             vacancy = vacancy,
             user = user,
