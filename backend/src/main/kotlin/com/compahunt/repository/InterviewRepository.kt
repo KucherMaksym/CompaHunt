@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
-import java.time.LocalDateTime
+import java.time.Instant
 
 @Repository
 interface InterviewRepository : JpaRepository<Interview, Long> {
@@ -17,8 +17,8 @@ interface InterviewRepository : JpaRepository<Interview, Long> {
     @Query("SELECT i FROM Interview i WHERE i.user.id = :userId AND i.scheduledAt BETWEEN :start AND :end ORDER BY i.scheduledAt ASC")
     fun findByUserIdAndScheduledAtBetween(
         @Param("userId") userId: Long,
-        @Param("start") start: LocalDateTime,
-        @Param("end") end: LocalDateTime
+        @Param("start") start: Instant,
+        @Param("end") end: Instant
     ): List<Interview>
     
     @Query("SELECT i FROM Interview i WHERE i.vacancy.id = :vacancyId AND i.user.id = :userId ORDER BY i.scheduledAt ASC")

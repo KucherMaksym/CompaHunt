@@ -12,7 +12,7 @@ import com.compahunt.repository.InterviewRepository
 import com.compahunt.repository.UserRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDateTime
+import java.time.Instant
 
 @Service
 @Transactional
@@ -157,7 +157,7 @@ class NotesService(
             priority = request.priority?.let { NotePriority.valueOf(it) } ?: note.priority,
             tags = request.tags ?: note.tags,
             isPrivate = request.isPrivate ?: note.isPrivate,
-            updatedAt = LocalDateTime.now()
+            updatedAt = Instant.now()
         )
 
         return noteRepository.save(updatedNote)

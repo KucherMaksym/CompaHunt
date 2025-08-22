@@ -1,7 +1,7 @@
 package com.compahunt.model
 
 import jakarta.persistence.*
-import java.time.LocalDateTime
+import java.time.Instant
 
 @Entity
 @Table(name = "notes")
@@ -37,9 +37,9 @@ data class Note(
 
     val isPrivate: Boolean = false,
 
-    val createdAt: LocalDateTime = LocalDateTime.now(),
+    val createdAt: Instant = Instant.now(),
 
-    val updatedAt: LocalDateTime = LocalDateTime.now()
+    val updatedAt: Instant = Instant.now()
 ) {
     init {
         // Ensure exactly one of vacancy or interview is set

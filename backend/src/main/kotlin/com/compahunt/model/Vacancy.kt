@@ -1,9 +1,10 @@
 package com.compahunt.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.*
 import org.hibernate.annotations.SQLRestriction
 import java.math.BigDecimal
-import java.time.LocalDateTime
+import java.time.Instant
 
 @Entity
 @Table(name = "vacancies")
@@ -51,7 +52,7 @@ data class Vacancy(
     @Column(nullable = false)
     val status: VacancyStatus = VacancyStatus.APPLIED,
 
-    val appliedAt: LocalDateTime = LocalDateTime.now(),
+    val appliedAt: Instant = Instant.now(),
 
     val postedDate: String? = null,
 
@@ -73,9 +74,11 @@ data class Vacancy(
     val experience: String? = null,
 
     @OneToMany(mappedBy = "vacancy", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    @JsonIgnore
     val interviews: List<Interview> = listOf(),
 
     @OneToMany(mappedBy = "vacancy", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    @JsonIgnore
     val notes: List<VacancyNote> = listOf(),
 
     @Column(name = "manual", nullable = false, columnDefinition = "boolean default true")
@@ -84,9 +87,9 @@ data class Vacancy(
     @Column(nullable = false)
     val deleted: Boolean = false,
 
-    val createdAt: LocalDateTime = LocalDateTime.now(),
+    val createdAt: Instant = Instant.now(),
 
-    val updatedAt: LocalDateTime = LocalDateTime.now()
+    val updatedAt: Instant = Instant.now()
 )
 
 @Embeddable

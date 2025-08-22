@@ -1,7 +1,7 @@
 package com.compahunt.model
 
 import jakarta.persistence.*
-import java.time.LocalDateTime
+import java.time.Instant
 
 @Entity
 @Table(name = "vacancy_audit")
@@ -32,7 +32,7 @@ data class VacancyAudit(
     @Column(columnDefinition = "TEXT")
     val changes: String? = null,
 
-    val timestamp: LocalDateTime = LocalDateTime.now(),
+    val timestamp: Instant = Instant.now(),
 
     val reason: String? = null,
 

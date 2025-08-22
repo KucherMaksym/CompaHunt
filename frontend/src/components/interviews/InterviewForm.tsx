@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Calendar } from 'lucide-react'
 import { InterviewType } from '@/types/vacancy'
 import apiClient from '@/lib/api-client'
+import { inputValueToUTC } from '@/lib/timezone'
 
 interface InterviewFormData {
   scheduledAt: string
@@ -44,11 +45,16 @@ export function InterviewForm({ vacancyId, isVisible, onCancel, onSuccess }: Int
     notes: ''
   })
 
+  // const createInterviewMutation = (data: InterviewFormData) => {
+  //   console.log(data)
+  //   console.log(inputValueToUTC(data.scheduledAt))
+  // }
+
   const createInterviewMutation = useMutation({
     mutationFn: async (data: InterviewFormData) => {
       const payload = {
         vacancyId,
-        scheduledAt: new Date(data.scheduledAt).toISOString(),
+        scheduledAt: inputValueToUTC(data.scheduledAt),
         type: data.type,
         duration: data.duration,
         meetingLink: data.meetingLink || null,
@@ -57,7 +63,7 @@ export function InterviewForm({ vacancyId, isVisible, onCancel, onSuccess }: Int
         interviewerEmail: data.interviewerEmail || null,
         notes: data.notes || null
       }
-      
+
       return await apiClient.post(`/api/vacancies/${vacancyId}/interviews`, payload)
     },
     onSuccess: () => {

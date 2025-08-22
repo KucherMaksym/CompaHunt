@@ -10,7 +10,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.Table
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
-import java.time.LocalDateTime
+import java.time.Instant
 
 @Entity
 @Table(name = "users")
@@ -35,10 +35,10 @@ data class User(
     val role: Role = Role.USER,
 
     @CreatedDate
-    val createdAt: LocalDateTime = LocalDateTime.now(),
+    val createdAt: Instant = Instant.now(),
 
     @LastModifiedDate
-    val updatedAt: LocalDateTime = LocalDateTime.now()
+    val updatedAt: Instant = Instant.now()
 )
 
 enum class AuthProvider {

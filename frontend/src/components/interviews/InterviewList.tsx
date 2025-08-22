@@ -26,6 +26,7 @@ import { Interview, InterviewType, InterviewStatus } from '@/types/vacancy'
 import { getInterviewStatusColor } from '@/utils/interview-utils'
 import { formatShortLink } from '@/utils/url-utils'
 import { interviewApi } from '@/lib/api/interviews'
+import { formatUTCForDisplay, utcToDate } from '@/lib/timezone'
 
 const getInterviewTypeIcon = (type: InterviewType) => {
   const iconMap = {
@@ -94,7 +95,7 @@ export function InterviewList({ interviews, vacancyId, onScheduleNew, onEdit }: 
     <div className="space-y-3">
       {interviews.map((interview: Interview) => {
         const IconComponent = getInterviewTypeIcon(interview.type)
-        const interviewDate = new Date(interview.scheduledAt)
+        const interviewDate = utcToDate(interview.scheduledAt)
         const isPast = interviewDate < new Date()
         
         return (

@@ -1,7 +1,7 @@
 package com.compahunt.model
 
 import jakarta.persistence.*
-import java.time.LocalDateTime
+import java.time.Instant
 
 @Entity
 @Table(name = "interview_notes")
@@ -33,7 +33,7 @@ data class InterviewNote(
 
     val isPrivate: Boolean = false,
 
-    val createdAt: LocalDateTime = LocalDateTime.now(),
+    val createdAt: Instant = Instant.now(),
 
-    val updatedAt: LocalDateTime = LocalDateTime.now()
+    val updatedAt: Instant = Instant.now()
 )

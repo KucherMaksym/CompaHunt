@@ -19,8 +19,7 @@ import org.springframework.transaction.annotation.Transactional
 import jakarta.servlet.http.HttpServletRequest
 import org.slf4j.LoggerFactory
 import java.math.BigDecimal
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+import java.time.Instant
 
 @Service
 @Transactional
@@ -34,7 +33,6 @@ class VacancyService(
     private val log = LoggerFactory.getLogger(VacancyService::class.java)
 
     private val objectMapper = jacksonObjectMapper()
-    private val dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
 
     fun createVacancy(
         request: CreateVacancyRequest, 
@@ -213,7 +211,7 @@ class VacancyService(
             industry = request.industry ?: vacancy.industry,
             benefits = request.benefits ?: vacancy.benefits,
             experience = request.experience ?: vacancy.experience,
-            updatedAt = LocalDateTime.now()
+            updatedAt = Instant.now()
         )
 
         val savedVacancy = vacancyRepository.save(updatedVacancy)
@@ -251,7 +249,7 @@ class VacancyService(
         val oldStatus = vacancy.status
         val updatedVacancy = vacancy.copy(
             status = status,
-            updatedAt = LocalDateTime.now()
+            updatedAt = Instant.now()
         )
 
         val savedVacancy = vacancyRepository.save(updatedVacancy)
@@ -283,7 +281,7 @@ class VacancyService(
 
         val updatedVacancy = vacancy.copy(
             status = VacancyStatus.ARCHIVED,
-            updatedAt = LocalDateTime.now()
+            updatedAt = Instant.now()
         )
 
         vacancyRepository.save(updatedVacancy)
@@ -403,7 +401,7 @@ class VacancyService(
             requirements = vacancy.requirements,
             skills = vacancy.skills,
             status = vacancy.status,
-            appliedAt = vacancy.appliedAt.format(dateFormatter),
+            appliedAt = vacancy.appliedAt.toString(),
             postedDate = vacancy.postedDate,
             applicantCount = vacancy.applicantCount,
             url = vacancy.url,
@@ -412,9 +410,9 @@ class VacancyService(
             industry = vacancy.industry,
             benefits = vacancy.benefits,
             experience = vacancy.experience,
-            createdAt = vacancy.createdAt.format(dateFormatter),
-            updatedAt = vacancy.updatedAt.format(dateFormatter),
-            lastUpdated = vacancy.updatedAt.format(dateFormatter),
+            createdAt = vacancy.createdAt.toString(),
+            updatedAt = vacancy.updatedAt.toString(),
+            lastUpdated = vacancy.updatedAt.toString(),
             manual = vacancy.manual
         )
     }
@@ -449,7 +447,7 @@ class VacancyService(
             oldValue = audit.oldValue,
             newValue = audit.newValue,
             changes = audit.changes,
-            timestamp = audit.timestamp.format(dateFormatter),
+            timestamp = audit.timestamp.toString(),
             reason = audit.reason,
             userAgent = audit.userAgent,
             ipAddress = audit.ipAddress

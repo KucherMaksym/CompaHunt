@@ -370,7 +370,7 @@ export function VacancyDetailModal({ vacancy, isOpen, onClose, onEdit }: Vacancy
                         </p>
                       </div>
 
-                      {!notes.length > 0 && (
+                      {!(notes.length > 0) && (
                           <Button
                               onClick={() => setShowNoteForm(true)}
                               className="flex items-center gap-2"

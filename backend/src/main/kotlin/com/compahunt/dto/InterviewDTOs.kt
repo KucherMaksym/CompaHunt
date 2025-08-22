@@ -3,14 +3,14 @@ package com.compahunt.dto
 import com.compahunt.model.InterviewStatus
 import com.compahunt.model.InterviewType
 import jakarta.validation.constraints.NotNull
-import java.time.LocalDateTime
+import java.time.Instant
 
 data class CreateInterviewRequest(
     @field:NotNull(message = "Vacancy ID is required")
     val vacancyId: Long,
     
     @field:NotNull(message = "Scheduled time is required")
-    val scheduledAt: LocalDateTime,
+    val scheduledAt: Instant,
     
     @field:NotNull(message = "Interview type is required")
     val type: InterviewType,
@@ -24,7 +24,7 @@ data class CreateInterviewRequest(
 )
 
 data class UpdateInterviewRequest(
-    val scheduledAt: LocalDateTime? = null,
+    val scheduledAt: Instant? = null,
     val type: InterviewType? = null,
     val status: InterviewStatus? = null,
     val notes: String? = null,

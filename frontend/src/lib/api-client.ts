@@ -142,11 +142,7 @@ export class ApiClient {
             } catch (error) {
                 lastError = error as Error;
 
-                if (error instanceof ApiError && error.status >= 400 && error.status < 500) {
-                    throw error;
-                }
-
-                if (error instanceof ApiError && (error.status === 401 || error.status === 403)) {
+                if (error instanceof ApiError && error.status >= 400) {
                     throw error;
                 }
 

@@ -4,7 +4,7 @@ import com.compahunt.model.Salary
 import com.compahunt.model.VacancyStatus
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
-import java.time.LocalDateTime
+import java.time.Instant
 
 data class CreateVacancyRequest(
     @field:NotBlank(message = "Title is required")

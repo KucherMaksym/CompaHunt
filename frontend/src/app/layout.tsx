@@ -4,6 +4,7 @@ import './globals.css'
 import { Header } from '@/components/Header'
 import {Providers} from "@/app/providers";
 import {Toaster} from "@/components/Toaster";
+import {PendingEventsManager} from "@/components/events/PendingEventsManager";
 
 const inter = Inter({ subsets: ['latin'] })
 

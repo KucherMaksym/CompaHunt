@@ -1,5 +1,6 @@
 package com.compahunt.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -8,7 +9,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
-import java.time.LocalDateTime
+import java.time.Instant
 
 @Entity
 @Table(name = "companies")
@@ -27,9 +28,10 @@ data class Company(
     val logoUrl: String? = null,
 
     @OneToMany(mappedBy = "company", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @JsonIgnore
     val vacancies: List<Vacancy> = mutableListOf(),
 
-    val createdAt: LocalDateTime = LocalDateTime.now(),
+    val createdAt: Instant = Instant.now(),
 
-    val updatedAt: LocalDateTime = LocalDateTime.now()
+    val updatedAt: Instant = Instant.now()
 )

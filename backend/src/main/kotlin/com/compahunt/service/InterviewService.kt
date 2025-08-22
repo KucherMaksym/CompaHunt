@@ -5,9 +5,11 @@ import com.compahunt.dto.InterviewResponse
 import com.compahunt.dto.UpdateInterviewRequest
 import com.compahunt.mapper.InterviewMapper
 import com.compahunt.model.Interview
+import com.compahunt.model.InterviewStatus
 import com.compahunt.repository.InterviewRepository
 import com.compahunt.repository.VacancyRepository
 import com.compahunt.repository.UserRepository
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -17,8 +19,11 @@ class InterviewService(
     private val interviewRepository: InterviewRepository,
     private val vacancyRepository: VacancyRepository,
     private val userRepository: UserRepository,
-    private val interviewMapper: InterviewMapper
+    private val interviewMapper: InterviewMapper,
+    private val pendingEventService: PendingEventService
 ) {
+
+    private val logger = LoggerFactory.getLogger(javaClass)
 
     fun createInterview(request: CreateInterviewRequest, userId: Long): InterviewResponse {
         val vacancy = vacancyRepository.findById(request.vacancyId)
@@ -46,6 +51,14 @@ class InterviewService(
         )
         val savedInterview = interviewRepository.save(interview)
         
+        // Schedule feedback job for when interview ends
+        try {
+            pendingEventService.scheduleInterviewFeedbackJob(savedInterview)
+        } catch (e: Exception) {
+            // Log error but don't fail the interview creation
+            println("Failed to schedule interview feedback job for interview ${savedInterview.id}: ${e.message}")
+        }
+        
         return interviewMapper.toResponse(savedInterview)
     }
 
@@ -69,10 +82,31 @@ class InterviewService(
             location = request.location ?: interview.location,
             interviewerName = request.interviewerName ?: interview.interviewerName,
             interviewerEmail = request.interviewerEmail ?: interview.interviewerEmail,
-            updatedAt = java.time.LocalDateTime.now()
+            updatedAt = java.time.Instant.now()
         )
         
         val savedInterview = interviewRepository.save(updatedInterview)
+        
+        // Handle job rescheduling if interview time or duration changed
+        val timeChanged = request.scheduledAt != null && request.scheduledAt != interview.scheduledAt
+        val durationChanged = request.duration != null && request.duration != interview.duration
+        val statusChanged = request.status != null && request.status != interview.status
+        
+        if (timeChanged || durationChanged || statusChanged) {
+            try {
+                if (statusChanged && savedInterview.status.isCompletedOrCancelled()) {
+                    // Cancel feedback job if interview is completed/cancelled
+                    pendingEventService.cancelInterviewFeedbackJob(savedInterview.id)
+                } else if (timeChanged || durationChanged) {
+                    // Reschedule feedback job with new time
+                    pendingEventService.scheduleInterviewFeedbackJob(savedInterview)
+                }
+            } catch (e: Exception) {
+                // Log error but don't fail the update
+                println("Failed to update interview feedback job for interview ${savedInterview.id}: ${e.message}")
+            }
+        }
+        
         return interviewMapper.toResponse(savedInterview)
     }
 
@@ -106,7 +140,22 @@ class InterviewService(
             throw IllegalArgumentException("Access denied")
         }
 
+        // Cancel any scheduled feedback job
+        try {
+            pendingEventService.cancelInterviewFeedbackJob(interviewId)
+        } catch (e: Exception) {
+            // Log error but continue with deletion
+            println("Failed to cancel interview feedback job for interview $interviewId: ${e.message}")
+        }
+        
         interviewRepository.delete(interview)
         return true
+    }
+    
+    // Extension function for InterviewStatus
+    private fun InterviewStatus.isCompletedOrCancelled(): Boolean {
+        return this == InterviewStatus.COMPLETED ||
+               this == InterviewStatus.CANCELLED ||
+               this == InterviewStatus.NO_SHOW
     }
 }

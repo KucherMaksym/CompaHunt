@@ -1,7 +1,7 @@
 package com.compahunt.model
 
 import jakarta.persistence.*
-import java.time.LocalDateTime
+import java.time.Instant
 
 @Entity
 @Table(name = "interviews")
@@ -19,7 +19,7 @@ data class Interview(
     val user: User,
 
     @Column(nullable = false)
-    val scheduledAt: LocalDateTime,
+    val scheduledAt: Instant,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -45,9 +45,9 @@ data class Interview(
 
     val interviewerEmail: String? = null,
 
-    val createdAt: LocalDateTime = LocalDateTime.now(),
+    val createdAt: Instant = Instant.now(),
 
-    val updatedAt: LocalDateTime = LocalDateTime.now()
+    val updatedAt: Instant = Instant.now()
 )
 
 enum class InterviewType {

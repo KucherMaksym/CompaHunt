@@ -10,7 +10,7 @@ import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.Named
 import org.springframework.stereotype.Component
-import java.time.LocalDateTime
+import java.time.Instant
 import java.time.format.DateTimeFormatter
 
 @Mapper(componentModel = "spring")

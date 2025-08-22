@@ -10,6 +10,7 @@ import { VacancyDetailModal } from "@/components/vacancies/VacancyDetailModal"
 import { InterviewDashboard } from "@/components/dashboard/InterviewDashboard"
 import { Vacancy, VacancyStatus } from "@/types/vacancy"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {PendingEventsManager} from "@/components/events/PendingEventsManager";
 
 const DynamicHome = dynamic(() => Promise.resolve(Home), {
     ssr: false
@@ -111,6 +112,8 @@ function Home() {
 
     return (
         <main className="min-h-screen bg-background">
+            <PendingEventsManager />
+
             <div className="container mx-auto p-6 lg:p-8 flex flex-col gap-y-6 max-w-7xl">
                 <div>
                     <h1 className="text-3xl lg:text-4xl font-bold text-foreground mb-2">
