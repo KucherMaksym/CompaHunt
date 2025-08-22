@@ -30,14 +30,14 @@ import { Text } from "@/components/ui/Text"
 import { RichTextEditor } from '@/components/ui/rich-text-editor'
 import apiClient from '@/lib/api-client'
 import { notesApi } from '@/lib/api/notes'
-import EditInterviewModal from '@/components/interviews/EditInterviewModal'
+import {EditInterviewModal} from '@/components/interviews/EditInterviewModal'
 import { InterviewForm } from '@/components/interviews/InterviewForm'
 import { InterviewList } from '@/components/interviews/InterviewList'
 import { NoteForm } from '@/components/notes/NoteForm'
 import { NoteList } from '@/components/notes/NoteList'
 
 interface VacancyDetailModalProps {
-  vacancy: Vacancy | null
+  vacancy: Vacancy | undefined
   isOpen: boolean
   onClose: () => void
   onEdit?: (vacancy: Vacancy) => void

@@ -1,16 +1,16 @@
 'use client'
 
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import {useState} from 'react'
+import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query'
 import apiClient from "@/lib/api-client";
 import dynamic from 'next/dynamic'
-import { VacanciesList } from "@/components/vacancies/VacanciesList"
-import { VacancyEditModal } from "@/components/vacancies/VacancyEditModal"
-import { VacancyDetailModal } from "@/components/vacancies/VacancyDetailModal"
-import { InterviewDashboard } from "@/components/dashboard/InterviewDashboard"
-import { Vacancy, VacancyStatus } from "@/types/vacancy"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import {PendingEventsManager} from "@/components/events/PendingEventsManager";
+import {VacanciesList} from "@/components/vacancies/VacanciesList"
+import {VacancyEditModal} from "@/components/vacancies/VacancyEditModal"
+import {VacancyDetailModal} from "@/components/vacancies/VacancyDetailModal"
+import {InterviewDashboard} from "@/components/dashboard/InterviewDashboard"
+import {Vacancy, VacancyStatus} from "@/types/vacancy"
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
+import {DashboardLayout} from "@/components/dashboard-layout"
 
 const DynamicHome = dynamic(() => Promise.resolve(Home), {
     ssr: false
@@ -19,13 +19,13 @@ const DynamicHome = dynamic(() => Promise.resolve(Home), {
 async function fetchApplications(): Promise<Vacancy[]> {
     console.log("fetching applications");
     const response = await apiClient.getD<any[]>("/api/vacancies");
-    
+
     // Transform API response to match our Vacancy type
     return response || [];
 }
 
 function Home() {
-    const { data: applications, isLoading, error } = useQuery({
+    const {data: applications, isLoading, error} = useQuery({
         queryKey: ['applications'],
         queryFn: fetchApplications,
     })
@@ -35,12 +35,12 @@ function Home() {
         isOpen: boolean
         mode: 'create' | 'edit'
         vacancy?: Vacancy
-    }>({ isOpen: false, mode: 'create' })
-    
+    }>({isOpen: false, mode: 'create'})
+
     const [detailModalState, setDetailModalState] = useState<{
         isOpen: boolean
         vacancy?: Vacancy
-    }>({ isOpen: false })
+    }>({isOpen: false})
 
     const archiveMutation = useMutation({
         mutationFn: async (vacancyId: string) => {
@@ -49,16 +49,16 @@ function Home() {
             })
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['applications'] })
+            queryClient.invalidateQueries({queryKey: ['applications']})
         }
     })
 
     const handleAddVacancy = () => {
-        setModalState({ isOpen: true, mode: 'create' })
+        setModalState({isOpen: true, mode: 'create'})
     }
 
     const handleEditVacancy = (vacancy: Vacancy) => {
-        setModalState({ isOpen: true, mode: 'edit', vacancy })
+        setModalState({isOpen: true, mode: 'edit', vacancy})
     }
 
     const handleArchiveVacancy = (vacancyId: string) => {
@@ -66,55 +66,59 @@ function Home() {
     }
 
     const handleCloseModal = () => {
-        setModalState({ isOpen: false, mode: 'create' })
+        setModalState({isOpen: false, mode: 'create'})
     }
 
     const handleViewVacancy = (vacancy: Vacancy) => {
-        setDetailModalState({ isOpen: true, vacancy })
+        setDetailModalState({isOpen: true, vacancy})
     }
 
     const handleCloseDetailModal = () => {
-        setDetailModalState({ isOpen: false })
+        setDetailModalState({isOpen: false})
     }
 
     const handleAddInterview = () => {
         // This could open a separate interview creation modal
         // For now, we'll just handle it by opening the vacancy modal in create mode
-        setModalState({ isOpen: true, mode: 'create' })
+        setModalState({isOpen: true, mode: 'create'})
     }
 
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-background flex items-center justify-center">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-                    <p className="text-muted-foreground">Loading applications...</p>
+            <DashboardLayout>
+                <div className="flex items-center justify-center min-h-[400px]">
+                    <div className="text-center">
+                        <div
+                            className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                        <p className="text-muted-foreground">Loading applications...</p>
+                    </div>
                 </div>
-            </div>
+            </DashboardLayout>
         )
     }
 
     if (error) {
         return (
-            <div className="min-h-screen bg-background flex items-center justify-center">
-                <div className="text-center">
-                    <div className="text-destructive mb-4">
-                        <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-1.732-.833-2.5 0L4.732 15.5c-.77.833.192 2.5 1.732 2.5z" />
-                        </svg>
+            <DashboardLayout>
+                <div className="flex items-center justify-center min-h-[400px]">
+                    <div className="text-center">
+                        <div className="text-destructive mb-4">
+                            <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-1.732-.833-2.5 0L4.732 15.5c-.77.833.192 2.5 1.732 2.5z"/>
+                            </svg>
+                        </div>
+                        <h3 className="text-lg font-medium text-foreground mb-2">Error loading applications</h3>
+                        <p className="text-muted-foreground">Please try refreshing the page</p>
                     </div>
-                    <h3 className="text-lg font-medium text-foreground mb-2">Error loading applications</h3>
-                    <p className="text-muted-foreground">Please try refreshing the page</p>
                 </div>
-            </div>
+            </DashboardLayout>
         )
     }
 
     return (
-        <main className="min-h-screen bg-background">
-            <PendingEventsManager />
-
-            <div className="container mx-auto p-6 lg:p-8 flex flex-col gap-y-6 max-w-7xl">
+        <DashboardLayout>
+            <div className="flex flex-col gap-y-6">
                 <div>
                     <h1 className="text-3xl lg:text-4xl font-bold text-foreground mb-2">
                         Dashboard
@@ -124,10 +128,9 @@ function Home() {
                     </p>
                 </div>
 
-                <InterviewDashboard onAddInterview={handleAddInterview} />
+                <InterviewDashboard onAddInterview={handleAddInterview}/>
 
                 <VacanciesList
-                    vacancies={applications || []}
                     onAddVacancy={handleAddVacancy}
                     onEditVacancy={handleEditVacancy}
                     onArchiveVacancy={handleArchiveVacancy}
@@ -148,7 +151,7 @@ function Home() {
                     onEdit={handleEditVacancy}
                 />
             </div>
-        </main>
+        </DashboardLayout>
     )
 }
 

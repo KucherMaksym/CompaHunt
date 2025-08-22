@@ -26,7 +26,7 @@ import {
 import { Vacancy, VacancyStatus, Interview, VacancyNote } from '@/types/vacancy'
 import apiClient from '@/lib/api-client'
 import {getStatusColor} from "@/utils/vacancy-utils";
-import EditInterviewModal from '@/components/interviews/EditInterviewModal';
+import {EditInterviewModal} from '@/components/interviews/EditInterviewModal';
 import { InterviewForm } from '@/components/interviews/InterviewForm';
 import { InterviewList } from '@/components/interviews/InterviewList';
 import { NoteForm } from '@/components/notes/NoteForm';

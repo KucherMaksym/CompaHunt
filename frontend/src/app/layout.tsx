@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import { Header } from '@/components/Header'
 import {Providers} from "@/app/providers";
 import {Toaster} from "@/components/Toaster";
 import {PendingEventsManager} from "@/components/events/PendingEventsManager";
@@ -9,7 +8,7 @@ import {PendingEventsManager} from "@/components/events/PendingEventsManager";
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-    title: 'JobTracker Pro',
+    title: 'CompaHunt',
     description: 'AI-Powered Career Management Platform',
 }
 
@@ -19,10 +18,8 @@ export default function RootLayout({children}: { children: React.ReactNode }) {
         <body className={inter.className} suppressHydrationWarning>
         <Providers>
             <Toaster/>
-            <Header />
-            <div className="min-h-app-height">
-                {children}
-            </div>
+            <PendingEventsManager />
+            {children}
         </Providers>
         </body>
         </html>

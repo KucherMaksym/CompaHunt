@@ -19,7 +19,7 @@ import {
 } from 'lucide-react'
 import { formatDistanceToNow, format } from 'date-fns'
 import { useState } from 'react'
-import EditInterviewModal from './EditInterviewModal'
+import {EditInterviewModal} from './EditInterviewModal'
 import {formatShortLink} from "@/utils/url-utils";
 import {Title} from "@/components/ui/Title";
 import {Text} from "@/components/ui/Text";

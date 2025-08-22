@@ -10,6 +10,7 @@ import { ProfileFormWizard } from '@/components/profile/ProfileFormWizard';
 import { ProfileFormData } from '@/lib/validation/profile';
 import { Card, CardContent } from '@/components/ui/card';
 import { User } from 'lucide-react';
+import {DashboardLayout} from "@/components/dashboard-layout";
 
 export default function ProfilePage() {
   const { user, loading, isAuthenticated } = useAuth();
@@ -62,12 +63,12 @@ export default function ProfilePage() {
 
   if (loading || isLoadingProfile) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <DashboardLayout>
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-y-2 border-primary mx-auto mb-4"></div>
           <p className="text-secondary">Loading your profile...</p>
         </div>
-      </div>
+      </DashboardLayout>
     )
   }
 
@@ -109,7 +110,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-background py-8">
+    <DashboardLayout>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* User Header */}
         <Card className="mb-8">
@@ -154,6 +155,6 @@ export default function ProfilePage() {
           isLoading={isSubmitting}
         />
       </div>
-    </div>
+    </DashboardLayout>
   )
 }
