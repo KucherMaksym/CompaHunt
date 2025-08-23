@@ -2,6 +2,7 @@ package com.compahunt.service
 
 import com.compahunt.dto.CreateInterviewRequest
 import com.compahunt.dto.InterviewResponse
+import com.compahunt.dto.InterviewWithVacancyResponse
 import com.compahunt.dto.UpdateInterviewRequest
 import com.compahunt.mapper.InterviewMapper
 import com.compahunt.model.Interview
@@ -116,6 +117,14 @@ class InterviewService(
 
         return interviewRepository.findByUserIdOrderByScheduledAtAsc(userId)
             .map { interviewMapper.toResponse(it) }
+    }
+
+    fun getAllInterviewsWithVacancies(userId: Long): List<InterviewWithVacancyResponse> {
+        val user = userRepository.findById(userId)
+            .orElseThrow { IllegalArgumentException("User not found") }
+
+        return interviewRepository.findByUserIdOrderByScheduledAtAsc(userId)
+            .map { interviewMapper.toResponseWithVacancy(it) }
     }
 
     fun getInterviewsByVacancy(vacancyId: Long, userId: Long): List<InterviewResponse> {

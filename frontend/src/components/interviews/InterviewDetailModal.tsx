@@ -15,7 +15,8 @@ import {
   MessageSquare,
   Edit,
   ExternalLink,
-  Building2
+  Building2,
+  DollarSign
 } from 'lucide-react'
 import { formatDistanceToNow, format } from 'date-fns'
 import { useState } from 'react'
@@ -24,6 +25,7 @@ import {formatShortLink} from "@/utils/url-utils";
 import {Title} from "@/components/ui/Title";
 import {Text} from "@/components/ui/Text";
 import {getInterviewStatusColor, getInterviewStatusLabel, getInterviewTypeLabel} from "@/utils/interview-utils";
+import {VacancyDetailModal} from '@/components/vacancies/VacancyDetailModal';
 
 interface InterviewDetailModalProps {
   interview: Interview | null
@@ -35,6 +37,7 @@ interface InterviewDetailModalProps {
 
 export function InterviewDetailModal({ interview, isOpen, onClose, onEdit, onSave }: InterviewDetailModalProps) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [isVacancyModalOpen, setIsVacancyModalOpen] = useState(false)
 
   if (!interview) return null
 
@@ -90,6 +93,55 @@ export function InterviewDetailModal({ interview, isOpen, onClose, onEdit, onSav
           </DialogHeader>
 
           <div className="space-y-8 mt-6">
+            {/* Vacancy Information Card */}
+            {interview.vacancy && (
+              <div className="space-y-4">
+                <Title level={3} variant="primary">
+                  Position Details
+                </Title>
+
+                <div className="bg-background-surface p-4 rounded-lg border border-border space-y-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-lg font-semibold text-foreground mb-2 leading-tight">
+                        {interview.vacancy.title}
+                      </h4>
+                      <div className="flex items-center gap-2 mb-2">
+                        <Building2 className="h-4 w-4 text-muted-foreground" />
+                        <Text size="base" weight="medium">
+                          {interview.vacancy.company?.name}
+                        </Text>
+                      </div>
+                      {interview.vacancy.location && (
+                        <div className="flex items-center gap-2 mb-2">
+                          <MapPin className="h-4 w-4 text-muted-foreground" />
+                          <Text size="sm" variant="muted">
+                            {interview.vacancy.location}
+                          </Text>
+                        </div>
+                      )}
+                      {interview.vacancy.salary && (
+                        <div className="flex items-center gap-2">
+                          <DollarSign className="h-4 w-4 text-muted-foreground" />
+                          <Text size="sm" variant="muted">
+                            ${interview.vacancy.salary.toLocaleString()}
+                          </Text>
+                        </div>
+                      )}
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsVacancyModalOpen(true)}
+                      className="flex-shrink-0"
+                    >
+                      View Details
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Contact Information Card */}
             <div className="space-y-4">
               <Title level={3} variant="primary">
@@ -270,6 +322,15 @@ export function InterviewDetailModal({ interview, isOpen, onClose, onEdit, onSav
         onClose={() => setIsEditModalOpen(false)}
         onSave={handleSaveInterview}
       />
+
+      {/* Vacancy Detail Modal */}
+      {interview.vacancy && (
+        <VacancyDetailModal
+          vacancy={interview.vacancy}
+          isOpen={isVacancyModalOpen}
+          onClose={() => setIsVacancyModalOpen(false)}
+        />
+      )}
     </>
   )
 }

@@ -2,6 +2,7 @@ package com.compahunt.controller
 
 import com.compahunt.dto.CreateInterviewRequest
 import com.compahunt.dto.InterviewResponse
+import com.compahunt.dto.InterviewWithVacancyResponse
 import com.compahunt.dto.UpdateInterviewRequest
 import com.compahunt.model.UserPrincipal
 import com.compahunt.service.InterviewService
@@ -20,9 +21,9 @@ class InterviewController(
     @GetMapping
     fun getAllInterviews(
         authentication: Authentication
-    ): ResponseEntity<List<InterviewResponse>> {
+    ): ResponseEntity<List<InterviewWithVacancyResponse>> {
         val userId = getUserId(authentication)
-        val interviews = interviewService.getAllInterviews(userId)
+        val interviews = interviewService.getAllInterviewsWithVacancies(userId)
         return ResponseEntity.ok(interviews)
     }
 

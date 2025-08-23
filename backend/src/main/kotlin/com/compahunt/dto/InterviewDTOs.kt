@@ -55,6 +55,24 @@ data class InterviewResponse(
     val updatedAt: String
 )
 
+data class InterviewWithVacancyResponse(
+    val id: Long,
+    val vacancy: VacancyResponse,
+    val companyName: String,
+    val scheduledAt: String,
+    val type: InterviewType,
+    val status: InterviewStatus,
+    val notes: String?,
+    val feedback: String?,
+    val duration: Int?,
+    val meetingLink: String?,
+    val location: String?,
+    val interviewerName: String?,
+    val interviewerEmail: String?,
+    val createdAt: String,
+    val updatedAt: String
+)
+
 data class UserResponse(
     val id: Long,
     val email: String,

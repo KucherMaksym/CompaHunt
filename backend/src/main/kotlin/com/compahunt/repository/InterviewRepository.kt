@@ -12,7 +12,8 @@ interface InterviewRepository : JpaRepository<Interview, Long> {
     
     fun findByVacancyIdOrderByScheduledAtAsc(vacancyId: Long): List<Interview>
     
-    fun findByUserIdOrderByScheduledAtAsc(userId: Long): List<Interview>
+    @Query("SELECT i FROM Interview i JOIN FETCH i.vacancy v JOIN FETCH v.company WHERE i.user.id = :userId ORDER BY i.scheduledAt ASC")
+    fun findByUserIdOrderByScheduledAtAsc(@Param("userId") userId: Long): List<Interview>
     
     @Query("SELECT i FROM Interview i WHERE i.user.id = :userId AND i.scheduledAt BETWEEN :start AND :end ORDER BY i.scheduledAt ASC")
     fun findByUserIdAndScheduledAtBetween(

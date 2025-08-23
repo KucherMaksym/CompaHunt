@@ -350,7 +350,7 @@ export function VacancyEditModal({ isOpen, onClose, vacancy, mode }: VacancyModa
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value={VacancyStatus.APPLIED}>Applied</SelectItem>
-                            <SelectItem value={VacancyStatus.VIEWED}>Viewed</SelectItem>
+                            <SelectItem value={VacancyStatus.WISHLIST}>Viewed</SelectItem>
                             <SelectItem value={VacancyStatus.PHONE_SCREEN}>Phone Screen</SelectItem>
                             <SelectItem value={VacancyStatus.INTERVIEW}>Interview</SelectItem>
                             <SelectItem value={VacancyStatus.OFFER}>Offer</SelectItem>

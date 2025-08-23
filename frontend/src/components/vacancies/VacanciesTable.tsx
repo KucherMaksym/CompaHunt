@@ -19,32 +19,13 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { ExternalLink, MapPin, Calendar, DollarSign, MoreHorizontal, Edit, Archive } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
-import {getStatusColor} from "@/utils/vacancy-utils";
+import {getStatusColor, getVacancyStatusLabel} from "@/utils/vacancy-utils";
 
 interface VacanciesTableProps {
   vacancies: Vacancy[]
   onEditVacancy?: (vacancy: Vacancy) => void
   onArchiveVacancy?: (vacancyId: string) => void
   onViewVacancy?: (vacancy: Vacancy) => void
-}
-
-function getStatusLabel(status: VacancyStatus): string {
-  switch (status) {
-    case VacancyStatus.APPLIED:
-      return 'Applied'
-    case VacancyStatus.VIEWED:
-      return 'Viewed'
-    case VacancyStatus.PHONE_SCREEN:
-      return 'Phone Screen'
-    case VacancyStatus.INTERVIEW:
-      return 'Interview'
-    case VacancyStatus.OFFER:
-      return 'Offer'
-    case VacancyStatus.REJECTED:
-      return 'Rejected'
-    default:
-      return status
-  }
 }
 
 function truncateText(text: string | undefined, maxLength: number): string {
@@ -127,7 +108,7 @@ export function VacanciesTable({ vacancies, onEditVacancy, onArchiveVacancy, onV
                   variant="outline" 
                   className={`text-xs font-medium ${getStatusColor(vacancy.status)}`}
                 >
-                  {getStatusLabel(vacancy.status)}
+                  {getVacancyStatusLabel(vacancy.status)}
                 </Badge>
               </TableCell>
               <TableCell>
@@ -138,9 +119,9 @@ export function VacanciesTable({ vacancies, onEditVacancy, onArchiveVacancy, onV
               </TableCell>
               <TableCell>
                 <div className="flex items-center gap-1">
-                  {vacancy.jobUrl && (
+                  {vacancy.url && (
                     <a 
-                      href={vacancy.jobUrl} 
+                      href={vacancy.url}
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground p-1"

@@ -35,8 +35,8 @@ function getStatusLabel(status: VacancyStatus): string {
   switch (status) {
     case VacancyStatus.APPLIED:
       return 'Applied'
-    case VacancyStatus.VIEWED:
-      return 'Viewed'
+    case VacancyStatus.WISHLIST:
+      return 'Wishlist'
     case VacancyStatus.PHONE_SCREEN:
       return 'Phone Screen'
     case VacancyStatus.INTERVIEW:

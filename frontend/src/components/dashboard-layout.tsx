@@ -8,9 +8,11 @@ import {useAuth} from "@/hooks/useAuth"
 import Avatar from "@/components/ui/Avatar"
 import {useRouter, usePathname} from "next/navigation"
 import {Button} from "@/components/ui/button"
+import {cn} from "@/lib/utils";
 
 interface DashboardLayoutProps {
-    children: React.ReactNode
+    children: React.ReactNode;
+    className?: string;
 }
 
 function getPageTitle(pathname: string): string {
@@ -33,7 +35,7 @@ function getPageTitle(pathname: string): string {
     return routeTitles[pathname] || 'CompaHunt'
 }
 
-export function DashboardLayout({children}: DashboardLayoutProps) {
+export function DashboardLayout({children, className}: DashboardLayoutProps) {
     const {user, loading} = useAuth()
     const router = useRouter()
     const pathname = usePathname()
@@ -42,7 +44,7 @@ export function DashboardLayout({children}: DashboardLayoutProps) {
     return (
         <SidebarProvider>
             <AppSidebar/>
-            <SidebarInset>
+            <SidebarInset className="overflow-x-hidden">
                 <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
                     <SidebarTrigger className="-ml-1"/>
                     <Separator orientation="vertical" className="mr-2 h-4"/>
@@ -59,7 +61,8 @@ export function DashboardLayout({children}: DashboardLayoutProps) {
                         </div>
                     </div>
                 </header>
-                <div className="flex flex-1 flex-col gap-4 p-4">
+
+                <div className={cn("flex flex-1 flex-col gap-4 p-4", className)}>
                     {children}
                 </div>
             </SidebarInset>

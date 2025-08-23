@@ -104,11 +104,19 @@ function InterviewCard({ interview, onEditInterview, onDeleteInterview, onViewIn
       <div className="flex justify-between items-start mb-4">
         <div className="flex-1 min-w-0">
           <h3 className="text-lg font-semibold text-foreground leading-tight mb-1">
-            {getTypeLabel(interview.type)}
+            {interview.vacancy?.title || 'Position not specified'}
           </h3>
+          <div className="flex items-center gap-1 text-muted-foreground mb-2">
+            <span className="text-sm font-medium">
+              {interview.vacancy?.company?.name || 'Company not specified'}
+            </span>
+          </div>
+          <div className="text-sm text-muted-foreground mb-1">
+            {getTypeLabel(interview.type)}
+          </div>
           <div className="flex items-center gap-1 text-muted-foreground">
             <Calendar className="h-4 w-4 flex-shrink-0" />
-            <span className="text-sm font-medium">
+            <span className="text-sm">
               {format(new Date(interview.scheduledAt), 'PPP')}
             </span>
           </div>

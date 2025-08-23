@@ -1,4 +1,4 @@
-import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query'
+import {useQuery, useMutation, useQueryClient, UseQueryResult} from '@tanstack/react-query'
 import {apiClient} from '@/lib/api-client'
 import {Vacancy} from '@/types/vacancy'
 
@@ -55,16 +55,16 @@ export function useFilteredVacancies(params: VacancyQueryParams = {}) {
 }
 
 // Hook for getting all vacancies (legacy endpoint)
-export function useVacancies(status?: string, limit?: number) {
+export function useVacancies(status?: string, limit?: number): UseQueryResult<Vacancy[], Error> {
     return useQuery({
         queryKey: ['vacancies', status, limit],
         queryFn: async (): Promise<Vacancy[]> => {
-            const params = new URLSearchParams()
-            if (status) params.append('status', status)
-            if (limit) params.append('limit', limit.toString())
+            const params = new URLSearchParams();
+            if (status) params.append('status', status);
+            if (limit) params.append('limit', limit.toString());
 
-            const response = await apiClient.get(`/api/vacancies?${params.toString()}`)
-            return response.data
+            const response = await apiClient.get(`/api/vacancies?${params.toString()}`);
+            return response.data || [];
         },
         staleTime: 30 * 1000,
     })

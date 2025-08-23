@@ -66,6 +66,7 @@ export function InterviewsTable({
             <Table>
                 <TableHeader>
                     <TableRow className="hover:bg-transparent">
+                        <TableHead className="font-semibold">Position & Company</TableHead>
                         <TableHead className="font-semibold">Type & Interviewer</TableHead>
                         <TableHead className="font-semibold">Date & Time</TableHead>
                         <TableHead className="font-semibold">Duration</TableHead>
@@ -82,6 +83,16 @@ export function InterviewsTable({
                             onClick={() => onViewInterview?.(interview)}
                         >
                             <TableCell className="min-w-[240px]">
+                                <div className="space-y-1">
+                                    <h3 className="font-semibold text-foreground text-sm leading-tight">
+                                        {interview.vacancy?.title || 'Position not specified'}
+                                    </h3>
+                                    <div className="text-muted-foreground text-xs">
+                                        {interview.vacancy?.company?.name || 'Company not specified'}
+                                    </div>
+                                </div>
+                            </TableCell>
+                            <TableCell className="min-w-[200px]">
                                 <div className="space-y-1">
                                     <h3 className="font-semibold text-foreground text-sm leading-tight">
                                         {getInterviewTypeLabel(interview.type)}

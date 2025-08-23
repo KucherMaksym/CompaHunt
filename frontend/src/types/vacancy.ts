@@ -22,11 +22,12 @@ export interface Vacancy {
   url?: string;
   lastUpdated?: string;
   manual?: boolean;
+  sortOrder?: number;
 }
 
 export enum VacancyStatus {
+  WISHLIST = 'WISHLIST',
   APPLIED = 'APPLIED',
-  VIEWED = 'VIEWED', 
   PHONE_SCREEN = 'PHONE_SCREEN',
   INTERVIEW = 'INTERVIEW',
   OFFER = 'OFFER',
@@ -39,6 +40,7 @@ export type ViewMode = 'table' | 'cards';
 export interface Interview {
   id: string;
   vacancyId: string;
+  vacancy?: Vacancy;
   scheduledAt: string;
   type: InterviewType;
   status: InterviewStatus;

@@ -54,7 +54,7 @@ const REMOTENESS_OPTIONS = [
 
 const STATUS_OPTIONS = [
     {value: VacancyStatus.APPLIED, label: 'Applied'},
-    {value: VacancyStatus.VIEWED, label: 'Viewed'},
+    {value: VacancyStatus.WISHLIST, label: 'Wishlist'},
     {value: VacancyStatus.PHONE_SCREEN, label: 'Phone Screen'},
     {value: VacancyStatus.INTERVIEW, label: 'Interview'},
     {value: VacancyStatus.OFFER, label: 'Offer'},

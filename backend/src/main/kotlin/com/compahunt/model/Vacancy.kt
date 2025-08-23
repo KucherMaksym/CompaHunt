@@ -112,7 +112,7 @@ enum class Remoteness {
 
 enum class VacancyStatus {
     APPLIED,
-    VIEWED,
+    WISHLIST,
     PHONE_SCREEN,
     INTERVIEW,
     OFFER,

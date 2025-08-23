@@ -19,7 +19,7 @@ export function ViewToggle({ currentView, onViewChange }: ViewToggleProps) {
         onClick={() => onViewChange('table')}
         className={`relative flex items-center gap-2 px-3 py-1.5 text-sm font-medium transition-all ${
           currentView === 'table' 
-            ? 'bg-primary text-primary-foreground shadow-sm' 
+            ? 'bg-primary text-white shadow-sm' 
             : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
         }`}
       >
@@ -32,7 +32,7 @@ export function ViewToggle({ currentView, onViewChange }: ViewToggleProps) {
         onClick={() => onViewChange('cards')}
         className={`relative flex items-center gap-2 px-3 py-1.5 text-sm font-medium transition-all ${
           currentView === 'cards'
-            ? 'bg-primary text-primary-foreground shadow-sm'
+            ? 'bg-primary text-white shadow-sm'
             : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
         }`}
       >

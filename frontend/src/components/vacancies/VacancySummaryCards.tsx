@@ -24,10 +24,11 @@ export function VacancySummaryCards({vacancies}: VacancySummaryCardsProps) {
     const offerVacancies = vacancies.filter(v => v.status === VacancyStatus.OFFER)
     const rejectedVacancies = vacancies.filter(v => v.status === VacancyStatus.REJECTED)
 
-    // Response rate calculation - exclude APPLIED and VIEWED
+    // Response rate calculation - exclude APPLIED
     const respondedVacancies = vacancies.filter(v =>
-        v.status !== VacancyStatus.APPLIED && v.status !== VacancyStatus.VIEWED
-    )
+        v.status !== VacancyStatus.APPLIED
+    );
+
     const responseRate = vacancies.length > 0
         ? Math.round((respondedVacancies.length / vacancies.length) * 100)
         : 0
@@ -54,11 +55,11 @@ export function VacancySummaryCards({vacancies}: VacancySummaryCardsProps) {
                         {vacancies.length}
                     </div>
                     <div className="text-xs text-primary mt-1 space-x-2">
-                        <Badge variant="secondary"
+                        <Badge variant="static"
                                className="text-[10px] px-1.5 py-0.5 border border-orange-600/50 bg-orange-600/20 text-orange-600">
                             {appliedVacancies.length} pending
                         </Badge>
-                        <Badge variant="secondary"
+                        <Badge variant="static"
                                className="text-[10px] px-1.5 py-0.5 border border-green-600/50 bg-green-600/20 text-green-600">
                             {interviewVacancies.length} active
                         </Badge>

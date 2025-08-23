@@ -7,7 +7,6 @@ import com.compahunt.repository.VacancyRepository
 import com.compahunt.repository.CompanyRepository
 import com.compahunt.repository.VacancyAuditRepository
 import com.compahunt.repository.UserRepository
-import com.compahunt.util.formatSalaryToString
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -27,7 +26,8 @@ class VacancyService(
     private val vacancyRepository: VacancyRepository,
     private val companyRepository: CompanyRepository,
     private val vacancyAuditRepository: VacancyAuditRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val vacancyMapper: com.compahunt.mapper.VacancyMapper
 ) {
 
     private val log = LoggerFactory.getLogger(VacancyService::class.java)
@@ -89,14 +89,14 @@ class VacancyService(
             ipAddress = getClientIpAddress(httpRequest)
         )
 
-        return mapToVacancyResponse(savedVacancy)
+        return vacancyMapper.toResponse(savedVacancy)
     }
 
     fun getVacancy(id: Long, userId: Long): VacancyResponse {
         val vacancy = vacancyRepository.findByIdAndUserId(id, userId)
             .orElseThrow { VacancyNotFoundException("Vacancy not found or access denied") }
         
-        return mapToVacancyResponse(vacancy)
+        return vacancyMapper.toResponse(vacancy)
     }
 
     fun getAllVacancies(userId: Long, status: VacancyStatus? = null, limit: Int? = null): List<VacancyResponse> {
@@ -112,7 +112,7 @@ class VacancyService(
             vacancies
         }
         
-        return limitedVacancies.map { mapToVacancyResponse(it) }
+        return limitedVacancies.map { vacancyMapper.toResponse(it) }
     }
 
     fun getVacanciesWithFilters(userId: Long, filterRequest: VacancyFilterRequest): VacancyPageResponse {
@@ -156,7 +156,7 @@ class VacancyService(
         )
         
         return VacancyPageResponse(
-            content = vacancyPage.content.map { mapToVacancyResponse(it) },
+            content = vacancyPage.content.map { vacancyMapper.toResponse(it) },
             totalElements = vacancyPage.totalElements,
             totalPages = vacancyPage.totalPages,
             currentPage = vacancyPage.number,
@@ -230,7 +230,7 @@ class VacancyService(
             )
         }
 
-        return mapToVacancyResponse(savedVacancy)
+        return vacancyMapper.toResponse(savedVacancy)
     }
 
     fun updateStatus(
@@ -243,7 +243,7 @@ class VacancyService(
             .orElseThrow { VacancyNotFoundException("Vacancy not found or access denied") }
 
         if (vacancy.status == status) {
-            return mapToVacancyResponse(vacancy)
+            return vacancyMapper.toResponse(vacancy)
         }
 
         val oldStatus = vacancy.status
@@ -267,7 +267,7 @@ class VacancyService(
             ipAddress = getClientIpAddress(httpRequest)
         )
 
-        return mapToVacancyResponse(savedVacancy)
+        return vacancyMapper.toResponse(savedVacancy)
     }
 
     fun archiveVacancy(
@@ -310,7 +310,7 @@ class VacancyService(
 
     fun getArchivedVacancies(userId: Long): List<VacancyResponse> {
         val archivedVacancies = vacancyRepository.findArchivedByUserId(userId)
-        return archivedVacancies.map { mapToVacancyResponse(it) }
+        return archivedVacancies.map { vacancyMapper.toResponse(it) }
     }
 
     private fun findOrCreateCompany(companyName: String): Company {
@@ -382,40 +382,6 @@ class VacancyService(
         }
     }
 
-    private fun mapToVacancyResponse(vacancy: Vacancy): VacancyResponse {
-        return VacancyResponse(
-            id = vacancy.id,
-            title = vacancy.title,
-            company = CompanyResponse(
-                id = vacancy.company.id,
-                name = vacancy.company.name,
-                description = vacancy.company.description,
-                websiteUrl = vacancy.company.websiteUrl,
-                logoUrl = vacancy.company.logoUrl
-            ),
-            location = vacancy.location,
-            jobType = vacancy.jobType,
-            experienceLevel = vacancy.experienceLevel,
-            description = vacancy.description,
-            htmlDescription = vacancy.htmlDescription,
-            requirements = vacancy.requirements,
-            skills = vacancy.skills,
-            status = vacancy.status,
-            appliedAt = vacancy.appliedAt.toString(),
-            postedDate = vacancy.postedDate,
-            applicantCount = vacancy.applicantCount,
-            url = vacancy.url,
-            salary = formatSalaryToString(vacancy.salary),
-            remoteness = vacancy.remoteness,
-            industry = vacancy.industry,
-            benefits = vacancy.benefits,
-            experience = vacancy.experience,
-            createdAt = vacancy.createdAt.toString(),
-            updatedAt = vacancy.updatedAt.toString(),
-            lastUpdated = vacancy.updatedAt.toString(),
-            manual = vacancy.manual
-        )
-    }
 
     private fun htmlToPlainText(html: String?): String {
         if (html.isNullOrBlank()) return ""
