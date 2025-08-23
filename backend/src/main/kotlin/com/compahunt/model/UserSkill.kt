@@ -1,5 +1,6 @@
 package com.compahunt.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.*
 import jakarta.persistence.GenerationType
 import jakarta.validation.constraints.*
@@ -12,6 +13,7 @@ data class UserSkill(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_profile_id", nullable = false)
     val userProfile: UserProfile,
@@ -40,7 +42,32 @@ data class UserSkill(
     @Enumerated(EnumType.STRING)
     @Column(name = "skill_category")
     val skillCategory: SkillCategory? = null
-)
+) {
+    override fun hashCode(): Int {
+        return Objects.hash(
+            id,
+            skillName,
+            proficiencyLevel,
+            yearsExperience,
+            isPrimarySkill,
+            wantToImprove,
+            skillCategory
+        )
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is UserSkill) return false
+
+        return id == other.id &&
+                skillName == other.skillName &&
+                proficiencyLevel == other.proficiencyLevel &&
+                yearsExperience == other.yearsExperience &&
+                isPrimarySkill == other.isPrimarySkill &&
+                wantToImprove == other.wantToImprove &&
+                skillCategory == other.skillCategory
+    }
+}
 
 enum class SkillCategory {
     PROGRAMMING_LANGUAGE,

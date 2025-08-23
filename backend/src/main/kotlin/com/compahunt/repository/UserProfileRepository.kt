@@ -14,12 +14,18 @@ interface UserProfileRepository : JpaRepository<UserProfile, Long> {
 
     fun existsByUserId(userId: Long): Boolean
 
+//    @Query("""
+//        SELECT up FROM UserProfile up
+//        LEFT JOIN FETCH up.skills
+//        LEFT JOIN FETCH up.workExperiences
+//        LEFT JOIN FETCH up.careerGoals
+//        LEFT JOIN FETCH up.preferences
+//        WHERE up.userId = :userId
+//    """)
     @Query("""
         SELECT up FROM UserProfile up 
-        LEFT JOIN FETCH up.skills 
         LEFT JOIN FETCH up.workExperiences 
-        LEFT JOIN FETCH up.careerGoals 
-        LEFT JOIN FETCH up.preferences 
+        
         WHERE up.userId = :userId
     """)
     fun findByUserIdWithDetails(@Param("userId") userId: Long): UserProfile?

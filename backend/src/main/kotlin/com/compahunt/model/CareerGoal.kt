@@ -1,5 +1,6 @@
 package com.compahunt.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.*
 import jakarta.validation.constraints.*
 import java.time.LocalDate
@@ -12,6 +13,7 @@ data class CareerGoal(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_profile_id", nullable = false)
     val userProfile: UserProfile,
@@ -49,7 +51,30 @@ data class CareerGoal(
     @Size(max = 1000, message = "Notes must not exceed 1000 characters")
     @Column(name = "notes", length = 1000)
     val notes: String? = null
-)
+) {
+    override fun toString(): String {
+        return "CareerGoal(id=$id, goalType=$goalType, title=$title, description=$description, targetDate=$targetDate, progressStatus=$progressStatus, progressPercentage=$progressPercentage, priority=$priority, notes=$notes)"
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hash(id, goalType, title, description, targetDate, progressStatus, progressPercentage, priority, notes)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is CareerGoal) return false
+
+        return id == other.id &&
+                goalType == other.goalType &&
+                title == other.title &&
+                description == other.description &&
+                targetDate == other.targetDate &&
+                progressStatus == other.progressStatus &&
+                progressPercentage == other.progressPercentage &&
+                priority == other.priority &&
+                notes == other.notes
+    }
+}
 
 enum class GoalType {
     SHORT_TERM,    // < 1 year

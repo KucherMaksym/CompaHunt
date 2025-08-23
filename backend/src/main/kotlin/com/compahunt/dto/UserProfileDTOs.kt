@@ -20,10 +20,10 @@ data class UserProfileResponse(
     val bio: String?,
     val linkedinUrl: String?,
     val githubUrl: String?,
-    val skills: List<UserSkillResponse>,
+//    val skills: List<UserSkillResponse>,
     val workExperiences: List<WorkExperienceResponse>,
-    val careerGoals: List<CareerGoalResponse>,
-    val preferences: UserPreferenceResponse?
+//    val careerGoals: List<CareerGoalResponse>,
+//    val preferences: UserPreferenceResponse?
 )
 
 data class UserProfileRequest(
@@ -205,18 +205,18 @@ data class CompleteUserProfileRequest(
     @field:Valid
     val profile: UserProfileRequest,
 
-    @field:Valid
-    @field:Size(max = 20, message = "Maximum 20 skills allowed")
-    val skills: List<UserSkillRequest> = emptyList(),
+//    @field:Valid
+//    @field:Size(max = 20, message = "Maximum 20 skills allowed")
+//    val skills: List<UserSkillRequest> = emptyList(),
 
     @field:Valid
     @field:Size(max = 5, message = "Maximum 5 work experiences allowed")
     val workExperiences: List<WorkExperienceRequest> = emptyList(),
 
-    @field:Valid
-    @field:Size(max = 5, message = "Maximum 5 career goals allowed")
-    val careerGoals: List<CareerGoalRequest> = emptyList(),
+//    @field:Valid
+//    @field:Size(max = 5, message = "Maximum 5 career goals allowed")
+//    val careerGoals: List<CareerGoalRequest> = emptyList(),
 
-    @field:Valid
-    val preferences: UserPreferenceRequest?
+//    @field:Valid
+//    val preferences: UserPreferenceRequest?
 )

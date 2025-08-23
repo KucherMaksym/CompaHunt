@@ -55,18 +55,47 @@ data class UserProfile(
     @Column(name = "github_url", length = 100)
     val githubUrl: String? = null,
 
-    @OneToMany(mappedBy = "userProfile", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
-    val skills: MutableSet<UserSkill> = mutableSetOf(),
-
-    @OneToMany(mappedBy = "userProfile", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "userProfile", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
     val workExperiences: MutableSet<WorkExperience> = mutableSetOf(),
 
-    @OneToMany(mappedBy = "userProfile", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
-    val careerGoals: MutableSet<CareerGoal> = mutableSetOf(),
 
-    @OneToOne(mappedBy = "userProfile", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
-    val preferences: UserPreference? = null
-)
+//   TODO: Later
+//
+//    @OneToMany(mappedBy = "userProfile", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+//    val careerGoals: MutableSet<CareerGoal> = mutableSetOf(),
+//
+//    @OneToMany(mappedBy = "userProfile", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+//    val skills: MutableSet<UserSkill> = mutableSetOf(),
+//
+//    @OneToOne(mappedBy = "userProfile", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+//    var preferences: UserPreference? = null
+) {
+    override fun toString(): String {
+        return "UserProfile(id=$id, userId=$userId, currentPosition=$currentPosition, experienceLevel=$experienceLevel, targetPosition=$targetPosition, targetSalaryMin=$targetSalaryMin, targetSalaryMax=$targetSalaryMax, locationPreference=$locationPreference, remotenessPreference=$remotenessPreference, bio=$bio, linkedinUrl=$linkedinUrl, githubUrl=$githubUrl)"
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hash(id, userId, currentPosition, experienceLevel, targetPosition, targetSalaryMin, targetSalaryMax, locationPreference, remotenessPreference, bio, linkedinUrl, githubUrl)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is UserProfile) return false
+
+        return id == other.id &&
+                userId == other.userId &&
+                currentPosition == other.currentPosition &&
+                experienceLevel == other.experienceLevel &&
+                targetPosition == other.targetPosition &&
+                targetSalaryMin == other.targetSalaryMin &&
+                targetSalaryMax == other.targetSalaryMax &&
+                locationPreference == other.locationPreference &&
+                remotenessPreference == other.remotenessPreference &&
+                bio == other.bio &&
+                linkedinUrl == other.linkedinUrl &&
+                githubUrl == other.githubUrl
+    }
+}
 
 enum class ExperienceLevel {
     INTERN,

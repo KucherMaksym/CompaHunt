@@ -204,10 +204,10 @@ export const preferencesSchema = z.object({
 // Complete profile form schema
 export const completeProfileSchema = z.object({
   profile: profileSchema,
-  skills: skillsSchema,
+  // skills: skillsSchema,
   workExperiences: workExperiencesSchema,
-  careerGoals: careerGoalsSchema,
-  preferences: preferencesSchema.optional()
+  // careerGoals: careerGoalsSchema,
+  // preferences: preferencesSchema.optional()
 });
 
 export type ProfileFormData = z.infer<typeof completeProfileSchema>;
