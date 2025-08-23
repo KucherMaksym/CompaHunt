@@ -11,6 +11,7 @@ import { ProfileFormData } from '@/lib/validation/profile';
 import { Card, CardContent } from '@/components/ui/card';
 import { User } from 'lucide-react';
 import {DashboardLayout} from "@/components/dashboard-layout";
+import { profileApi } from '@/lib/api/profile';
 
 export default function ProfilePage() {
   const { user, loading, isAuthenticated } = useAuth();
@@ -29,31 +30,8 @@ export default function ProfilePage() {
   const loadProfileData = async () => {
     try {
       setIsLoadingProfile(true);
-      const response = await fetch('/api/profile');
-      
-      if (response.ok) {
-        const data = await response.json();
-        // Transform backend response to form data format
-        const formData: Partial<ProfileFormData> = {
-          profile: {
-            currentPosition: data.currentPosition,
-            experienceLevel: data.experienceLevel,
-            targetPosition: data.targetPosition,
-            targetSalaryMin: data.targetSalaryMin,
-            targetSalaryMax: data.targetSalaryMax,
-            locationPreference: data.locationPreference,
-            remotenessPreference: data.remotenessPreference,
-            bio: data.bio,
-            linkedinUrl: data.linkedinUrl,
-            githubUrl: data.githubUrl,
-          },
-          skills: data.skills || [],
-          workExperiences: data.workExperiences || [],
-          careerGoals: data.careerGoals || [],
-          preferences: data.preferences
-        };
-        setProfileData(formData);
-      }
+      const formData = await profileApi.getProfileForForm();
+      setProfileData(formData || undefined);
     } catch (error) {
       console.error('Error loading profile:', error);
     } finally {
@@ -84,19 +62,7 @@ export default function ProfilePage() {
   const handleProfileSubmit = async (data: ProfileFormData) => {
     setIsSubmitting(true);
     try {
-      const response = await fetch('/api/profile', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to save profile');
-      }
-
-      const result = await response.json();
+      const result = await profileApi.createOrUpdateProfile(data);
       console.log('Profile saved successfully:', result);
       
       // Optionally redirect to dashboard or show success message

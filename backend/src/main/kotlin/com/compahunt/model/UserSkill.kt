@@ -1,6 +1,7 @@
 package com.compahunt.model
 
 import jakarta.persistence.*
+import jakarta.persistence.GenerationType
 import jakarta.validation.constraints.*
 import java.util.*
 
@@ -8,8 +9,8 @@ import java.util.*
 @Table(name = "user_skills")
 data class UserSkill(
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    val id: UUID = UUID.randomUUID(),
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long = 0,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_profile_id", nullable = false)

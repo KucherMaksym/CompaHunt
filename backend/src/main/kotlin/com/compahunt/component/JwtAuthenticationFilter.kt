@@ -1,5 +1,6 @@
 package com.compahunt.component
 
+import com.compahunt.model.Role
 import com.compahunt.model.User
 import com.compahunt.model.UserPrincipal
 import com.compahunt.repository.UserRepository
@@ -45,7 +46,8 @@ class JwtAuthenticationFilter(
                         id = userId,
                         email = email,
                         name = name,
-                        authorities = emptyList()
+                        role = Role.USER, // Default role
+                        authorities = listOf(org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_USER"))
                     )
 //                        .apply { this.name = name }
                 }

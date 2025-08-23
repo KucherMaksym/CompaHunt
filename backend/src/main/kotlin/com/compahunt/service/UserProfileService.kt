@@ -14,12 +14,12 @@ class UserProfileService(
 ) {
 
     @Transactional(readOnly = true)
-    fun getUserProfile(userId: UUID): UserProfileResponse? {
+    fun getUserProfile(userId: Long): UserProfileResponse? {
         val profile = userProfileRepository.findByUserIdWithDetails(userId)
         return profile?.let { toUserProfileResponse(it) }
     }
 
-    fun createOrUpdateUserProfile(userId: UUID, request: CompleteUserProfileRequest): UserProfileResponse {
+    fun createOrUpdateUserProfile(userId: Long, request: CompleteUserProfileRequest): UserProfileResponse {
         val existingProfile = userProfileRepository.findByUserIdWithDetails(userId)
         
         val profile = if (existingProfile != null) {
@@ -32,7 +32,7 @@ class UserProfileService(
         return toUserProfileResponse(savedProfile)
     }
 
-    fun updateBasicProfile(userId: UUID, request: UserProfileRequest): UserProfileResponse {
+    fun updateBasicProfile(userId: Long, request: UserProfileRequest): UserProfileResponse {
         val profile = userProfileRepository.findByUserId(userId)
             ?: throw IllegalArgumentException("User profile not found")
 
@@ -54,11 +54,11 @@ class UserProfileService(
     }
 
     @Transactional(readOnly = true)
-    fun profileExists(userId: UUID): Boolean {
+    fun profileExists(userId: Long): Boolean {
         return userProfileRepository.existsByUserId(userId)
     }
 
-    private fun createNewProfile(userId: UUID, request: CompleteUserProfileRequest): UserProfile {
+    private fun createNewProfile(userId: Long, request: CompleteUserProfileRequest): UserProfile {
         val profile = UserProfile(
             userId = userId,
             currentPosition = request.profile.currentPosition,
@@ -92,6 +92,7 @@ class UserProfileService(
         request.workExperiences.forEach { expRequest ->
             profile.workExperiences.add(
                 WorkExperience(
+
                     userProfile = profile,
                     companyName = expRequest.companyName,
                     position = expRequest.position,
@@ -121,6 +122,22 @@ class UserProfileService(
                     priority = goalRequest.priority,
                     notes = goalRequest.notes
                 )
+            )
+        }
+
+        // Add preferences if provided
+        request.preferences?.let { prefRequest ->
+            val preferences = UserPreference(
+                userProfile = profile,
+                companySizePreference = prefRequest.companySizePreference,
+                industryPreferences = prefRequest.industryPreferences,
+                communicationStyle = prefRequest.communicationStyle,
+                workValues = prefRequest.workValues,
+                benefitsPreferences = prefRequest.benefitsPreferences,
+                workLifeBalanceImportance = prefRequest.workLifeBalanceImportance,
+                careerGrowthImportance = prefRequest.careerGrowthImportance,
+                compensationImportance = prefRequest.compensationImportance,
+                additionalPreferences = prefRequest.additionalPreferences
             )
         }
 
@@ -191,6 +208,22 @@ class UserProfileService(
                         priority = goalRequest.priority,
                         notes = goalRequest.notes
                     )
+                )
+            }
+
+            // Update preferences if provided
+            request.preferences?.let { prefRequest ->
+                val preferences = UserPreference(
+                    userProfile = updatedProfile,
+                    companySizePreference = prefRequest.companySizePreference,
+                    industryPreferences = prefRequest.industryPreferences,
+                    communicationStyle = prefRequest.communicationStyle,
+                    workValues = prefRequest.workValues,
+                    benefitsPreferences = prefRequest.benefitsPreferences,
+                    workLifeBalanceImportance = prefRequest.workLifeBalanceImportance,
+                    careerGrowthImportance = prefRequest.careerGrowthImportance,
+                    compensationImportance = prefRequest.compensationImportance,
+                    additionalPreferences = prefRequest.additionalPreferences
                 )
             }
         }

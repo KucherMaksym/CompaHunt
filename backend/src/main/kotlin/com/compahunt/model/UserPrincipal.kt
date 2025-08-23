@@ -3,11 +3,13 @@ package com.compahunt.model
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
+import java.util.*
 
 data class UserPrincipal(
     val id: Long,
     val email: String,
     val name: String,
+    val role: Role,
     private val authorities: Collection<GrantedAuthority>
 ) : UserDetails {
 
@@ -26,6 +28,7 @@ data class UserPrincipal(
                 id = user.id,
                 email = user.email,
                 name = user.name,
+                role = user.role,
                 authorities = authorities
             )
         }

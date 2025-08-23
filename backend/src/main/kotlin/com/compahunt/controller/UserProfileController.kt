@@ -1,11 +1,13 @@
 package com.compahunt.controller
 
 import com.compahunt.dto.*
+import com.compahunt.model.UserPrincipal
 import com.compahunt.service.UserProfileService
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
@@ -17,8 +19,8 @@ class UserProfileController(
 ) {
 
     @GetMapping
-    fun getUserProfile(authentication: Authentication): ResponseEntity<UserProfileResponse> {
-        val userId = getUserIdFromAuth(authentication)
+    fun getUserProfile(@AuthenticationPrincipal userPrincipal: UserPrincipal): ResponseEntity<UserProfileResponse> {
+        val userId = userPrincipal.id;
         val profile = userProfileService.getUserProfile(userId)
         
         return if (profile != null) {
@@ -31,9 +33,9 @@ class UserProfileController(
     @PostMapping
     fun createOrUpdateProfile(
         @Valid @RequestBody request: CompleteUserProfileRequest,
-        authentication: Authentication
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<UserProfileResponse> {
-        val userId = getUserIdFromAuth(authentication)
+        val userId = userPrincipal.id
         val profile = userProfileService.createOrUpdateUserProfile(userId, request)
         
         return ResponseEntity.ok(profile)
@@ -42,9 +44,9 @@ class UserProfileController(
     @PutMapping("/basic")
     fun updateBasicProfile(
         @Valid @RequestBody request: UserProfileRequest,
-        authentication: Authentication
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<UserProfileResponse> {
-        val userId = getUserIdFromAuth(authentication)
+        val userId = userPrincipal.id
         
         return try {
             val profile = userProfileService.updateBasicProfile(userId, request)
@@ -55,18 +57,10 @@ class UserProfileController(
     }
 
     @GetMapping("/exists")
-    fun checkProfileExists(authentication: Authentication): ResponseEntity<Map<String, Boolean>> {
-        val userId = getUserIdFromAuth(authentication)
+    fun checkProfileExists(@AuthenticationPrincipal userPrincipal: UserPrincipal): ResponseEntity<Map<String, Boolean>> {
+        val userId = userPrincipal.id
         val exists = userProfileService.profileExists(userId)
         
         return ResponseEntity.ok(mapOf("exists" to exists))
-    }
-
-    private fun getUserIdFromAuth(authentication: Authentication): UUID {
-        return try {
-            UUID.fromString(authentication.name)
-        } catch (e: IllegalArgumentException) {
-            throw IllegalStateException("Cannot extract user ID from authentication", e)
-        }
     }
 }
