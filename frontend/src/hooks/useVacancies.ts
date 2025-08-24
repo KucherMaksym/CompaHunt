@@ -1,6 +1,6 @@
 import {useQuery, useMutation, useQueryClient, UseQueryResult} from '@tanstack/react-query'
 import {apiClient} from '@/lib/api-client'
-import {Vacancy} from '@/types/vacancy'
+import {Vacancy, VacancySearchResponse, VacancySearchItem} from '@/types/vacancy'
 
 export interface VacancyFilters {
     search?: string
@@ -144,6 +144,28 @@ export function useUpdateVacancyStatus() {
             // Invalidate vacancy lists
             queryClient.invalidateQueries({queryKey: ['vacancies']})
         },
+    })
+}
+
+// Hook for search vacancies for interview creation
+export function useSearchVacancies(params: { search?: string, page?: number, size?: number } = {}) {
+    return useQuery({
+        queryKey: ['vacancies', 'search', params],
+        queryFn: async (): Promise<VacancySearchResponse> => {
+            const searchParams = new URLSearchParams()
+
+            // Add search parameters
+            Object.entries(params).forEach(([key, value]) => {
+                if (value !== undefined && value !== null && value !== '') {
+                    searchParams.append(key, value.toString())
+                }
+            })
+
+            const response = await apiClient.get(`/api/vacancies/search?${searchParams.toString()}`)
+            return response.data
+        },
+        staleTime: 30 * 1000, // 30 seconds
+        enabled: false, // Only run when manually triggered
     })
 }
 

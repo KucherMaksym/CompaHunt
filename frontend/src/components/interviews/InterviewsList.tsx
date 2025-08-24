@@ -6,7 +6,7 @@ import { ViewToggle } from '../vacancies/ViewToggle'
 import { InterviewsTable } from './InterviewsTable'
 import { InterviewsCards } from './InterviewsCards'
 import { Button } from '@/components/ui/button'
-import { Plus, Filter, Search } from 'lucide-react'
+import {Plus, Filter, Search, PictureInPicture2} from 'lucide-react'
 import { Title } from "@/components/ui/Title"
 
 interface InterviewsListProps {
@@ -79,11 +79,9 @@ export function InterviewsList({ interviews, onAddInterview, onEditInterview, on
 
       {/* Empty State */}
       {interviews.length === 0 && (
-        <div className="text-center py-16 bg-background-surface rounded-lg border border-border">
-          <div className="text-muted-foreground mb-6">
-            <svg className="mx-auto h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-6 0h6m-6 0l-2 7a2 2 0 002 2h8a2 2 0 002-2l-2-7m-6 0V4" />
-            </svg>
+        <div className="text-center flex flex-col items-center py-16 bg-background-surface rounded-lg border border-border">
+          <div className="text-secondary mb-6 w-full flex items-center justify-center">
+            <PictureInPicture2 width={46} height={46}/>
           </div>
           <h3 className="text-xl font-semibold text-foreground mb-2">
             No interviews scheduled yet

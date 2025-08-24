@@ -291,7 +291,7 @@ export default function VacanciesKanbanPage() {
 
                 <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
                     <div className="flex gap-6 h-full overflow-x-auto p-0 ">
-                        <div className={"p-3 flex gap-6 overflow-y-hidden"}>
+                        <div className={"p-6 flex gap-6 overflow-y-hidden"}>
                             {kanbanColumns.map(column => {
                                 // Give more space to columns with more items
                                 const columnVacancies = getVacanciesByStatus(column.status)

@@ -115,6 +115,49 @@ class VacancyService(
         return limitedVacancies.map { vacancyMapper.toResponse(it) }
     }
 
+    fun searchVacancies(userId: Long, filterRequest: VacancyFilterRequest): VacancySearchResponse {
+        val sort = if (filterRequest.sortDirection.lowercase() == "asc") {
+            Sort.by(Sort.Order.asc(filterRequest.sortBy))
+        } else {
+            Sort.by(Sort.Order.desc(filterRequest.sortBy))
+        }
+        
+        val pageable = PageRequest.of(filterRequest.page, filterRequest.size, sort)
+        
+        val vacanciesPage = if (filterRequest.search.isNullOrBlank()) {
+            vacancyRepository.findByUserId(userId, pageable)
+        } else {
+            vacancyRepository.findByUserIdAndTitleContainingIgnoreCaseOrCompanyNameContainingIgnoreCase(
+                userId = userId,
+                title = filterRequest.search,
+                companyName = filterRequest.search,
+                pageable = pageable
+            )
+        }
+        
+        val searchItems = vacanciesPage.content.map { vacancy ->
+            VacancySearchItem(
+                id = vacancy.id,
+                title = vacancy.title,
+                companyName = vacancy.company.name,
+                location = vacancy.location,
+                status = vacancy.status
+            )
+        }
+        
+        return VacancySearchResponse(
+            content = searchItems,
+            totalElements = vacanciesPage.totalElements,
+            totalPages = vacanciesPage.totalPages,
+            currentPage = vacanciesPage.number,
+            size = vacanciesPage.size,
+            hasNext = vacanciesPage.hasNext(),
+            hasPrevious = vacanciesPage.hasPrevious(),
+            isFirst = vacanciesPage.isFirst,
+            isLast = vacanciesPage.isLast
+        )
+    }
+
     fun getVacanciesWithFilters(userId: Long, filterRequest: VacancyFilterRequest): VacancyPageResponse {
         val status = filterRequest.status?.let { VacancyStatus.valueOf(it) }
         

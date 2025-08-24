@@ -83,6 +83,28 @@ class VacancyController(
         return ResponseEntity.ok(result)
     }
 
+    @GetMapping("/search")
+    fun searchVacancies(
+        authentication: Authentication,
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "10") size: Int,
+        @RequestParam(defaultValue = "createdAt") sortBy: String,
+        @RequestParam(defaultValue = "desc") sortDirection: String,
+        @RequestParam(required = false) search: String?
+    ): ResponseEntity<VacancySearchResponse> {
+        val userId = getUserId(authentication)
+        val filterRequest = VacancyFilterRequest(
+            page = page,
+            size = minOf(size, 50), // Limit max page size to 50 for search
+            sortBy = sortBy,
+            sortDirection = sortDirection,
+            search = search
+        )
+        
+        val result = vacancyService.searchVacancies(userId, filterRequest)
+        return ResponseEntity.ok(result)
+    }
+
     @PostMapping
     fun createApplication(
         @RequestBody jobData: Map<String, Any?>,

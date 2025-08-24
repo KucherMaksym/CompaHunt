@@ -37,6 +37,26 @@ export enum VacancyStatus {
 
 export type ViewMode = 'table' | 'cards';
 
+export interface VacancySearchItem {
+  id: string;
+  title: string;
+  companyName: string;
+  location: string;
+  status: VacancyStatus;
+}
+
+export interface VacancySearchResponse {
+  content: VacancySearchItem[];
+  totalElements: number;
+  totalPages: number;
+  currentPage: number;
+  size: number;
+  hasNext: boolean;
+  hasPrevious: boolean;
+  isFirst: boolean;
+  isLast: boolean;
+}
+
 export interface Interview {
   id: string;
   vacancyId: string;

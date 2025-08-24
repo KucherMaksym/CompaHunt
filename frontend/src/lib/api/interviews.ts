@@ -14,7 +14,7 @@ export interface CreateInterviewRequest {
 }
 
 export interface UpdateInterviewRequest {
-  scheduledAt?: string;
+  scheduledAt?: Date;
   type?: InterviewType;
   status?: InterviewStatus;
   notes?: string;
@@ -26,12 +26,16 @@ export interface UpdateInterviewRequest {
   interviewerEmail?: string;
 }
 
+export type UpdateInterviewRequestWithStringDate = Omit<UpdateInterviewRequest, "scheduledAt"> & {
+  scheduledAt?: string;
+};
+
 export const interviewApi = {
   create: async (data: CreateInterviewRequest): Promise<Interview> => {
     return apiClient.postD<Interview>('/api/interviews', data);
   },
 
-  update: async (id: string, data: UpdateInterviewRequest): Promise<Interview> => {
+  update: async (id: string, data: UpdateInterviewRequestWithStringDate): Promise<Interview> => {
     return apiClient.putD<Interview>(`/api/interviews/${id}`, data);
   },
 

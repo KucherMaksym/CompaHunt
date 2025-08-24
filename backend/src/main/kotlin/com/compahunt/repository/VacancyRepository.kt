@@ -25,6 +25,22 @@ interface VacancyRepository : JpaRepository<Vacancy, Long> {
 
     fun findByUserIdAndStatusOrderByCreatedAtDesc(userId: Long, status: VacancyStatus): List<Vacancy>
 
+    fun findByUserId(userId: Long, pageable: Pageable): Page<Vacancy>
+
+    @Query("""
+        SELECT v FROM Vacancy v 
+        WHERE v.user.id = :userId 
+        AND v.deleted = false
+        AND (LOWER(v.title) LIKE LOWER(CONCAT('%', :title, '%')) 
+             OR LOWER(v.company.name) LIKE LOWER(CONCAT('%', :companyName, '%')))
+    """)
+    fun findByUserIdAndTitleContainingIgnoreCaseOrCompanyNameContainingIgnoreCase(
+        @Param("userId") userId: Long,
+        @Param("title") title: String,
+        @Param("companyName") companyName: String,
+        pageable: Pageable
+    ): Page<Vacancy>
+
     @Query("SELECT v FROM Vacancy v WHERE v.user.id = :userId AND v.status = 'ARCHIVED' ORDER BY v.updatedAt DESC")
     fun findArchivedByUserId(@Param("userId") userId: Long): List<Vacancy>
 

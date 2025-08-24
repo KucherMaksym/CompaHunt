@@ -113,7 +113,7 @@ export function InterviewDetailModal({ interview, isOpen, onClose, onEdit, onSav
                         </Text>
                       </div>
                       {interview.vacancy.location && (
-                        <div className="flex items-center gap-2 mb-2">
+                        <div className={`flex items-center gap-2 ${interview.vacancy.salary && "mb-2"} `}>
                           <MapPin className="h-4 w-4 text-muted-foreground" />
                           <Text size="sm" variant="muted">
                             {interview.vacancy.location}

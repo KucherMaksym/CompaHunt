@@ -55,11 +55,6 @@ const vacancyItems = [
     url: "/vacancies/kanban",
     icon: Kanban,
   },
-  {
-    title: "Archive",
-    url: "/vacancies/archive",
-    icon: Archive,
-  },
 ]
 
 const careerItems = [
@@ -72,16 +67,6 @@ const careerItems = [
     title: "Companies",
     url: "/companies",
     icon: Building2,
-  },
-  {
-    title: "Contacts",
-    url: "/contacts",
-    icon: Users,
-  },
-  {
-    title: "Career Goals",
-    url: "/career-goals",
-    icon: Target,
   },
 ]
 

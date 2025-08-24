@@ -6,6 +6,7 @@ import { DashboardLayout } from "@/components/dashboard-layout"
 import { InterviewsList } from "@/components/interviews/InterviewsList"
 import { InterviewSummaryCards } from "@/components/interviews/InterviewSummaryCards"
 import {EditInterviewModal} from "@/components/interviews/EditInterviewModal"
+import {CreateInterviewModal} from "@/components/interviews/CreateInterviewModal"
 import { InterviewDetailModal } from "@/components/interviews/InterviewDetailModal"
 import { Interview } from "@/types/vacancy"
 import apiClient from "@/lib/api-client"
@@ -22,11 +23,11 @@ export default function InterviewsPage() {
   })
 
   const queryClient = useQueryClient()
-  const [modalState, setModalState] = useState<{
+  const [createModalOpen, setCreateModalOpen] = useState(false)
+  const [editModalState, setEditModalState] = useState<{
     isOpen: boolean
-    mode: 'create' | 'edit'
-    interview?: Interview
-  }>({ isOpen: false, mode: 'create' })
+    interview: Interview | null
+  }>({ isOpen: false, interview: null })
   
   const [detailModalState, setDetailModalState] = useState<{
     isOpen: boolean
@@ -43,19 +44,27 @@ export default function InterviewsPage() {
   })
 
   const handleAddInterview = () => {
-    setModalState({ isOpen: true, mode: 'create' })
+    setCreateModalOpen(true)
   }
 
   const handleEditInterview = (interview: Interview) => {
-    setModalState({ isOpen: true, mode: 'edit', interview })
+    setEditModalState({ isOpen: true, interview })
   }
 
   const handleDeleteInterview = (interviewId: string) => {
     deleteMutation.mutate(interviewId)
   }
 
-  const handleCloseModal = () => {
-    setModalState({ isOpen: false, mode: 'create' })
+  const handleCloseCreateModal = () => {
+    setCreateModalOpen(false)
+  }
+
+  const handleCloseEditModal = () => {
+    setEditModalState({ isOpen: false, interview: null })
+  }
+
+  const handleSaveInterview = () => {
+    queryClient.invalidateQueries({ queryKey: ['interviews'] })
   }
 
   const handleViewInterview = (interview: Interview) => {
@@ -113,19 +122,29 @@ export default function InterviewsPage() {
         />
       </div>
 
-      <EditInterviewModal
-        isOpen={modalState.isOpen}
-        onClose={handleCloseModal}
-        mode={modalState.mode}
-        interview={modalState.interview}
+      <CreateInterviewModal
+        isOpen={createModalOpen}
+        onClose={handleCloseCreateModal}
+        onSave={handleSaveInterview}
       />
 
-      <InterviewDetailModal
-        isOpen={detailModalState.isOpen}
-        interview={detailModalState.interview}
-        onClose={handleCloseDetailModal}
-        onEdit={handleEditInterview}
-      />
+      {editModalState.interview && (
+        <EditInterviewModal
+          isOpen={editModalState.isOpen}
+          onClose={handleCloseEditModal}
+          interview={editModalState.interview}
+          onSave={handleSaveInterview}
+        />
+      )}
+
+      {detailModalState.interview && (
+        <InterviewDetailModal
+          isOpen={detailModalState.isOpen}
+          interview={detailModalState.interview}
+          onClose={handleCloseDetailModal}
+          onEdit={handleEditInterview}
+        />
+      )}
     </DashboardLayout>
   )
 }

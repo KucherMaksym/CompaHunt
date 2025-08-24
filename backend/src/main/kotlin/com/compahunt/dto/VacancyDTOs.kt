@@ -154,3 +154,23 @@ data class VacancyPageResponse(
     val isFirst: Boolean,
     val isLast: Boolean
 )
+
+data class VacancySearchItem(
+    val id: Long,
+    val title: String,
+    val companyName: String,
+    val location: String,
+    val status: VacancyStatus
+)
+
+data class VacancySearchResponse(
+    val content: List<VacancySearchItem>,
+    val totalElements: Long,
+    val totalPages: Int,
+    val currentPage: Int,
+    val size: Int,
+    val hasNext: Boolean,
+    val hasPrevious: Boolean,
+    val isFirst: Boolean,
+    val isLast: Boolean
+)
