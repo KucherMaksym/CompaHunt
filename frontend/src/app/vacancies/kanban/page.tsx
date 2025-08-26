@@ -282,13 +282,6 @@ export default function VacanciesKanbanPage() {
     return (
         <DashboardLayout className={"p-0"}>
             <div className="flex flex-col gap-y-6 min-h-full">
-                <div className="flex items-center justify-between">
-                    <Button onClick={handleAddVacancy} className="shadow-sm">
-                        <Plus className="h-4 w-4 mr-2"/>
-                        Add Vacancy
-                    </Button>
-                </div>
-
                 <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
                     <div className="flex gap-6 h-full overflow-x-auto p-0 ">
                         <div className={"p-6 flex gap-6 overflow-y-hidden"}>

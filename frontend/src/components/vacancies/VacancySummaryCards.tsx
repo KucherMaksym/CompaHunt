@@ -43,7 +43,7 @@ export function VacancySummaryCards({vacancies}: VacancySummaryCardsProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
             {/* Total Applications */}
             <Card
-                className="relative overflow-hidden border-l-4 border-l-blue-500 bg-gradient-to-r from-blue-600/10 to-background-surface">
+                className="relative overflow-hidden border-l-4 border-l-blue-500 bg-gradient-to-r from-blue-600/10 to-background-surface/10">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <div className="text-sm font-medium text-primary">Total Applications</div>
                     <div className="p-1.5 rounded-md bg-blue-600/20">
@@ -69,7 +69,7 @@ export function VacancySummaryCards({vacancies}: VacancySummaryCardsProps) {
 
             {/* Response Rate */}
             <Card
-                className="relative overflow-hidden border-l-4 border-l-green-500 bg-gradient-to-r from-green-600/10 to-background-surface">
+                className="relative overflow-hidden border-l-4 border-l-green-500 bg-gradient-to-r from-green-600/10 to-background-surface/10">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <div className="text-sm font-medium text-primary">Response Rate</div>
                     <div className="p-1.5 rounded-md bg-green-600/20">
@@ -88,7 +88,7 @@ export function VacancySummaryCards({vacancies}: VacancySummaryCardsProps) {
 
             {/* Active Interviews */}
             <Card
-                className="relative overflow-hidden border-l-4 border-l-purple-600 bg-gradient-to-r from-purple-600/10 to-background-surface">
+                className="relative overflow-hidden border-l-4 border-l-purple-600 bg-gradient-to-r from-purple-600/10 to-background-surface/10">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <div className="text-sm font-medium text-primary">Active Interviews</div>
                     <div className="p-1.5 rounded-md bg-purple-600/20">
@@ -114,7 +114,7 @@ export function VacancySummaryCards({vacancies}: VacancySummaryCardsProps) {
 
             {/* Average Salary */}
             <Card
-                className="relative overflow-hidden border-l-4 border-l-amber-600 bg-gradient-to-r from-amber-600/10 to-background-surface">
+                className="relative overflow-hidden border-l-4 border-l-amber-600 bg-gradient-to-r from-amber-600/10 to-background-surface/10">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <div className="text-sm font-medium text-primary">Avg. Salary</div>
                     <div className="p-1.5 rounded-md bg-amber-600/20">

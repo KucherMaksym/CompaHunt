@@ -102,4 +102,25 @@ class PendingEventController(
         val count = pendingEventService.getUnresolvedEventCount(userPrincipal.id)
         return ResponseEntity.ok(mapOf("unresolved" to count))
     }
+
+
+    // TODO: endpoint for testing. remove in production
+    @GetMapping("/test/create")
+    fun createTestEvent(@CurrentUser userPrincipal: UserPrincipal): ResponseEntity<PendingEventDTO> {
+        val event = pendingEventService.createEvent(
+            userId = userPrincipal.id,
+            eventType = com.compahunt.model.EventType.INTERVIEW_FEEDBACK,
+            title = "Test Interview Feedback Required",
+            description = "This is a test pending event created for frontend testing purposes.",
+            priority = 1,
+            interviewId = 1,
+            vacancyId = 1,
+            metadata = null,
+            scheduledFor = null,
+            eventSubtype = "test_event"
+        )
+        
+        val eventDTO = eventMapper.toPendingEventDTO(event)
+        return ResponseEntity.ok(eventDTO)
+    }
 }

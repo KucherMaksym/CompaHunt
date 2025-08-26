@@ -109,7 +109,7 @@ export function WorkExperienceStep() {
         <div className="space-y-6">
           {fields.map((field, index) => (
             <Card key={field.id} className="relative">
-              <CardHeader className="pb-4">
+              <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-base flex items-center gap-2">
                     <Building className="w-4 h-4" />

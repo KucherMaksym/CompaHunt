@@ -171,26 +171,26 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarGroup>
-          <SidebarGroupLabel>Resources</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {resourceItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton 
-                    asChild 
-                    isActive={pathname === item.url}
-                  >
-                    <Link href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {/*<SidebarGroup>*/}
+        {/*  <SidebarGroupLabel>Resources</SidebarGroupLabel>*/}
+        {/*  <SidebarGroupContent>*/}
+        {/*    <SidebarMenu>*/}
+        {/*      {resourceItems.map((item) => (*/}
+        {/*        <SidebarMenuItem key={item.title}>*/}
+        {/*          <SidebarMenuButton */}
+        {/*            asChild */}
+        {/*            isActive={pathname === item.url}*/}
+        {/*          >*/}
+        {/*            <Link href={item.url}>*/}
+        {/*              <item.icon />*/}
+        {/*              <span>{item.title}</span>*/}
+        {/*            </Link>*/}
+        {/*          </SidebarMenuButton>*/}
+        {/*        </SidebarMenuItem>*/}
+        {/*      ))}*/}
+        {/*    </SidebarMenu>*/}
+        {/*  </SidebarGroupContent>*/}
+        {/*</SidebarGroup>*/}
       </SidebarContent>
       
       <SidebarFooter>

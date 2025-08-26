@@ -13,6 +13,7 @@ import {PendingEventDTO} from '@/lib/api/events';
 import {InterviewStatus} from '@/types/vacancy';
 import {interviewApi, UpdateInterviewRequest} from '@/lib/api/interviews';
 import {toast} from 'sonner';
+import {Title} from "@/components/ui/Title";
 
 interface InterviewFeedbackModalProps {
     event: PendingEventDTO;
@@ -98,13 +99,14 @@ export const InterviewFeedbackModal: React.FC<InterviewFeedbackModalProps> = ({
                 <div className="space-y-6">
                     {/* Interview Details Card */}
                     <Card>
-                        <CardHeader className="pb-3">
-                            <CardTitle className="text-lg flex items-center gap-2">
-                                <Building className="h-5 w-5"/>
-                                {event.vacancyInfo?.title} at {event.vacancyInfo?.companyName}
-                            </CardTitle>
-                        </CardHeader>
                         <CardContent className="space-y-3">
+                            <div className={"flex items-center gap-4 "}>
+                                <Building className="h-5 w-5"/>
+                                <Title>
+                                    {event.vacancyInfo?.title} at {event.vacancyInfo?.companyName}
+                                </Title>
+                            </div>
+
                             {event.interviewInfo && (
                                 <div className="grid grid-cols-2 gap-4 text-sm">
                                     <div className="flex items-center gap-2">
@@ -129,20 +131,6 @@ export const InterviewFeedbackModal: React.FC<InterviewFeedbackModalProps> = ({
                                         <div className="flex items-center gap-2">
                                             <MapPin className="h-4 w-4 text-muted-foreground"/>
                                             <span>{event.interviewInfo.location}</span>
-                                        </div>
-                                    )}
-
-                                    {event.interviewInfo.meetingLink && (
-                                        <div className="flex items-center gap-2 col-span-2">
-                                            <Video className="h-4 w-4 text-muted-foreground"/>
-                                            <a
-                                                href={event.interviewInfo.meetingLink}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="text-blue-600 hover:underline truncate"
-                                            >
-                                                {event.interviewInfo.meetingLink}
-                                            </a>
                                         </div>
                                     )}
                                 </div>
