@@ -1,51 +1,25 @@
 'use client'
 
-import {useState, useEffect} from 'react'
+import React from 'react'
 import {useRouter} from 'next/navigation'
 import {useAuth} from "@/hooks/useAuth";
 import {signOut} from "next-auth/react";
 import Avatar from "@/components/ui/Avatar";
 import {Button} from "@/components/ui/button";
-import {ProfileFormWizard} from '@/components/profile/ProfileFormWizard';
-import {ProfileFormData} from '@/lib/validation/profile';
-import {Card, CardContent} from '@/components/ui/card';
-import {User} from 'lucide-react';
+import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
+import {User, Settings, Target, Mail, Calendar} from 'lucide-react';
 import {DashboardLayout} from "@/components/dashboard-layout";
-import {profileApi} from '@/lib/api/profile';
-import {toast} from "sonner";
 
 export default function ProfilePage() {
     const {user, loading, isAuthenticated} = useAuth();
     const router = useRouter();
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [profileData, setProfileData] = useState<Partial<ProfileFormData> | undefined>();
-    const [isLoadingProfile, setIsLoadingProfile] = useState(true);
 
-    // Load existing profile data
-    useEffect(() => {
-        if (isAuthenticated && user) {
-            loadProfileData();
-        }
-    }, [isAuthenticated, user]);
-
-    const loadProfileData = async () => {
-        try {
-            setIsLoadingProfile(true);
-            const formData = await profileApi.getProfileForForm();
-            setProfileData(formData || undefined);
-        } catch (error) {
-            console.error('Error loading profile:', error);
-        } finally {
-            setIsLoadingProfile(false);
-        }
-    };
-
-    if (loading || isLoadingProfile) {
+    if (loading) {
         return (
             <DashboardLayout>
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-y-2 border-primary mx-auto mb-4"></div>
-                    <p className="text-secondary">Loading your profile...</p>
+                <div className="flex flex-col items-center justify-center min-h-[400px]">
+                    <div className="animate-spin rounded-full h-8 w-8 border-y-2 border-primary mb-4"></div>
+                    <p className="text-muted-foreground">Loading your profile...</p>
                 </div>
             </DashboardLayout>
         )
@@ -60,65 +34,53 @@ export default function ProfilePage() {
         router.push('/')
     }
 
-    const handleProfileSubmit = async (data: ProfileFormData) => {
-        setIsSubmitting(true);
-
-        try {
-            const result =  toast.promise(profileApi.createOrUpdateProfile(data), {
-                success: "Profile saved successfully",
-                loading: "Saving profile...",
-                error: (e) =>  e.message || "Something went wrong"
-            })
-        }  finally {
-            setIsSubmitting(false);
-        }
-    };
-
     return (
         <DashboardLayout>
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* User Header */}
-                <Card className="mb-8">
-                    <CardContent className="p-6">
+            <div className="max-w-4xl w-full mx-auto space-y-6">
+                {/* User Profile Card */}
+                <Card className="shadow-lg">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-2xl">
+                            <User className="w-7 h-7" />
+                            My Profile
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
                         <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-4">
+                            <div className="flex items-center space-x-6">
                                 {user && (
                                     <>
-                                        <Avatar name={user.name} avatarUrl={user.avatar}/>
+                                        <Avatar
+                                            name={user.name}
+                                            avatarUrl={user.avatar}
+                                            size="lg"
+                                        />
                                         <div>
-                                            <h1 className="text-2xl font-bold text-primary flex items-center gap-2">
-                                                <User className="w-6 h-6"/>
-                                                {user.name || user.email}
-                                            </h1>
-                                            <p className="text-secondary">{user.email}</p>
+                                            <h2 className="text-2xl font-bold text-foreground">
+                                                {user.name || 'User'}
+                                            </h2>
+                                            <div className="flex items-center gap-2 text-muted-foreground">
+                                                <Mail className="w-4 h-4" />
+                                                {user.email}
+                                            </div>
+                                            <div className="flex items-center gap-2 text-muted-foreground mt-1">
+                                                <Calendar className="w-4 h-4" />
+                                                Member since {new Date().getFullYear()}
+                                            </div>
                                         </div>
                                     </>
                                 )}
                             </div>
-                            <div className="flex items-center gap-4">
-                                <Button
-                                    onClick={() => router.push("/dashboard")}
-                                    variant="outline"
-                                >
-                                    Go to Dashboard
-                                </Button>
-                                <Button
-                                    onClick={handleSignOut}
-                                    variant="destructive"
-                                >
-                                    Sign Out
-                                </Button>
-                            </div>
+                            <Button
+                                onClick={handleSignOut}
+                                variant="destructive"
+                                className="flex items-center gap-2"
+                            >
+                                Sign Out
+                            </Button>
                         </div>
                     </CardContent>
                 </Card>
-
-                {/* Profile Form */}
-                <ProfileFormWizard
-                    initialData={profileData}
-                    onSubmit={handleProfileSubmit}
-                    isLoading={isSubmitting}
-                />
             </div>
         </DashboardLayout>
     )

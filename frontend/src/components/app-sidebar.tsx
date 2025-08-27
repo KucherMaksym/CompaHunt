@@ -59,6 +59,11 @@ const vacancyItems = [
 
 const careerItems = [
   {
+    title: "Career Profile",
+    url: "/career",
+    icon: Target,
+  },
+  {
     title: "Interviews",
     url: "/interviews",
     icon: Calendar,

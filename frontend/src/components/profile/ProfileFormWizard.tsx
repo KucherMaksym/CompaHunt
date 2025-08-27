@@ -168,17 +168,7 @@ export function ProfileFormWizard({
     });
 
     return (
-        <div className="max-w-4xl mx-auto p-6">
-            {/* Header */}
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-primary mb-2">
-                    Complete Your Profile
-                </h1>
-                <p className="text-secondary">
-                    Help us understand your career goals and preferences to provide better job recommendations.
-                </p>
-            </div>
-
+        <div className="w-full mx-auto">
             {/* Form */}
             <FormProvider {...methods}>
                 <form onSubmit={handleFormSubmit}>

@@ -19,9 +19,8 @@ data class UserProfile(
     @Column(name = "current_position", length = 100)
     val currentPosition: String? = null,
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "experience_level")
-    val experienceLevel: ExperienceLevel? = null,
+    val experienceLevel: String? = null,
 
     @Size(max = 100, message = "Target position must not exceed 100 characters")
     @Column(name = "target_position", length = 100)

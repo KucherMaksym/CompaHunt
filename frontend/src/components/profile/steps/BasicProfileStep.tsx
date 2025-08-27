@@ -57,7 +57,7 @@ export function BasicProfileStep() {
                         render={({field}) => (
                             <FormItem className={"flex flex-col space-y-2 gap-0"}>
                                 <div className="flex items-center gap-2">
-                                    <FormLabel className="text-sm font-medium text-foreground">Experience Level</FormLabel>
+                                    <FormLabel htmlFor={"experienceLevel"} className="text-sm font-medium text-foreground">Experience Level</FormLabel>
                                     <Tooltip>
                                         <TooltipTrigger>
                                             <InfoIcon className="w-4 h-4 text-primary"/>
@@ -67,20 +67,12 @@ export function BasicProfileStep() {
                                         </TooltipContent>
                                     </Tooltip>
                                 </div>
-                                <Select onValueChange={field.onChange} value={field.value}>
-                                    <FormControl>
-                                        <SelectTrigger className={"w-full"}>
-                                            <SelectValue placeholder="Select your experience level"/>
-                                        </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        {Object.entries(experienceLevelLabels).map(([value, label]) => (
-                                            <SelectItem key={value} value={value}>
-                                                {label}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                <Input
+                                    id="experienceLevel"
+                                    {...register('profile.experienceLevel')}
+                                    placeholder="e.g. Senior, 5 years"
+                                    maxLength={100}
+                                />
                                 <FormMessage/>
                             </FormItem>
                         )}

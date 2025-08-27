@@ -22,6 +22,7 @@ function getPageTitle(pathname: string): string {
         '/vacancies': 'All Vacancies',
         '/vacancies/kanban': 'Kanban Board',
         '/vacancies/archive': 'Archive',
+        '/career': 'Career Profile',
         '/interviews': 'Interviews',
         '/companies': 'Companies',
         '/contacts': 'Contacts',

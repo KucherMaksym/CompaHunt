@@ -20,7 +20,7 @@ export const profileSchema = z.object({
     .max(100, 'Current position must not exceed 100 characters')
     .optional(),
   
-  experienceLevel: z.nativeEnum(ExperienceLevel).optional(),
+  experienceLevel: z.string('Experience level must not exceed 100 characters').max(100).optional(),
   
   targetPosition: z.string()
     .max(100, 'Target position must not exceed 100 characters')

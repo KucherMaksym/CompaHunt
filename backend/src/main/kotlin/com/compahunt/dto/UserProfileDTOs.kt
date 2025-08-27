@@ -11,7 +11,7 @@ data class UserProfileResponse(
     val id: Long,
     val userId: Long,
     val currentPosition: String?,
-    val experienceLevel: ExperienceLevel?,
+    val experienceLevel: String?,
     val targetPosition: String?,
     val targetSalaryMin: BigDecimal?,
     val targetSalaryMax: BigDecimal?,
@@ -30,7 +30,8 @@ data class UserProfileRequest(
     @field:Size(max = 100, message = "Current position must not exceed 100 characters")
     val currentPosition: String?,
 
-    val experienceLevel: ExperienceLevel?,
+    @field:Size(max = 100, message = "Experience level must not exceed 100 characters")
+    val experienceLevel: String?,
 
     @field:Size(max = 100, message = "Target position must not exceed 100 characters")
     val targetPosition: String?,
