@@ -52,67 +52,10 @@ import {
     Shuffle
 } from "lucide-react"
 import {cn} from "@/lib/utils"
-import {useTheme} from "next-themes";
+import {useTheme} from "next-themes"
+import {useQuery} from "@tanstack/react-query"
+import {analyticsApi} from "@/lib/api/analytics"
 
-// Status data with proper colors
-const statusData = [
-    {status: "APPLIED", label: "Applied", count: 45, icon: Briefcase, className: "bg-status-applied/10 text-status-applied border-status-applied/20"},
-    {status: "VIEWED", label: "Wishlist", count: 18, icon: Eye, className: "bg-status-viewed/10 text-status-viewed border-status-viewed/20"},
-    // {status: "PHONE_SCREEN", label: "Phone Screen", count: 12, icon: Phone, className: "bg-status-phone-screen/10 text-status-phone-screen border-status-phone-screen/20"},
-    {status: "INTERVIEW", label: "Interview", count: 8, icon: UserCheck, className: "bg-status-interview/10 text-status-interview border-status-interview/20"},
-    {status: "OFFER", label: "Offer", count: 3, icon: Trophy, className: "bg-status-offer/10 text-status-offer border-status-offer/20"},
-    {status: "REJECTED", label: "Rejected", count: 28, icon: XCircle, className: "bg-status-rejected/10 text-status-rejected border-status-rejected/20"},
-]
-
-const pieChartData = statusData.map(item => ({
-    name: item.label,
-    value: item.count,
-    fill: item.status === "APPLIED" ? "var(--status-applied)" :
-        item.status === "VIEWED" ? "var(--status-viewed)" :
-            // item.status === "PHONE_SCREEN" ? "hsl(var(--chart-3))" :
-            item.status === "INTERVIEW" ? "var(--status-interview)" :
-                item.status === "OFFER" ? "var(--status-offer)" :
-                    item.status === "REJECTED" ? "var(--status-rejected)" :
-                        "hsl(var(--muted))"
-}))
-
-const monthlyApplications = [
-    {month: "Jan", applied: 12, interviews: 3, offers: 1},
-    {month: "Feb", applied: 18, interviews: 4, offers: 0},
-    {month: "Mar", applied: 25, interviews: 6, offers: 2},
-    {month: "Apr", applied: 22, interviews: 8, offers: 1},
-    {month: "May", applied: 28, interviews: 5, offers: 3},
-    {month: "Jun", applied: 15, interviews: 2, offers: 0}
-]
-
-const salaryData = [
-    {range: "50-80k", count: 15, avg: 65},
-    {range: "80-120k", count: 28, avg: 100},
-    {range: "120-160k", count: 22, avg: 140},
-    {range: "160-200k", count: 12, avg: 180},
-    {range: "200k+", count: 8, avg: 250}
-]
-
-const remoteData = [
-    {type: "Remote", label: "Remote", count: 32, icon: Globe, percentage: 37.6},
-    {type: "On-site", label: "On-site", count: 28, icon: Building2, percentage: 32.9},
-    {type: "Hybrid", label: "Hybrid", count: 25, icon: Shuffle, percentage: 29.4}
-]
-
-const topCompanies = [
-    {company: "Google", applications: 8, interviews: 2, successRate: 25},
-    {company: "Microsoft", applications: 6, interviews: 3, successRate: 50},
-    {company: "Apple", applications: 5, interviews: 1, successRate: 20},
-    {company: "Meta", applications: 4, interviews: 2, successRate: 50},
-    {company: "Netflix", applications: 4, interviews: 1, successRate: 25}
-]
-
-const interviewTypes = [
-    {type: "Phone Screen", label: "Phone Screen", count: 15, successRate: 60, icon: Phone, color: "text-blue-500"},
-    {type: "Technical", label: "Technical", count: 12, successRate: 45, icon: Zap, color: "text-purple-500"},
-    {type: "Behavioral", label: "Behavioral", count: 8, successRate: 75, icon: Users, color: "text-green-500"},
-    {type: "Final Round", label: "Final Round", count: 6, successRate: 50, icon: Trophy, color: "text-amber-500"}
-]
 
 const chartConfig = {
     applied: {
@@ -138,8 +81,70 @@ const responseTimeData = [
 ]
 
 export default function AnalyticsPage() {
-
     const {resolvedTheme} = useTheme()
+    
+    const {data: analyticsData, isLoading, error} = useQuery({
+        queryKey: ['analytics'],
+        queryFn: analyticsApi.getAnalyticsData,
+    })
+
+    if (isLoading) {
+        return (
+            <DashboardLayout>
+                <div className="flex flex-col items-center justify-center min-h-[400px]">
+                    <div className="animate-spin rounded-full h-12 w-12 border-y-2 border-primary mb-6"></div>
+                    <p className="text-muted-foreground text-lg">Loading your analytics...</p>
+                </div>
+            </DashboardLayout>
+        )
+    }
+
+    if (error) {
+        return (
+            <DashboardLayout>
+                <div className="flex flex-col items-center justify-center min-h-[400px]">
+                    <div className="text-center">
+                        <h2 className="text-xl font-semibold mb-2">Unable to load analytics</h2>
+                        <p className="text-muted-foreground">Please try refreshing the page</p>
+                    </div>
+                </div>
+            </DashboardLayout>
+        )
+    }
+
+    if (!analyticsData) {
+        return (
+            <DashboardLayout>
+                <div className="flex flex-col items-center justify-center min-h-[400px]">
+                    <div className="text-center">
+                        <h2 className="text-xl font-semibold mb-2">No Data Available</h2>
+                        <p className="text-muted-foreground">Start applying to jobs to see your analytics</p>
+                    </div>
+                </div>
+            </DashboardLayout>
+        )
+    }
+
+    // Transform data for charts
+    const pieChartData = analyticsData.statusDistribution.map(item => ({
+        name: item.label,
+        value: item.count,
+        fill: item.status === "APPLIED" ? "var(--status-applied)" :
+            item.status === "WISHLIST" ? "var(--status-viewed)" :
+            item.status === "PHONE_SCREEN" ? "var(--status-phone-screen)" :
+            item.status === "INTERVIEW" ? "var(--status-interview)" :
+            item.status === "OFFER" ? "var(--status-offer)" :
+            item.status === "REJECTED" ? "var(--status-rejected)" :
+            "hsl(var(--muted))"
+    }))
+
+    const totalVacancies = analyticsData.statusDistribution.reduce((sum, item) => sum + item.count, 0)
+
+    // Map remote work data with icons
+    const remoteDataWithIcons = analyticsData.remoteWorkDistribution.map(item => ({
+        ...item,
+        icon: item.type === "Remote" ? Globe : item.type === "Hybrid" ? Shuffle : Building2
+    }))
 
     return (
         <DashboardLayout>
@@ -156,7 +161,7 @@ export default function AnalyticsPage() {
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-3">
-                                {topCompanies.map((company, index) => (
+                                {analyticsData.topCompanies.map((company, index) => (
                                     <div key={company.company}
                                          className="group flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-muted/50 to-muted/30 hover:from-muted/70 hover:to-muted/50 transition-all cursor-pointer">
                                         <div className="flex items-center gap-3">
@@ -216,7 +221,7 @@ export default function AnalyticsPage() {
                                                                 y={viewBox.cy}
                                                                 className={` ${resolvedTheme === "dark" ? "fill-white" : "fill-black"} text-3xl font-bold`}
                                                             >
-                                                                {statusData.reduce((tot, curVal) => tot + curVal.count, 0)}
+                                                                {totalVacancies}
                                                             </tspan>
                                                             <tspan
                                                                 x={viewBox.cx}
@@ -252,7 +257,7 @@ export default function AnalyticsPage() {
                     </CardHeader>
                     <CardContent>
                         <ChartContainer config={chartConfig} className="w-full h-[300px]">
-                            <AreaChart data={monthlyApplications}>
+                            <AreaChart data={analyticsData.monthlyTrends}>
                                 <defs>
                                     <linearGradient id="colorApplied" x1="0" y1="0" x2="0" y2="1">
                                         <stop offset="5%" stopColor="var(--status-applied)" stopOpacity={0.3}/>
@@ -291,7 +296,7 @@ export default function AnalyticsPage() {
                         </CardHeader>
                         <CardContent>
                             <ChartContainer config={chartConfig} className="w-full h-[300px]">
-                                <BarChart data={salaryData}>
+                                <BarChart data={analyticsData.salaryDistribution}>
                                     <defs>
                                         <linearGradient id="colorSalary" x1="0" y1="0" x2="0" y2="1">
                                             <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.8}/>
@@ -319,7 +324,7 @@ export default function AnalyticsPage() {
                         </CardHeader>
                         <CardContent className={`h-full`}>
                             <div className="flex flex-col justify-around h-full">
-                                {remoteData.map((item) => {
+                                {remoteDataWithIcons.map((item) => {
                                     const Icon = item.icon
                                     return (
                                         <div key={item.type} className="group">
