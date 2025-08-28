@@ -21,8 +21,7 @@ export const usePendingEventsGrouped = () => {
     return useQuery({
         queryKey: ['pending-events-grouped'],
         queryFn: eventsApi.getPendingEventsGrouped,
-        refetchInterval: 30000,
-        staleTime: 10000,
+        staleTime: 15 * 60 * 1000 // 15 minutes
     });
 };
 

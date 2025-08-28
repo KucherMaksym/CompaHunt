@@ -1,4 +1,5 @@
 import {apiClient} from '@/lib/api-client';
+import {InterviewType} from "@/types/vacancy";
 
 export interface PendingEventDTO {
     id: number;
@@ -16,7 +17,7 @@ export interface PendingEventDTO {
     interviewInfo?: {
         id: number;
         scheduledAt: string;
-        type: string;
+        type: InterviewType;
         interviewerName?: string;
         location?: string;
         meetingLink?: string;

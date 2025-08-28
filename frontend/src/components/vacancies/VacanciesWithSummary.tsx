@@ -39,9 +39,9 @@ export function VacanciesWithSummary({
 
   return (
     <div className="space-y-6">
-      <VacancySummaryCards
-        vacancies={allVacancies}
-      />
+      {/*<VacancySummaryCards*/}
+      {/*  vacancies={allVacancies}*/}
+      {/*/>*/}
       
       <VacanciesList
         onAddVacancy={onAddVacancy}

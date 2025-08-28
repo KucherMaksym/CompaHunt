@@ -109,9 +109,9 @@ export default function InterviewsPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <InterviewSummaryCards
-          interviews={interviews || []}
-        />
+        {/*<InterviewSummaryCards*/}
+        {/*  interviews={interviews || []}*/}
+        {/*/>*/}
         
         <InterviewsList
           interviews={interviews || []}

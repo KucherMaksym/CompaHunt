@@ -14,6 +14,7 @@ import {InterviewStatus} from '@/types/vacancy';
 import {interviewApi, UpdateInterviewRequest} from '@/lib/api/interviews';
 import {toast} from 'sonner';
 import {Title} from "@/components/ui/Title";
+import {getInterviewTypeLabel} from "@/utils/interview-utils";
 
 interface InterviewFeedbackModalProps {
     event: PendingEventDTO;
@@ -116,7 +117,7 @@ export const InterviewFeedbackModal: React.FC<InterviewFeedbackModalProps> = ({
 
                                     <div className="flex items-center gap-2">
                                         <Badge variant="secondary">
-                                            {event.interviewInfo.type.replace('_', ' ')}
+                                            {getInterviewTypeLabel(event.interviewInfo.type)}
                                         </Badge>
                                     </div>
 

@@ -127,15 +127,14 @@ export const workExperienceSchema = z.object({
   
   industry: z.nativeEnum(Industry).optional()
 }).refine((data) => {
-  if (!data.isCurrent && !data.endDate) {
-    return false;
+  // If current position, validation passes
+  if (data.isCurrent) {
+    return true;
   }
-  if (data.isCurrent && data.endDate) {
-    return false;
-  }
-  return true;
+  // If not current position, end date is required
+  return data.endDate && data.endDate.trim() !== '';
 }, {
-  message: 'Please specify end date or mark as current position',
+  message: 'End date is required for past positions',
   path: ['endDate']
 });
 

@@ -66,7 +66,7 @@ export default function CareerPage() {
     return (
         <DashboardLayout>
             <div className="max-w-4xl w-full mx-auto">
-                 <div className=" w-full rounded-2xl p-1 shadow-custom-xl border-border">
+                 <div className=" w-full rounded-2xl p-1">
                     <ProfileFormWizard
                         initialData={profileData}
                         onSubmit={handleProfileSubmit}

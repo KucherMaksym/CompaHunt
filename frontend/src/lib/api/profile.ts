@@ -170,7 +170,7 @@ export const transformProfileFormDataToRequest = (formData: ProfileFormData): Co
       companyName: exp.companyName,
       position: exp.position,
       startDate: exp.startDate,
-      endDate: exp.endDate,
+      endDate: exp.endDate && exp.endDate.trim() !== '' ? exp.endDate : undefined,
       isCurrent: exp.isCurrent,
       description: exp.description,
       achievements: exp.achievements,
