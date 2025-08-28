@@ -4,10 +4,11 @@ import com.compahunt.model.InterviewStatus
 import com.compahunt.model.InterviewType
 import jakarta.validation.constraints.NotNull
 import java.time.Instant
+import java.util.UUID
 
 data class CreateInterviewRequest(
     @field:NotNull(message = "Vacancy ID is required")
-    val vacancyId: Long,
+    val vacancyId: UUID,
     
     @field:NotNull(message = "Scheduled time is required")
     val scheduledAt: Instant,
@@ -37,8 +38,8 @@ data class UpdateInterviewRequest(
 )
 
 data class InterviewResponse(
-    val id: Long,
-    val vacancyId: Long,
+    val id: UUID,
+    val vacancyId: UUID,
     val vacancyTitle: String,
     val companyName: String,
     val scheduledAt: String,
@@ -56,7 +57,7 @@ data class InterviewResponse(
 )
 
 data class InterviewWithVacancyResponse(
-    val id: Long,
+    val id: UUID,
     val vacancy: VacancyResponse,
     val companyName: String,
     val scheduledAt: String,
@@ -74,7 +75,7 @@ data class InterviewWithVacancyResponse(
 )
 
 data class UserResponse(
-    val id: Long,
+    val id: UUID,
     val email: String,
     val firstName: String?,
     val lastName: String?

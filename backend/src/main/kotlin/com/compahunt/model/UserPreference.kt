@@ -11,8 +11,8 @@ import java.util.*
 @Table(name = "user_preferences")
 data class UserPreference(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    @GeneratedValue(strategy = GenerationType.UUID)
+    val id: UUID = UUID.randomUUID(),
 
     @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)

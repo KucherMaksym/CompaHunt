@@ -35,13 +35,13 @@ class PendingEventService(
 
     // Create a new pending event
     fun createEvent(
-        userId: Long,
+        userId: UUID,
         eventType: EventType,
         title: String,
         description: String? = null,
         priority: Int? = null,
-        interviewId: Long? = null,
-        vacancyId: Long? = null,
+        interviewId: UUID? = null,
+        vacancyId: UUID? = null,
         metadata: JsonNode? = null,
         scheduledFor: Instant? = null,
         eventSubtype: String? = null
@@ -109,8 +109,8 @@ class PendingEventService(
 
             val jobDetail = JobBuilder.newJob(InterviewFeedbackJob::class.java)
                 .withIdentity(jobKey)
-                .usingJobData(InterviewFeedbackJob.INTERVIEW_ID_KEY, interview.id)
-                .usingJobData(InterviewFeedbackJob.USER_ID_KEY, interview.user.id)
+                .usingJobData(InterviewFeedbackJob.INTERVIEW_ID_KEY, interview.id.toString())
+                .usingJobData(InterviewFeedbackJob.USER_ID_KEY, interview.user.id.toString())
                 .storeDurably()
                 .build()
 
@@ -129,7 +129,7 @@ class PendingEventService(
     }
 
     // Cancel scheduled interview feedback job
-    fun cancelInterviewFeedbackJob(interviewId: Long) {
+    fun cancelInterviewFeedbackJob(interviewId: UUID) {
         val jobKey = JobKey.jobKey("interview-feedback-$interviewId", "interview-jobs")
         try {
             scheduler.deleteJob(jobKey)
@@ -140,18 +140,18 @@ class PendingEventService(
     }
 
     // Get all unresolved events for a user, ordered by priority
-    fun getUnresolvedEvents(userId: Long): List<PendingEvent> {
+    fun getUnresolvedEvents(userId: UUID): List<PendingEvent> {
         return pendingEventRepository.findUnresolvedByUserIdOrderByPriorityAndCreatedAt(userId)
     }
 
     // Get events grouped by related vacancy for better UX
-    fun getGroupedUnresolvedEvents(userId: Long): Map<Vacancy?, List<PendingEvent>> {
+    fun getGroupedUnresolvedEvents(userId: UUID): Map<Vacancy?, List<PendingEvent>> {
         val allEvents = getUnresolvedEvents(userId)
         return allEvents.groupBy { it.vacancy }
     }
 
     // Resolve a single event
-    fun resolveEvent(eventId: Long, userId: Long): PendingEvent {
+    fun resolveEvent(eventId: UUID, userId: UUID): PendingEvent {
         val event = pendingEventRepository.findByIdOrNull(eventId)
             ?: throw IllegalArgumentException("Event not found: $eventId")
 
@@ -169,7 +169,7 @@ class PendingEventService(
     }
 
     // Resolve multiple events in bulk
-    fun resolveEvents(eventIds: List<Long>, userId: Long): Int {
+    fun resolveEvents(eventIds: List<UUID>, userId: UUID): Int {
         // Verify all events belong to user
         val events = pendingEventRepository.findAllById(eventIds)
         val unauthorizedEvents = events.filter { it.user.id != userId }
@@ -183,12 +183,12 @@ class PendingEventService(
     }
 
     // Get count of unresolved events for notification badges
-    fun getUnresolvedEventCount(userId: Long): Long {
+    fun getUnresolvedEventCount(userId: UUID): Long {
         return pendingEventRepository.countByUserIdAndIsResolvedFalse(userId)
     }
 
     // Get count breakdown by priority
-    fun getUnresolvedEventCountByPriority(userId: Long): Map<Int, Long> {
+    fun getUnresolvedEventCountByPriority(userId: UUID): Map<Int, Long> {
         val results = pendingEventRepository.countUnresolvedByUserIdGroupByPriority(userId)
         return results.associate {
             (it[0] as Int) to (it[1] as Long)
@@ -197,8 +197,8 @@ class PendingEventService(
 
     // Create AI-detected status change event
     fun createAIStatusChangeEvent(
-        userId: Long,
-        vacancyId: Long,
+        userId: UUID,
+        vacancyId: UUID,
         newStatus: String,
         confidence: Double,
         emailSubject: String?,
@@ -227,8 +227,8 @@ class PendingEventService(
 
     // Create AI-scheduled interview event
     fun createAIInterviewScheduledEvent(
-        userId: Long,
-        vacancyId: Long,
+        userId: UUID,
+        vacancyId: UUID,
         interviewDateTime: Instant,
         interviewType: String,
         location: String?,

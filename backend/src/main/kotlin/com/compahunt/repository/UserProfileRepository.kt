@@ -8,11 +8,11 @@ import org.springframework.stereotype.Repository
 import java.util.*
 
 @Repository
-interface UserProfileRepository : JpaRepository<UserProfile, Long> {
+interface UserProfileRepository : JpaRepository<UserProfile, UUID> {
 
-    fun findByUserId(userId: Long): UserProfile?
+    fun findByUserId(userId: UUID): UserProfile?
 
-    fun existsByUserId(userId: Long): Boolean
+    fun existsByUserId(userId: UUID): Boolean
 
 //    @Query("""
 //        SELECT up FROM UserProfile up
@@ -28,5 +28,5 @@ interface UserProfileRepository : JpaRepository<UserProfile, Long> {
         
         WHERE up.userId = :userId
     """)
-    fun findByUserIdWithDetails(@Param("userId") userId: Long): UserProfile?
+    fun findByUserIdWithDetails(@Param("userId") userId: UUID): UserProfile?
 }

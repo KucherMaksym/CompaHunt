@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
+import java.util.UUID
 
 @RestController
 @RequestMapping("/api/interviews")
@@ -39,7 +40,7 @@ class InterviewController(
 
     @PutMapping("/{id}")
     fun updateInterview(
-        @PathVariable id: Long,
+        @PathVariable id: UUID,
         @Valid @RequestBody request: UpdateInterviewRequest,
         authentication: Authentication
     ): ResponseEntity<InterviewResponse> {
@@ -50,7 +51,7 @@ class InterviewController(
 
     @GetMapping("/vacancy/{vacancyId}")
     fun getInterviewsByVacancy(
-        @PathVariable vacancyId: Long,
+        @PathVariable vacancyId: UUID,
         authentication: Authentication
     ): ResponseEntity<List<InterviewResponse>> {
         val userId = getUserId(authentication)
@@ -60,7 +61,7 @@ class InterviewController(
 
     @DeleteMapping("/{id}")
     fun deleteInterview(
-        @PathVariable id: Long,
+        @PathVariable id: UUID,
         authentication: Authentication
     ): ResponseEntity<Map<String, Any>> {
         val userId = getUserId(authentication)
@@ -68,13 +69,13 @@ class InterviewController(
         return ResponseEntity.ok(mapOf("deleted" to deleted))
     }
 
-    private fun getUserId(authentication: Authentication): Long {
+    private fun getUserId(authentication: Authentication): UUID {
         return when (val principal = authentication.principal) {
             is UserPrincipal -> principal.id
             is Map<*, *> -> {
                 // Fallback for JWT token claims
                 val claims = principal as Map<String, Any>
-                (claims["sub"] as String).toLong()
+                UUID.fromString(claims["sub"] as String)
             }
             else -> throw IllegalArgumentException("Unsupported principal type: ${principal::class.java}")
         }

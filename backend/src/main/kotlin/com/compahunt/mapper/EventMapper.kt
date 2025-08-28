@@ -8,6 +8,7 @@ import com.compahunt.model.Interview
 import com.compahunt.model.InterviewType
 import com.compahunt.model.VacancyStatus
 import org.mapstruct.*
+import java.util.UUID
 
 @Mapper(componentModel = "spring")
 interface EventMapper {

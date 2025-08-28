@@ -16,12 +16,12 @@ class UserProfileService(
 ) {
 
     @Transactional(readOnly = true)
-    fun getUserProfile(userId: Long): UserProfileResponse? {
+    fun getUserProfile(userId: UUID): UserProfileResponse? {
         val profile = userProfileRepository.findByUserIdWithDetails(userId)
         return profile?.let { userProfileMapper.toUserProfileResponse(it) }
     }
 
-    fun createOrUpdateUserProfile(userId: Long, request: CompleteUserProfileRequest): UserProfileResponse {
+    fun createOrUpdateUserProfile(userId: UUID, request: CompleteUserProfileRequest): UserProfileResponse {
         val existingProfile = userProfileRepository.findByUserIdWithDetails(userId)
 
         val profile = if (existingProfile != null) {
@@ -34,7 +34,7 @@ class UserProfileService(
         return userProfileMapper.toUserProfileResponse(savedProfile)
     }
 
-    fun updateBasicProfile(userId: Long, request: UserProfileRequest): UserProfileResponse {
+    fun updateBasicProfile(userId: UUID, request: UserProfileRequest): UserProfileResponse {
         val profile = userProfileRepository.findByUserId(userId)
             ?: throw IllegalArgumentException("User profile not found")
 
@@ -56,11 +56,11 @@ class UserProfileService(
     }
 
     @Transactional(readOnly = true)
-    fun profileExists(userId: Long): Boolean {
+    fun profileExists(userId: UUID): Boolean {
         return userProfileRepository.existsByUserId(userId)
     }
 
-    private fun createNewProfile(userId: Long, request: CompleteUserProfileRequest): UserProfile {
+    private fun createNewProfile(userId: UUID, request: CompleteUserProfileRequest): UserProfile {
         val profile = UserProfile(
             userId = userId,
             currentPosition = request.profile.currentPosition,

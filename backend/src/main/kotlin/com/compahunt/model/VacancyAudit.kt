@@ -2,19 +2,20 @@ package com.compahunt.model
 
 import jakarta.persistence.*
 import java.time.Instant
+import java.util.UUID
 
 @Entity
 @Table(name = "vacancy_audit")
 data class VacancyAudit(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    @GeneratedValue(strategy = GenerationType.UUID)
+    val id: UUID = UUID.randomUUID(),
 
     @Column(nullable = false)
-    val vacancyId: Long,
+    val vacancyId: UUID,
 
     @Column(nullable = false)
-    val userId: Long,
+    val userId: UUID,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

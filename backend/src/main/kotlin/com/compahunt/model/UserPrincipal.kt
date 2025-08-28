@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails
 import java.util.*
 
 data class UserPrincipal(
-    val id: Long,
+    val id: UUID,
     val email: String,
     val name: String,
     val role: Role,

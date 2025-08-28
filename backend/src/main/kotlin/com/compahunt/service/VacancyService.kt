@@ -19,6 +19,7 @@ import jakarta.servlet.http.HttpServletRequest
 import org.slf4j.LoggerFactory
 import java.math.BigDecimal
 import java.time.Instant
+import java.util.*
 
 @Service
 @Transactional
@@ -36,7 +37,7 @@ class VacancyService(
 
     fun createVacancy(
         request: CreateVacancyRequest, 
-        userId: Long, 
+        userId: UUID, 
         httpRequest: HttpServletRequest
     ): VacancyResponse {
         val user = userRepository.findById(userId)
@@ -92,14 +93,14 @@ class VacancyService(
         return vacancyMapper.toResponse(savedVacancy)
     }
 
-    fun getVacancy(id: Long, userId: Long): VacancyResponse {
+    fun getVacancy(id: UUID, userId: UUID): VacancyResponse {
         val vacancy = vacancyRepository.findByIdAndUserId(id, userId)
             .orElseThrow { VacancyNotFoundException("Vacancy not found or access denied") }
         
         return vacancyMapper.toResponse(vacancy)
     }
 
-    fun getAllVacancies(userId: Long, status: VacancyStatus? = null, limit: Int? = null): List<VacancyResponse> {
+    fun getAllVacancies(userId: UUID, status: VacancyStatus? = null, limit: Int? = null): List<VacancyResponse> {
         val vacancies = if (status != null) {
             vacancyRepository.findByUserIdAndStatusOrderByCreatedAtDesc(userId, status)
         } else {
@@ -115,7 +116,7 @@ class VacancyService(
         return limitedVacancies.map { vacancyMapper.toResponse(it) }
     }
 
-    fun searchVacancies(userId: Long, filterRequest: VacancyFilterRequest): VacancySearchResponse {
+    fun searchVacancies(userId: UUID, filterRequest: VacancyFilterRequest): VacancySearchResponse {
         val sort = if (filterRequest.sortDirection.lowercase() == "asc") {
             Sort.by(Sort.Order.asc(filterRequest.sortBy))
         } else {
@@ -158,7 +159,7 @@ class VacancyService(
         )
     }
 
-    fun getVacanciesWithFilters(userId: Long, filterRequest: VacancyFilterRequest): VacancyPageResponse {
+    fun getVacanciesWithFilters(userId: UUID, filterRequest: VacancyFilterRequest): VacancyPageResponse {
         val status = filterRequest.status?.let { VacancyStatus.valueOf(it) }
         
         // Convert salary values to monthly amounts if period is provided
@@ -212,9 +213,9 @@ class VacancyService(
     }
 
     fun updateVacancy(
-        id: Long, 
+        id: UUID, 
         request: UpdateVacancyRequest, 
-        userId: Long, 
+        userId: UUID, 
         httpRequest: HttpServletRequest
     ): VacancyResponse {
         val vacancy = vacancyRepository.findByIdAndUserId(id, userId)
@@ -277,9 +278,9 @@ class VacancyService(
     }
 
     fun updateStatus(
-        id: Long, 
+        id: UUID, 
         status: VacancyStatus, 
-        userId: Long, 
+        userId: UUID, 
         httpRequest: HttpServletRequest
     ): VacancyResponse {
         val vacancy = vacancyRepository.findByIdAndUserId(id, userId)
@@ -314,8 +315,8 @@ class VacancyService(
     }
 
     fun archiveVacancy(
-        id: Long, 
-        userId: Long, 
+        id: UUID, 
+        userId: UUID, 
         reason: String?, 
         httpRequest: HttpServletRequest
     ): Boolean {
@@ -342,7 +343,7 @@ class VacancyService(
         return true
     }
 
-    fun getAuditHistory(vacancyId: Long, userId: Long): List<VacancyAuditResponse> {
+    fun getAuditHistory(vacancyId: UUID, userId: UUID): List<VacancyAuditResponse> {
         // Verify user has access to this vacancy
         vacancyRepository.findByIdAndUserId(vacancyId, userId)
             .orElseThrow { VacancyNotFoundException("Vacancy not found or access denied") }
@@ -351,7 +352,7 @@ class VacancyService(
         return auditRecords.map { mapToVacancyAuditResponse(it) }
     }
 
-    fun getArchivedVacancies(userId: Long): List<VacancyResponse> {
+    fun getArchivedVacancies(userId: UUID): List<VacancyResponse> {
         val archivedVacancies = vacancyRepository.findArchivedByUserId(userId)
         return archivedVacancies.map { vacancyMapper.toResponse(it) }
     }
@@ -390,8 +391,8 @@ class VacancyService(
     }
 
     private fun createAuditRecord(
-        vacancyId: Long,
-        userId: Long,
+        vacancyId: UUID,
+        userId: UUID,
         action: AuditAction,
         fieldName: String? = null,
         oldValue: String? = null,

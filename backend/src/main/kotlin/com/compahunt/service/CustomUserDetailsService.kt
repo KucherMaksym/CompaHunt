@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class CustomUserDetailsService(
@@ -22,7 +23,7 @@ class CustomUserDetailsService(
     }
 
     @Transactional
-    fun loadUserById(id: Long): UserDetails {
+    fun loadUserById(id: UUID): UserDetails {
         val user = userRepository.findById(id)
             .orElseThrow { UsernameNotFoundException("User not found with id: $id") }
 

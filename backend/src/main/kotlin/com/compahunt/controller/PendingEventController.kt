@@ -8,6 +8,7 @@ import com.compahunt.service.PendingEventService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.util.UUID
 
 @RestController
 @RequestMapping("/api/events")
@@ -46,7 +47,7 @@ class PendingEventController(
     // Resolve a single event
     @PostMapping("/{eventId}/resolve")
     fun resolveEvent(
-        @PathVariable eventId: Long,
+        @PathVariable eventId: UUID,
         @CurrentUser userPrincipal: UserPrincipal
     ): ResponseEntity<PendingEventDTO> {
         val resolvedEvent = pendingEventService.resolveEvent(eventId, userPrincipal.id)
@@ -113,8 +114,8 @@ class PendingEventController(
             title = "Test Interview Feedback Required",
             description = "This is a test pending event created for frontend testing purposes.",
             priority = 1,
-            interviewId = 1,
-            vacancyId = 1,
+            interviewId = UUID.randomUUID(),
+            vacancyId = UUID.randomUUID(),
             metadata = null,
             scheduledFor = null,
             eventSubtype = "test_event"

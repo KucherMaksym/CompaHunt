@@ -3,16 +3,17 @@ package com.compahunt.dto
 import com.compahunt.model.EventType
 import com.fasterxml.jackson.databind.JsonNode
 import java.time.Instant
+import java.util.UUID
 
 data class PendingEventDTO(
-    val id: Long,
+    val id: UUID,
     val eventType: EventType,
     val eventSubtype: String?,
     val title: String,
     val description: String?,
     val priority: Int,
-    val interviewId: Long?,
-    val vacancyId: Long?,
+    val interviewId: UUID?,
+    val vacancyId: UUID?,
     val metadata: JsonNode?,
     val scheduledFor: Instant?,
     val createdAt: Instant,
@@ -23,7 +24,7 @@ data class PendingEventDTO(
     val vacancyInfo: VacancyInfo?
 ) {
     data class InterviewInfo(
-        val id: Long,
+        val id: UUID,
         val scheduledAt: Instant,
         val type: String,
         val interviewerName: String?,
@@ -32,7 +33,7 @@ data class PendingEventDTO(
     )
     
     data class VacancyInfo(
-        val id: Long,
+        val id: UUID,
         val title: String,
         val companyName: String?,
         val location: String?,
@@ -67,7 +68,7 @@ data class EventStatsDTO(
 }
 
 data class ResolveEventRequest(
-    val eventIds: List<Long>
+    val eventIds: List<UUID>
 )
 
 data class CreateEventRequest(
@@ -76,13 +77,13 @@ data class CreateEventRequest(
     val title: String,
     val description: String?,
     val priority: Int?,
-    val interviewId: Long?,
-    val vacancyId: Long?,
+    val interviewId: UUID?,
+    val vacancyId: UUID?,
     val metadata: JsonNode?,
     val scheduledFor: Instant?
 )
 
 data class BulkResolveResponse(
     val resolvedCount: Int,
-    val failedEventIds: List<Long> = emptyList()
+    val failedEventIds: List<UUID> = emptyList()
 )

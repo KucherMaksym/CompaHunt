@@ -8,38 +8,39 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import java.time.Instant
+import java.util.UUID
 
 @Repository
-interface PendingEventRepository : JpaRepository<PendingEvent, Long> {
+interface PendingEventRepository : JpaRepository<PendingEvent, UUID> {
     
     // Find all unresolved events for a user, ordered by priority (1=highest) then creation time
     @Query("SELECT pe FROM PendingEvent pe WHERE pe.user.id = :userId AND pe.isResolved = false ORDER BY pe.priority ASC, pe.createdAt ASC")
-    fun findUnresolvedByUserIdOrderByPriorityAndCreatedAt(@Param("userId") userId: Long): List<PendingEvent>
+    fun findUnresolvedByUserIdOrderByPriorityAndCreatedAt(@Param("userId") userId: UUID): List<PendingEvent>
 
     // Find events scheduled for a specific time range (for job processing)
     @Query("SELECT pe FROM PendingEvent pe WHERE pe.scheduledFor IS NOT NULL AND pe.scheduledFor <= :endTime AND pe.isResolved = false")
     fun findScheduledEventsBeforeOrAt(@Param("endTime") endTime: Instant): List<PendingEvent>
 
     // Find unresolved events by type for a user
-    fun findByUserIdAndEventTypeAndIsResolvedFalse(userId: Long, eventType: EventType): List<PendingEvent>
+    fun findByUserIdAndEventTypeAndIsResolvedFalse(userId: UUID, eventType: EventType): List<PendingEvent>
 
     // Find unresolved events related to specific interview
-    fun findByInterviewIdAndIsResolvedFalse(interviewId: Long): List<PendingEvent>
+    fun findByInterviewIdAndIsResolvedFalse(interviewId: UUID): List<PendingEvent>
 
     // Find unresolved events related to specific vacancy
-    fun findByVacancyIdAndIsResolvedFalse(vacancyId: Long): List<PendingEvent>
+    fun findByVacancyIdAndIsResolvedFalse(vacancyId: UUID): List<PendingEvent>
     
     // Count unresolved events for a user (for notification badges)
-    fun countByUserIdAndIsResolvedFalse(userId: Long): Long
+    fun countByUserIdAndIsResolvedFalse(userId: UUID): Long
     
     // Count unresolved events by priority for a user
     @Query("SELECT pe.priority, COUNT(pe) FROM PendingEvent pe WHERE pe.user.id = :userId AND pe.isResolved = false GROUP BY pe.priority")
-    fun countUnresolvedByUserIdGroupByPriority(@Param("userId") userId: Long): List<Array<Any>>
+    fun countUnresolvedByUserIdGroupByPriority(@Param("userId") userId: UUID): List<Array<Any>>
     
     // Mark events as resolved in bulk
     @Modifying
     @Query("UPDATE PendingEvent pe SET pe.isResolved = true, pe.resolvedAt = :resolvedAt WHERE pe.id IN :eventIds")
-    fun markEventsAsResolved(@Param("eventIds") eventIds: List<Long>, @Param("resolvedAt") resolvedAt: Instant): Int
+    fun markEventsAsResolved(@Param("eventIds") eventIds: List<UUID>, @Param("resolvedAt") resolvedAt: Instant): Int
     
     // Find duplicate events to prevent recreation
     @Query("""
@@ -55,10 +56,10 @@ interface PendingEventRepository : JpaRepository<PendingEvent, Long> {
         )
     """)
     fun findExistingEvent(
-        @Param("userId") userId: Long,
+        @Param("userId") userId: UUID,
         @Param("eventType") eventType: EventType,
-        @Param("interviewId") interviewId: Long?,
-        @Param("vacancyId") vacancyId: Long?
+        @Param("interviewId") interviewId: UUID?,
+        @Param("vacancyId") vacancyId: UUID?
     ): List<PendingEvent>
     
     // Clean up old resolved events (for maintenance)
@@ -74,5 +75,5 @@ interface PendingEventRepository : JpaRepository<PendingEvent, Long> {
         AND pe.vacancy IS NOT NULL 
         ORDER BY pe.vacancy.id, pe.priority ASC, pe.createdAt ASC
     """)
-    fun findUnresolvedByUserIdGroupedByVacancy(@Param("userId") userId: Long): List<PendingEvent>
+    fun findUnresolvedByUserIdGroupedByVacancy(@Param("userId") userId: UUID): List<PendingEvent>
 }

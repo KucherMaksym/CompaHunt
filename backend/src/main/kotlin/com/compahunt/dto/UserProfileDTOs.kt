@@ -8,8 +8,8 @@ import java.time.LocalDate
 import java.util.*
 
 data class UserProfileResponse(
-    val id: Long,
-    val userId: Long,
+    val id: UUID,
+    val userId: UUID,
     val currentPosition: String?,
     val experienceLevel: String?,
     val targetPosition: String?,
@@ -58,7 +58,7 @@ data class UserProfileRequest(
 )
 
 data class UserSkillResponse(
-    val id: Long,
+    val id: UUID,
     val skillName: String,
     val proficiencyLevel: Int,
     val yearsExperience: Int?,
@@ -86,7 +86,7 @@ data class UserSkillRequest(
 )
 
 data class WorkExperienceResponse(
-    val id: Long,
+    val id: UUID,
     val companyName: String,
     val position: String,
     val startDate: LocalDate,
@@ -131,7 +131,7 @@ data class WorkExperienceRequest(
 )
 
 data class CareerGoalResponse(
-    val id: Long,
+    val id: UUID,
     val goalType: GoalType,
     val title: String,
     val description: String,
@@ -168,7 +168,7 @@ data class CareerGoalRequest(
 )
 
 data class UserPreferenceResponse(
-    val id: Long,
+    val id: UUID,
     val companySizePreference: CompanySize?,
     val industryPreferences: List<Industry>,
     val communicationStyle: CommunicationStyle?,

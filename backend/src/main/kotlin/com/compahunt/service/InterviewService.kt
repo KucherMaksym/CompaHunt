@@ -13,6 +13,7 @@ import com.compahunt.repository.UserRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.util.*
 
 @Service
 @Transactional
@@ -26,7 +27,7 @@ class InterviewService(
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun createInterview(request: CreateInterviewRequest, userId: Long): InterviewResponse {
+    fun createInterview(request: CreateInterviewRequest, userId: UUID): InterviewResponse {
         val vacancy = vacancyRepository.findById(request.vacancyId)
             .orElseThrow { IllegalArgumentException("Vacancy not found") }
         
@@ -63,7 +64,7 @@ class InterviewService(
         return interviewMapper.toResponse(savedInterview)
     }
 
-    fun updateInterview(interviewId: Long, request: UpdateInterviewRequest, userId: Long): InterviewResponse {
+    fun updateInterview(interviewId: UUID, request: UpdateInterviewRequest, userId: UUID): InterviewResponse {
         val interview = interviewRepository.findById(interviewId)
             .orElseThrow { IllegalArgumentException("Interview not found") }
 
@@ -111,7 +112,7 @@ class InterviewService(
         return interviewMapper.toResponse(savedInterview)
     }
 
-    fun getAllInterviews(userId: Long): List<InterviewResponse> {
+    fun getAllInterviews(userId: UUID): List<InterviewResponse> {
         val user = userRepository.findById(userId)
             .orElseThrow { IllegalArgumentException("User not found") }
 
@@ -119,7 +120,7 @@ class InterviewService(
             .map { interviewMapper.toResponse(it) }
     }
 
-    fun getAllInterviewsWithVacancies(userId: Long): List<InterviewWithVacancyResponse> {
+    fun getAllInterviewsWithVacancies(userId: UUID): List<InterviewWithVacancyResponse> {
         val user = userRepository.findById(userId)
             .orElseThrow { IllegalArgumentException("User not found") }
 
@@ -127,7 +128,7 @@ class InterviewService(
             .map { interviewMapper.toResponseWithVacancy(it) }
     }
 
-    fun getInterviewsByVacancy(vacancyId: Long, userId: Long): List<InterviewResponse> {
+    fun getInterviewsByVacancy(vacancyId: UUID, userId: UUID): List<InterviewResponse> {
         val vacancy = vacancyRepository.findById(vacancyId)
             .orElseThrow { IllegalArgumentException("Vacancy not found") }
 
@@ -140,7 +141,7 @@ class InterviewService(
             .map { interviewMapper.toResponse(it) }
     }
 
-    fun deleteInterview(interviewId: Long, userId: Long): Boolean {
+    fun deleteInterview(interviewId: UUID, userId: UUID): Boolean {
         val interview = interviewRepository.findById(interviewId)
             .orElseThrow { IllegalArgumentException("Interview not found") }
 

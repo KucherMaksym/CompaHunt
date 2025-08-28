@@ -5,6 +5,7 @@ import com.compahunt.model.VacancyStatus
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import java.time.Instant
+import java.util.UUID
 
 data class CreateVacancyRequest(
     @field:NotBlank(message = "Title is required")
@@ -72,7 +73,7 @@ data class UpdateVacancyRequest(
 )
 
 data class VacancyResponse(
-    val id: Long,
+    val id: UUID,
     val title: String,
     val company: CompanyResponse,
     val location: String,
@@ -99,7 +100,7 @@ data class VacancyResponse(
 )
 
 data class CompanyResponse(
-    val id: Long,
+    val id: UUID,
     val name: String,
     val description: String?,
     val websiteUrl: String?,
@@ -107,9 +108,9 @@ data class CompanyResponse(
 )
 
 data class VacancyAuditResponse(
-    val id: Long,
-    val vacancyId: Long,
-    val userId: Long,
+    val id: UUID,
+    val vacancyId: UUID,
+    val userId: UUID,
     val action: String,
     val fieldName: String?,
     val oldValue: String?,
@@ -156,7 +157,7 @@ data class VacancyPageResponse(
 )
 
 data class VacancySearchItem(
-    val id: Long,
+    val id: UUID,
     val title: String,
     val companyName: String,
     val location: String,

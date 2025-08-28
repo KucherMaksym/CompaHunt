@@ -19,7 +19,7 @@ class AnalyticsService(
     private val interviewRepository: InterviewRepository
 ) {
 
-    fun getAnalyticsData(userId: Long): AnalyticsDataDTO {
+    fun getAnalyticsData(userId: UUID): AnalyticsDataDTO {
         val vacancies = vacancyRepository.findByUserIdOrderByCreatedAtDesc(userId)
         val interviews = interviewRepository.findByUserIdOrderByScheduledAtAsc(userId)
         

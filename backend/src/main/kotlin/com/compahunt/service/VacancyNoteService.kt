@@ -11,6 +11,7 @@ import com.compahunt.repository.UserRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
+import java.util.*
 
 @Service
 @Transactional
@@ -20,7 +21,7 @@ class VacancyNoteService(
     private val userRepository: UserRepository
 ) {
 
-    fun createNote(request: CreateNoteRequest, userId: Long): VacancyNote {
+    fun createNote(request: CreateNoteRequest, userId: UUID): VacancyNote {
         val vacancy = vacancyRepository.findById(request.vacancyId)
             .orElseThrow { IllegalArgumentException("Vacancy not found") }
         
@@ -51,7 +52,7 @@ class VacancyNoteService(
         return vacancyNoteRepository.save(note)
     }
 
-    fun updateNote(noteId: Long, request: UpdateNoteRequest, userId: Long): VacancyNote {
+    fun updateNote(noteId: UUID, request: UpdateNoteRequest, userId: UUID): VacancyNote {
         val note = vacancyNoteRepository.findById(noteId)
             .orElseThrow { IllegalArgumentException("Note not found") }
 
@@ -72,7 +73,7 @@ class VacancyNoteService(
         return vacancyNoteRepository.save(updatedNote)
     }
 
-    fun getNotesByVacancy(vacancyId: Long, userId: Long): List<VacancyNote> {
+    fun getNotesByVacancy(vacancyId: UUID, userId: UUID): List<VacancyNote> {
         val vacancy = vacancyRepository.findById(vacancyId)
             .orElseThrow { IllegalArgumentException("Vacancy not found") }
 
@@ -84,7 +85,7 @@ class VacancyNoteService(
         return vacancyNoteRepository.findByVacancyIdOrderByCreatedAtDesc(vacancyId)
     }
 
-    fun getNotesByType(vacancyId: Long, type: NoteType, userId: Long): List<VacancyNote> {
+    fun getNotesByType(vacancyId: UUID, type: NoteType, userId: UUID): List<VacancyNote> {
         val vacancy = vacancyRepository.findById(vacancyId)
             .orElseThrow { IllegalArgumentException("Vacancy not found") }
 
@@ -96,7 +97,7 @@ class VacancyNoteService(
         return vacancyNoteRepository.findByVacancyIdAndTypeOrderByCreatedAtDesc(vacancyId, type)
     }
 
-    fun deleteNote(noteId: Long, userId: Long): Boolean {
+    fun deleteNote(noteId: UUID, userId: UUID): Boolean {
         val note = vacancyNoteRepository.findById(noteId)
             .orElseThrow { IllegalArgumentException("Note not found") }
 

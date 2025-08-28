@@ -3,7 +3,7 @@ package com.compahunt.util
 import com.compahunt.model.UserPrincipal
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
-import java.util.*
+import java.util.UUID
 
 object AuthenticationUtils {
     
@@ -27,11 +27,11 @@ object AuthenticationUtils {
         }
     }
     
-    fun getUserId(authentication: Authentication): Long {
+    fun getUserId(authentication: Authentication): UUID {
         return getUserPrincipal(authentication).id
     }
     
-    fun getCurrentUserId(): Long? {
+    fun getCurrentUserId(): UUID? {
         return getCurrentUserPrincipal()?.id
     }
     

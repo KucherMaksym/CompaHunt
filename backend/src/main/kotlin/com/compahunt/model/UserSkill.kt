@@ -10,8 +10,8 @@ import java.util.*
 @Table(name = "user_skills")
 data class UserSkill(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    @GeneratedValue(strategy = GenerationType.UUID)
+    val id: UUID = UUID.randomUUID(),
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)

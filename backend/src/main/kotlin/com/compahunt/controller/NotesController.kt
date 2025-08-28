@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
+import java.util.UUID
 
 @RestController
 @RequestMapping("/api/notes")
@@ -44,7 +45,7 @@ class NotesController(
 
     @GetMapping("/vacancy/{vacancyId}")
     fun getVacancyNotes(
-        @PathVariable vacancyId: Long,
+        @PathVariable vacancyId: UUID,
         authentication: Authentication
     ): ResponseEntity<List<VacancyNoteResponse>> {
         val userId = getUserId(authentication)
@@ -112,7 +113,7 @@ class NotesController(
 
     @GetMapping("/interview/{interviewId}")
     fun getInterviewNotes(
-        @PathVariable interviewId: Long,
+        @PathVariable interviewId: UUID,
         authentication: Authentication
     ): ResponseEntity<List<InterviewNoteResponse>> {
         val userId = getUserId(authentication)
@@ -158,7 +159,7 @@ class NotesController(
     // Generic Note Operations (works for both vacancy and interview notes)
     @GetMapping("/{id}")
     fun getNote(
-        @PathVariable id: Long,
+        @PathVariable id: UUID,
         authentication: Authentication
     ): ResponseEntity<Map<String, Any>> {
         val userId = getUserId(authentication)
@@ -197,7 +198,7 @@ class NotesController(
 
     @PutMapping("/{id}")
     fun updateNote(
-        @PathVariable id: Long,
+        @PathVariable id: UUID,
         @RequestBody updateRequest: UpdateNoteRequest,
         authentication: Authentication
     ): ResponseEntity<Map<String, Any>> {
@@ -239,7 +240,7 @@ class NotesController(
 
     @DeleteMapping("/{id}")
     fun deleteNote(
-        @PathVariable id: Long,
+        @PathVariable id: UUID,
         authentication: Authentication
     ): ResponseEntity<Map<String, Any>> {
         val userId = getUserId(authentication)
@@ -260,7 +261,7 @@ class NotesController(
     // Bulk Operations
     @DeleteMapping("/vacancy/{vacancyId}")
     fun deleteAllVacancyNotes(
-        @PathVariable vacancyId: Long,
+        @PathVariable vacancyId: UUID,
         authentication: Authentication
     ): ResponseEntity<Map<String, Any>> {
         val userId = getUserId(authentication)
@@ -273,7 +274,7 @@ class NotesController(
 
     @DeleteMapping("/interview/{interviewId}")
     fun deleteAllInterviewNotes(
-        @PathVariable interviewId: Long,
+        @PathVariable interviewId: UUID,
         authentication: Authentication
     ): ResponseEntity<Map<String, Any>> {
         val userId = getUserId(authentication)
@@ -284,13 +285,13 @@ class NotesController(
         ))
     }
 
-    private fun getUserId(authentication: Authentication): Long {
+    private fun getUserId(authentication: Authentication): UUID {
         return when (val principal = authentication.principal) {
             is UserPrincipal -> principal.id
             is Map<*, *> -> {
                 // Fallback for JWT token claims
                 val claims = principal as Map<String, Any>
-                (claims["sub"] as String).toLong()
+                UUID.fromString(claims["sub"] as String)
             }
             else -> throw IllegalArgumentException("Unsupported principal type: ${principal::class.java}")
         }

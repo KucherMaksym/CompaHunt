@@ -7,6 +7,7 @@ import com.compahunt.util.formatSalaryToString
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.springframework.stereotype.Component
+import java.util.UUID
 
 @Mapper(componentModel = "spring")
 @Component

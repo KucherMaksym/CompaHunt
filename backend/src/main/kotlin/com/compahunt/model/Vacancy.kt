@@ -5,14 +5,15 @@ import jakarta.persistence.*
 import org.hibernate.annotations.SQLRestriction
 import java.math.BigDecimal
 import java.time.Instant
+import java.util.UUID
 
 @Entity
 @Table(name = "vacancies")
 @SQLRestriction("deleted = false")
 data class Vacancy(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    @GeneratedValue(strategy = GenerationType.UUID)
+    val id: UUID = UUID.randomUUID(),
 
     @Column(nullable = false)
     val title: String,

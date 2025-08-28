@@ -13,6 +13,7 @@ import com.compahunt.repository.UserRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
+import java.util.*
 
 @Service
 @Transactional
@@ -24,7 +25,7 @@ class NotesService(
 ) {
 
     // Vacancy Notes Operations
-    fun createVacancyNote(request: CreateVacancyNoteRequest, userId: Long): Note {
+    fun createVacancyNote(request: CreateVacancyNoteRequest, userId: UUID): Note {
         val vacancy = vacancyRepository.findById(request.vacancyId)
             .orElseThrow { IllegalArgumentException("Vacancy not found") }
         
@@ -49,7 +50,7 @@ class NotesService(
         return noteRepository.save(note)
     }
 
-    fun getVacancyNotes(vacancyId: Long, userId: Long): List<Note> {
+    fun getVacancyNotes(vacancyId: UUID, userId: UUID): List<Note> {
         val vacancy = vacancyRepository.findById(vacancyId)
             .orElseThrow { IllegalArgumentException("Vacancy not found") }
 
@@ -61,7 +62,7 @@ class NotesService(
         return noteRepository.findByVacancyIdAndUserId(vacancyId, userId)
     }
 
-    fun getAllVacancyNotesByUser(userId: Long, type: String? = null, priority: String? = null): List<Note> {
+    fun getAllVacancyNotesByUser(userId: UUID, type: String? = null, priority: String? = null): List<Note> {
         return when {
             type != null && priority != null -> {
                 noteRepository.findVacancyNotesByUserIdAndTypeAndPriority(
@@ -83,7 +84,7 @@ class NotesService(
     }
 
     // Interview Notes Operations
-    fun createInterviewNote(request: CreateInterviewNoteRequest, userId: Long): Note {
+    fun createInterviewNote(request: CreateInterviewNoteRequest, userId: UUID): Note {
         val interview = interviewRepository.findById(request.interviewId)
             .orElseThrow { IllegalArgumentException("Interview not found") }
         
@@ -108,7 +109,7 @@ class NotesService(
         return noteRepository.save(note)
     }
 
-    fun getInterviewNotes(interviewId: Long, userId: Long): List<Note> {
+    fun getInterviewNotes(interviewId: UUID, userId: UUID): List<Note> {
         val interview = interviewRepository.findById(interviewId)
             .orElseThrow { IllegalArgumentException("Interview not found") }
 
@@ -120,7 +121,7 @@ class NotesService(
         return noteRepository.findByInterviewIdAndUserId(interviewId, userId)
     }
 
-    fun getAllInterviewNotesByUser(userId: Long, type: String? = null, priority: String? = null): List<Note> {
+    fun getAllInterviewNotesByUser(userId: UUID, type: String? = null, priority: String? = null): List<Note> {
         return when {
             type != null && priority != null -> {
                 noteRepository.findInterviewNotesByUserIdAndTypeAndPriority(
@@ -142,12 +143,12 @@ class NotesService(
     }
 
     // Generic Note Operations
-    fun getNote(noteId: Long, userId: Long): Note {
+    fun getNote(noteId: UUID, userId: UUID): Note {
         return noteRepository.findByIdAndUserId(noteId, userId)
             ?: throw IllegalArgumentException("Note not found or access denied")
     }
 
-    fun updateNote(noteId: Long, request: UpdateNoteRequest, userId: Long): Note {
+    fun updateNote(noteId: UUID, request: UpdateNoteRequest, userId: UUID): Note {
         val note = noteRepository.findByIdAndUserId(noteId, userId)
             ?: throw IllegalArgumentException("Note not found or access denied")
 
@@ -163,7 +164,7 @@ class NotesService(
         return noteRepository.save(updatedNote)
     }
 
-    fun deleteNote(noteId: Long, userId: Long): Boolean {
+    fun deleteNote(noteId: UUID, userId: UUID): Boolean {
         val note = noteRepository.findByIdAndUserId(noteId, userId)
             ?: throw IllegalArgumentException("Note not found or access denied")
 
@@ -172,7 +173,7 @@ class NotesService(
     }
 
     // Bulk Operations
-    fun deleteAllVacancyNotes(vacancyId: Long, userId: Long): Int {
+    fun deleteAllVacancyNotes(vacancyId: UUID, userId: UUID): Int {
         val vacancy = vacancyRepository.findById(vacancyId)
             .orElseThrow { IllegalArgumentException("Vacancy not found") }
 
@@ -184,7 +185,7 @@ class NotesService(
         return noteRepository.deleteByVacancyIdAndUserId(vacancyId, userId)
     }
 
-    fun deleteAllInterviewNotes(interviewId: Long, userId: Long): Int {
+    fun deleteAllInterviewNotes(interviewId: UUID, userId: UUID): Int {
         val interview = interviewRepository.findById(interviewId)
             .orElseThrow { IllegalArgumentException("Interview not found") }
 

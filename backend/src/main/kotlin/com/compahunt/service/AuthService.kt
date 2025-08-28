@@ -6,6 +6,7 @@ import com.compahunt.repository.UserRepository
 import jakarta.transaction.Transactional
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 @Transactional
@@ -102,13 +103,13 @@ data class SyncGoogleUserRequest(
 )
 
 data class UserResponse(
-    val id: Long,
+    val id: UUID,
     val email: String,
     val name: String,
     val provider: String
 )
 
 data class SyncGoogleUserResponse(
-    val userId: Long,
+    val userId: UUID,
     val message: String
 )

@@ -12,8 +12,8 @@ import java.util.*
 @Table(name = "work_experiences")
 data class WorkExperience(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    @GeneratedValue(strategy = GenerationType.UUID)
+    val id: UUID = UUID.randomUUID(),
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)

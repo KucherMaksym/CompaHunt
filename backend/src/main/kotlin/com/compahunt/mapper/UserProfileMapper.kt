@@ -3,6 +3,7 @@ package com.compahunt.mapper
 import com.compahunt.dto.*
 import com.compahunt.model.*
 import org.mapstruct.*
+import java.util.UUID
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 interface UserProfileMapper {

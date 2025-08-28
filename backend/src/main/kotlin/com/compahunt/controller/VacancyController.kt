@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
 import jakarta.servlet.http.HttpServletRequest
 import java.math.BigDecimal
+import java.util.UUID
 import kotlin.math.max
 import kotlin.math.min
 
@@ -154,7 +155,7 @@ class VacancyController(
 
     @GetMapping("/{id}")
     fun getApplication(
-        @PathVariable id: Long,
+        @PathVariable id: UUID,
         authentication: Authentication
     ): ResponseEntity<VacancyResponse> {
         val userId = getUserId(authentication)
@@ -164,7 +165,7 @@ class VacancyController(
 
     @PutMapping("/{id}")
     fun updateApplication(
-        @PathVariable id: Long,
+        @PathVariable id: UUID,
         @RequestBody updateRequest: UpdateVacancyRequest,
         authentication: Authentication,
         request: HttpServletRequest
@@ -176,7 +177,7 @@ class VacancyController(
 
     @PatchMapping("/{id}/status")
     fun updateStatus(
-        @PathVariable id: Long,
+        @PathVariable id: UUID,
         @RequestBody statusRequest: UpdateStatusRequest,
         authentication: Authentication,
         request: HttpServletRequest
@@ -188,7 +189,7 @@ class VacancyController(
 
     @DeleteMapping("/{id}")
     fun archiveApplication(
-        @PathVariable id: Long,
+        @PathVariable id: UUID,
         @RequestParam(required = false) reason: String?,
         authentication: Authentication,
         request: HttpServletRequest
@@ -210,7 +211,7 @@ class VacancyController(
 
     @GetMapping("/{id}/audit")
     fun getAuditHistory(
-        @PathVariable id: Long,
+        @PathVariable id: UUID,
         authentication: Authentication
     ): ResponseEntity<List<VacancyAuditResponse>> {
         val userId = getUserId(authentication)
@@ -220,7 +221,7 @@ class VacancyController(
 
     @GetMapping("/{id}/interviews")
     fun getInterviews(
-        @PathVariable id: Long,
+        @PathVariable id: UUID,
         authentication: Authentication
     ): ResponseEntity<List<InterviewResponse>> {
         val userId = getUserId(authentication)
@@ -230,7 +231,7 @@ class VacancyController(
 
     @PostMapping("/{id}/interviews")
     fun createInterview(
-        @PathVariable id: Long,
+        @PathVariable id: UUID,
         @RequestBody interviewRequest: CreateInterviewRequest,
         authentication: Authentication
     ): ResponseEntity<Map<String, Any>> {
@@ -243,13 +244,13 @@ class VacancyController(
     }
 
 
-    private fun getUserId(authentication: Authentication): Long {
+    private fun getUserId(authentication: Authentication): UUID {
         return when (val principal = authentication.principal) {
             is UserPrincipal -> principal.id
             is Map<*, *> -> {
                 // Fallback for JWT token claims
                 val claims = principal as Map<String, Any>
-                (claims["sub"] as String).toLong()
+                UUID.fromString(claims["sub"] as String)
             }
             else -> throw IllegalArgumentException("Unsupported principal type: ${principal::class.java}")
         }

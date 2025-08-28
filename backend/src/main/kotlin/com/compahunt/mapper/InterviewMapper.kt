@@ -13,6 +13,7 @@ import org.mapstruct.Named
 import org.springframework.stereotype.Component
 import java.time.Instant
 import java.time.format.DateTimeFormatter
+import java.util.UUID
 
 @Mapper(componentModel = "spring", uses = [VacancyMapper::class])
 @Component

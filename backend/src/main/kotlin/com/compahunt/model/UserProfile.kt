@@ -9,11 +9,11 @@ import java.util.*
 @Table(name = "user_profiles")
 data class UserProfile(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    @GeneratedValue(strategy = GenerationType.UUID)
+    val id: UUID = UUID.randomUUID(),
 
     @Column(name = "user_id", nullable = false, unique = true)
-    val userId: Long,
+    val userId: UUID,
 
     @Size(max = 100, message = "Current position must not exceed 100 characters")
     @Column(name = "current_position", length = 100)

@@ -11,6 +11,7 @@ import java.security.PublicKey;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.Date;
+import java.util.UUID;
 
 @Component
 public class JwtUtils {
@@ -71,7 +72,7 @@ public class JwtUtils {
         }
     }
 
-    fun getUserIdFromToken(token: String): Long {
+    fun getUserIdFromToken(token: String): UUID {
         val publicKey = getPublicKey();
 
         val claims = Jwts.parser()
@@ -80,7 +81,7 @@ public class JwtUtils {
             .parseSignedClaims(token)
             .payload;
 
-        return claims.subject.toLong();
+        return UUID.fromString(claims.subject);
     }
 
     fun getEmailFromToken(token: String): String {

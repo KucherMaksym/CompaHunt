@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
 import java.time.temporal.ChronoUnit
+import java.util.UUID
 
 @Component
 class InterviewFeedbackJob(
@@ -31,8 +32,8 @@ class InterviewFeedbackJob(
     @Transactional
     override fun execute(context: JobExecutionContext) {
         val dataMap: JobDataMap = context.jobDetail.jobDataMap
-        val interviewId = dataMap.getLong(INTERVIEW_ID_KEY)
-        val userId = dataMap.getLong(USER_ID_KEY)
+        val interviewId = UUID.fromString(dataMap.getString(INTERVIEW_ID_KEY))
+        val userId = UUID.fromString(dataMap.getString(USER_ID_KEY))
 
         try {
             // Verify interview still exists and belongs to user

@@ -10,13 +10,14 @@ import jakarta.persistence.Id
 import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 import java.time.Instant
+import java.util.UUID
 
 @Entity
 @Table(name = "companies")
 data class Company(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    @GeneratedValue(strategy = GenerationType.UUID)
+    val id: UUID = UUID.randomUUID(),
 
     @Column(nullable = false, unique = true)
     val name: String,
