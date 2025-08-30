@@ -10,6 +10,7 @@ data class UserPrincipal(
     val email: String,
     val name: String,
     val role: Role,
+    val provider: String? = null,
     private val authorities: Collection<GrantedAuthority>
 ) : UserDetails {
 
@@ -24,11 +25,13 @@ data class UserPrincipal(
     companion object {
         fun create(user: User): UserPrincipal {
             val authorities = listOf(SimpleGrantedAuthority("ROLE_${user.role.name}"))
+
             return UserPrincipal(
                 id = user.id,
                 email = user.email,
                 name = user.name,
                 role = user.role,
+                provider = user.provider.name.lowercase(),
                 authorities = authorities
             )
         }

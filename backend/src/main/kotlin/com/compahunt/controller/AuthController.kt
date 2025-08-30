@@ -3,6 +3,7 @@ package com.compahunt.controller
 import com.compahunt.model.AuthProvider
 import com.compahunt.model.User
 import com.compahunt.repository.UserRepository
+import com.compahunt.service.OAuthTokenService
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
@@ -10,13 +11,7 @@ import jakarta.validation.constraints.Size
 import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
 import org.springframework.security.crypto.password.PasswordEncoder
-import org.springframework.web.bind.annotation.CrossOrigin
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestHeader
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import com.compahunt.util.JwtUtils
 import java.util.UUID
 
@@ -26,10 +21,11 @@ import java.util.UUID
 class AuthController(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder,
-    private val jwtUtils: JwtUtils
+    private val jwtUtils: JwtUtils,
+    private val oauthTokenService: OAuthTokenService
 ) {
 
-    private val log = LoggerFactory.getLogger(AuthController::class.java);
+    private val log = LoggerFactory.getLogger(AuthController::class.java)
 
     @PostMapping("/validate-credentials")
     fun validateCredentials(@RequestBody request: LoginRequest): ResponseEntity<*> {
@@ -89,15 +85,28 @@ class AuthController(
                     provider = AuthProvider.GOOGLE,
                     providerId = request.googleId
                 )
-                val userDb = userRepository.save(user)
-                log.info("Created new Google user: ${userDb.id}")
+                user = userRepository.save(user)
+                log.info("Created new Google user: ${user.id}")
             } else {
                 if (user.provider != AuthProvider.GOOGLE) {
-                    user.provider = AuthProvider.GOOGLE
-                    user.providerId = request.googleId
-                    val userDb = userRepository.save(user)
-                    log.info("Synced existing Google user: ${userDb.id}")
+                    user = user.copy(
+                        provider = AuthProvider.GOOGLE,
+                        providerId = request.googleId
+                    )
+                    user = userRepository.save(user)
+                    log.info("Updated existing user to Google: ${user.id}")
                 }
+            }
+
+            // Save gmail access token
+            if (request.accessToken != null && request.refreshToken != null) {
+                oauthTokenService.saveGmailToken(
+                    userId = user.id,
+                    accessToken = request.accessToken,
+                    refreshToken = request.refreshToken,
+                    expiresIn = request.expiresIn ?: 3600L
+                )
+                log.info("Gmail tokens saved for user: ${user.id}")
             }
 
             ResponseEntity.ok(mapOf(
@@ -117,12 +126,12 @@ class AuthController(
     fun validateToken(@RequestHeader("Authorization") authHeader: String): ResponseEntity<*> {
         return try {
             val token = authHeader.removePrefix("Bearer ").trim()
-            
+
             if (jwtUtils.validateToken(token)) {
                 val userId = jwtUtils.getUserIdFromToken(token)
                 val email = jwtUtils.getEmailFromToken(token)
                 val name = jwtUtils.getNameFromToken(token)
-                
+
                 ResponseEntity.ok(mapOf(
                     "valid" to true,
                     "userId" to userId,
@@ -143,17 +152,14 @@ class AuthController(
             ))
         }
     }
-
 }
 
 data class SignUpRequest(
     @NotBlank(message = "Name cannot be blank")
     val name: String,
-
     @NotBlank(message = "Email cannot be blank")
     @Email(message = "Email is not valid")
     val email: String,
-
     @NotBlank(message = "Password cannot be blank")
     @Size(min = 8, message = "Password must be at least 8 characters long")
     val password: String
@@ -167,5 +173,8 @@ data class LoginRequest(
 data class GoogleSyncRequest(
     val email: String,
     val name: String,
-    val googleId: String
+    val googleId: String,
+    val accessToken: String? = null,
+    val refreshToken: String? = null,
+    val expiresIn: Long? = null
 )

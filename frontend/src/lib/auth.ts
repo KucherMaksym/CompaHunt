@@ -12,7 +12,8 @@ export const authOptions: NextAuthOptions = {
                 params: {
                     prompt: 'consent',
                     access_type: 'offline',
-                    response_type: 'code'
+                    response_type: 'code',
+                    scope: 'openid email profile https://www.googleapis.com/auth/gmail.readonly'
                 }
             }
         }),
@@ -146,6 +147,8 @@ export const authOptions: NextAuthOptions = {
         async jwt({token, user, account}) {
 
             if (user) {
+                console.log("user exists, id: , provider", user.id, account?.provider);
+
                 token.sub = user.id;
                 token.email = user.email;
                 token.name = user.name;
@@ -154,6 +157,7 @@ export const authOptions: NextAuthOptions = {
 
                 // Sync with backend
                 if (account?.provider === 'google') {
+                    console.log("Google auth, syncing with backend...")
                     try {
                         const syncRes = await fetch(
                             `${process.env.NEXT_PUBLIC_API_URL}/api/auth/sync-google-user`,
@@ -164,32 +168,41 @@ export const authOptions: NextAuthOptions = {
                                     googleId: user.id,
                                     email: user.email,
                                     name: user.name,
+                                    accessToken: account.access_token,
+                                    refreshToken: account.refresh_token,
+                                    expiresIn: account.expires_at ?
+                                        Math.max(0, account.expires_at - Math.floor(Date.now() / 1000)) :
+                                        3600
                                 })
                             }
-                        )
+                        );
 
                         if (syncRes.ok) {
                             const syncData = await syncRes.json()
                             token.sub = syncData.userId.toString()
-                            console.log("✅ Google user synced with backend")
+                            console.log("✅ Google user synced, UUID:", token.sub)
+                        } else {
+                            const errorText = await syncRes.text()
+                            console.error("❌ Backend sync failed:", errorText)
+                            throw new Error("Failed to sync with backend")
                         }
                     } catch (error) {
                         console.error("❌ Failed to sync Google user:", error)
+                        throw error
                     }
                 }
             }
-
-            return token
+            return token;
         },
 
         async session({session, token}) {
-            // Pass only user-friendly data.
-            session.user.id = token.sub as string
-            session.user.email = token.email as string
-            session.user.name = token.name as string
-            session.user.avatar = token.avatar as string
+            session.user.id = token.sub as string;
+            session.user.email = token.email as string;
+            session.user.name = token.name as string;
+            session.provider = token.provider as string;
+            session.user.avatar = token.avatar as string;
 
-            return session
+            return session;
         },
     },
 

@@ -2,6 +2,14 @@ server:
   port: 8080
 
 spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 86930438633-5a00mf173sfcv458favnqelj8irlac4h.apps.googleusercontent.com
+            client-secret: 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
+
   application:
     name: backend
 
@@ -36,6 +44,9 @@ spring:
             tablePrefix: QRTZ_
 
 app:
+  encryption:
+                        #    In HEX!!!
+    key: 56d04a517a1fa6629f12cb0529a1b56fc203ff2af2f710639dfcb016f61d5362
   jwt:
     public-key: |
       -----BEGIN PUBLIC KEY-----

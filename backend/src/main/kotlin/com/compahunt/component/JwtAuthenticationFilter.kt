@@ -35,7 +35,6 @@ class JwtAuthenticationFilter(
                 val email = jwtUtils.getEmailFromToken(jwt)
                 val name = jwtUtils.getNameFromToken(jwt)
 
-
                 val user = userRepository.findById(userId).orElse(null)
 
                 val userPrincipal = if (user != null) {
