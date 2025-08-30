@@ -1,5 +1,6 @@
 package com.compahunt.service
 
+import com.compahunt.enums.GmailMessageFormat
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.json.gson.GsonFactory
 import com.google.api.services.gmail.Gmail
@@ -53,7 +54,7 @@ class GmailService {
             messages.mapNotNull { message ->
                 try {
                     val fullMessage = service.users().messages().get("me", message.id)
-                        .setFormat("full")
+                        .setFormat(GmailMessageFormat.FULL.value)
                         .execute()
                     parseJobEmail(fullMessage)
                 } catch (e: Exception) {

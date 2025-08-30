@@ -68,6 +68,7 @@ class SecurityConfig(
                         "/api/auth/register",
                         "/api/auth/validate-credentials",
                         "/api/auth/sync-google-user",
+                        "/api/gmail/webhook/**",
                         "/api/auth/health",
                         "/actuator/**",
                         "/swagger-ui/**",

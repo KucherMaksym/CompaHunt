@@ -47,6 +47,14 @@ app:
   encryption:
                         #    In HEX!!!
     key: 56d04a517a1fa6629f12cb0529a1b56fc203ff2af2f710639dfcb016f61d5362
+
+  gmail:
+    # Google Cloud Pub/Sub
+    pubsub:
+#      project-id: jobtracker-466021
+      topic-name: "projects/jobtracker-466021/topics/gmail-notifications"
+#      subscription-name: "gmail-notifications-subscription"
+
   jwt:
     public-key: |
       -----BEGIN PUBLIC KEY-----

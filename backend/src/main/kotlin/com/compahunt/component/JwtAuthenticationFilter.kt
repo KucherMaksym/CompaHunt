@@ -57,7 +57,7 @@ class JwtAuthenticationFilter(
                 SecurityContextHolder.getContext().authentication = authentication
 
             } else {
-                log.error("JWT validation failed")
+                log.error("JWT validation failed on request to ${request.requestURI}")
                 if (jwt != null) {
                     try {
                         val claims = jwtUtils.getAllClaimsFromToken(jwt)
