@@ -30,6 +30,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-quartz'
 
 	implementation("com.google.apis:google-api-services-gmail:v1-rev20240520-2.0.0")
+	implementation 'org.jsoup:jsoup:1.17.2'
 	implementation("com.google.auth:google-auth-library-oauth2-http:1.19.0")
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
 

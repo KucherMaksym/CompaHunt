@@ -1,6 +1,7 @@
 package com.compahunt.controller
 
 import com.compahunt.model.UserPrincipal
+import com.compahunt.service.EmailCleaningService
 import com.compahunt.service.GmailService
 import com.compahunt.service.OAuthTokenService
 import org.slf4j.LoggerFactory
@@ -12,7 +13,8 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/gmail")
 class GmailController(
     private val oauthTokenService: OAuthTokenService,
-    private val gmailService: GmailService
+    private val gmailService: GmailService,
+    private val emailCleaningService: EmailCleaningService
 ) {
 
     private val log = LoggerFactory.getLogger(GmailController::class.java)
@@ -42,14 +44,25 @@ class GmailController(
         return try {
             val emails = gmailService.searchJobRelatedEmails(gmailToken, userPrincipal.email)
 
-            // TODO val updatedApplications = applicationService.updateFromEmails(emails)
+            val processedEmails = emails.map { email ->
+                val cleanedBody = emailCleaningService.cleanEmailBody(email.body)
+                mapOf(
+                    "id" to email.messageId,
+                    "subject" to email.subject,
+                    "sender" to email.from,
+                    "date" to email.receivedAt,
+                    "originalBody" to email.body,
+                    "cleanedBody" to cleanedBody
+                )
+            }
 
             log.info("Gmail sync completed for user ${userPrincipal.id}: ${emails.size} emails processed")
 
             ResponseEntity.ok(
                 mapOf(
                     "success" to true,
-                    "emails" to emails,
+                    "emails" to processedEmails,
+                    "count" to emails.size,
                     "message" to "Gmail sync completed successfully"
                 )
             )
