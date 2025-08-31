@@ -10,7 +10,6 @@ spring:
             client-id: 86930438633-5a00mf173sfcv458favnqelj8irlac4h.apps.googleusercontent.com
             client-secret: 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
 
-
   application:
     name: backend
 

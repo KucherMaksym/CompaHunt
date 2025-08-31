@@ -18,4 +18,6 @@ interface GmailNotificationEventRepository : JpaRepository<GmailNotificationEven
 
     @Query("SELECT gne FROM GmailNotificationEvent gne WHERE gne.processedByAi = false ORDER BY gne.createdAt ASC")
     fun findUnprocessedEvents(): List<GmailNotificationEvent>
+    
+    fun findByUserIdAndMessageId(userId: UUID, messageId: String): GmailNotificationEvent?
 }

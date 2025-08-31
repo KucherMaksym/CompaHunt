@@ -104,6 +104,7 @@ class GmailController(
 
             if (success) {
                 val subscription = gmailWatchRepository.findByUserIdAndIsActive(userPrincipal.id, true)
+                log.info("User ${userPrincipal.id} enabled push notifications")
                 ResponseEntity.ok(
                     mapOf(
                         "success" to true,
@@ -140,7 +141,7 @@ class GmailController(
 
         return try {
             val success = pushNotificationService.disablePushNotifications(userPrincipal.id)
-
+            log.info("User ${userPrincipal.id} disabled push notifications")
             ResponseEntity.ok(
                 mapOf(
                     "success" to success,

@@ -1,7 +1,9 @@
 package com.compahunt.service
 
 import com.compahunt.enums.GmailMessageFormat
+import com.compahunt.model.GmailNotificationEvent
 import com.compahunt.model.GmailWatchSubscription
+import com.compahunt.repository.GmailNotificationEventRepository
 import com.compahunt.repository.GmailWatchSubscriptionRepository
 import com.google.api.client.googleapis.batch.BatchCallback
 import com.google.api.client.googleapis.batch.json.JsonBatchCallback
@@ -29,7 +31,8 @@ import java.util.*
 class GmailPushNotificationService(
     private val gmailWatchRepository: GmailWatchSubscriptionRepository,
     private val oauthTokenService: OAuthTokenService,
-    private val gmailService: GmailService
+    private val gmailService: GmailService,
+    private val notificationEventRepository: GmailNotificationEventRepository
 ) {
 
     private val log = LoggerFactory.getLogger(GmailPushNotificationService::class.java)
@@ -61,7 +64,7 @@ class GmailPushNotificationService(
                 return true
             }
 
-            // Create new subscription
+            // Create new subscription for INBOX messages
             val watchRequest = WatchRequest().apply {
                 topicName = pubSubTopicName
                 labelIds = listOf("INBOX")
@@ -153,13 +156,30 @@ class GmailPushNotificationService(
             if (changes.isNotEmpty()) {
                 log.info("Found ${changes.size} new email changes for user $userId")
 
-                // TODO: Analyze by vector model. If similar to job-related -> process by LLM
-
-                changes.forEach { change ->
-                    // Remove sensitive data logging in production
-                    log.info("New email detected for user '$userId: ${change.subject}' from ${change.sender}")
-                    // aiAnalysisService.vectorAnalyzeJobEmail(userId, change)
+                // Process only new emails
+                // It seems like 1+N problem, but logic assumes that changes > 1 is rare
+                val newEmails = changes.filter { change ->
+                    notificationEventRepository.findByUserIdAndMessageId(userId, change.messageId) == null
                 }
+
+                log.info("Processing ${newEmails.size} new emails (${changes.size - newEmails.size} duplicates filtered)")
+
+                newEmails.forEach { change ->
+                    // Save notification event
+                    val event = GmailNotificationEvent(
+                        userId = userId,
+                        historyId = change.historyId,
+                        messageId = change.messageId,
+                        emailSubject = change.subject,
+                        emailSender = change.sender
+                    )
+                    notificationEventRepository.save(event)
+
+                    log.info("New email saved for user $userId: '${change.subject}' from ${change.sender}")
+                    // TODO: aiAnalysisService.vectorAnalyzeJobEmail(userId, change)
+                }
+            } else {
+                log.warn("No email changes found for user $userId between history IDs ${subscription.historyId} and $newHistoryId")
             }
 
             // update history ID
@@ -176,22 +196,34 @@ class GmailPushNotificationService(
         return try {
             val service = buildGmailService(accessToken)
 
-            // Changes list
+            // Get ALL history changes, then filter manually
             val historyList = service.users().history().list("me")
                 .setStartHistoryId(BigInteger.valueOf(startHistoryId))
-                .setHistoryTypes(listOf("messageAdded"))
-                .setLabelId("INBOX")
                 .execute()
 
-            // Get all message IDs
+            if (historyList.history == null || historyList.history.isEmpty()) {
+                log.debug("No history changes found")
+                return emptyList()
+            }
+
+            // Filter only messageAdded events in INBOX
             val messageIds = mutableListOf<String>()
-            historyList.history?.forEach { history ->
+            historyList.history.forEach { history ->
                 history.messagesAdded?.forEach { messageAdded ->
-                    messageIds.add(messageAdded.message.id)
+                    // Check if message has INBOX label
+                    val message = messageAdded.message
+                    //                                ↓ Or "UNREAD". assumes that every new message is unread
+                    if (message.labelIds?.contains("INBOX") == true) {
+                        messageIds.add(message.id)
+                        log.info("Found new message added to INBOX: ${message.id}")
+                    }
                 }
             }
 
-            if (messageIds.isEmpty()) return emptyList()
+            if (messageIds.isEmpty()) {
+                log.debug("No new messages added to INBOX")
+                return emptyList()
+            }
 
             // Batch request for all mails
             val changes = mutableListOf<EmailChange>()
