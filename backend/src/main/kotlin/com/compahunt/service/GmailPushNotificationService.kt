@@ -3,9 +3,14 @@ package com.compahunt.service
 import com.compahunt.enums.GmailMessageFormat
 import com.compahunt.model.GmailWatchSubscription
 import com.compahunt.repository.GmailWatchSubscriptionRepository
+import com.google.api.client.googleapis.batch.BatchCallback
+import com.google.api.client.googleapis.batch.json.JsonBatchCallback
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
+import com.google.api.client.googleapis.json.GoogleJsonError
+import com.google.api.client.http.HttpHeaders
 import com.google.api.client.json.gson.GsonFactory
 import com.google.api.services.gmail.Gmail
+import com.google.api.services.gmail.model.Message
 import com.google.api.services.gmail.model.WatchRequest
 import com.google.api.services.gmail.model.WatchResponse
 import com.google.auth.http.HttpCredentialsAdapter
@@ -167,46 +172,52 @@ class GmailPushNotificationService(
         }
     }
 
-    private fun getGmailHistoryChanges(
-        accessToken: String, startHistoryId: Long, endHistoryId: Long
-    ): List<EmailChange> {
+    private fun getGmailHistoryChanges(accessToken: String, startHistoryId: Long, endHistoryId: Long): List<EmailChange> {
         return try {
             val service = buildGmailService(accessToken)
 
-            val historyList = service.users().history().list("me").setStartHistoryId(BigInteger.valueOf(startHistoryId))
-                    .setHistoryTypes(listOf("messageAdded")).setLabelId("INBOX").execute()
+            // Changes list
+            val historyList = service.users().history().list("me")
+                .setStartHistoryId(BigInteger.valueOf(startHistoryId))
+                .setHistoryTypes(listOf("messageAdded"))
+                .setLabelId("INBOX")
+                .execute()
 
-            val changes = mutableListOf<EmailChange>()
-
+            // Get all message IDs
+            val messageIds = mutableListOf<String>()
             historyList.history?.forEach { history ->
                 history.messagesAdded?.forEach { messageAdded ->
-                    try {
-                        val messageId = messageAdded.message.id
-                        val fullMessage = service.users().messages().get("me", messageId).setFormat(GmailMessageFormat.METADATA.value)
-                            .setMetadataHeaders(listOf("Subject", "From")).execute()
-
-                        val headers = fullMessage.payload?.headers ?: emptyList()
-                        val subject = headers.find { it.name.equals("Subject", true) }?.value ?: "No Subject"
-                        val from = headers.find { it.name.equals("From", true) }?.value ?: "Unknown Sender"
-
-                        changes.add(
-                            EmailChange(
-                                messageId = messageId,
-                                subject = subject,
-                                sender = from,
-                                historyId = history.id.toLong()
-                            )
-                        )
-
-                    } catch (e: Exception) {
-                        log.warn("Failed to process message ${messageAdded.message.id}: ${e.message}")
-                    }
+                    messageIds.add(messageAdded.message.id)
                 }
             }
 
+            if (messageIds.isEmpty()) return emptyList()
+
+            // Batch request for all mails
+            val changes = mutableListOf<EmailChange>()
+            val batchSize = 100 // Gmail API limit
+
+            messageIds.chunked(batchSize).forEach { batch ->
+                val batchRequest = service.batch()
+                val callbacks = mutableMapOf<String, MessageBatchCallback>()
+
+                batch.forEach { messageId ->
+                    val callback = MessageBatchCallback(messageId, changes)
+                    callbacks[messageId] = callback
+
+                    service.users().messages().get("me", messageId)
+                        .setFormat(GmailMessageFormat.METADATA.value)
+                        .setMetadataHeaders(listOf("Subject", "From"))
+                        .queue(batchRequest, callback)
+                }
+
+                batchRequest.execute()
+            }
+
             changes
+
         } catch (e: Exception) {
-            log.error("Failed to get Gmail history changes from $startHistoryId to $endHistoryId", e)
+            log.error("Failed to get Gmail history changes batch", e)
             emptyList()
         }
     }
@@ -235,3 +246,34 @@ class GmailPushNotificationService(
 data class EmailChange(
     val messageId: String, val subject: String, val sender: String, val historyId: Long
 )
+
+class MessageBatchCallback(
+    private val messageId: String,
+    private val changes: MutableList<EmailChange>
+) : JsonBatchCallback<Message>() {
+
+    private val log = LoggerFactory.getLogger(MessageBatchCallback::class.java)
+
+    override fun onSuccess(message: Message?, headers: HttpHeaders?) {
+        try {
+            message?.let {
+                val headers = it.payload?.headers ?: emptyList()
+                val subject = headers.find { h -> h.name.equals("Subject", true) }?.value ?: "No Subject"
+                val from = headers.find { h -> h.name.equals("From", true) }?.value ?: "Unknown Sender"
+
+                changes.add(EmailChange(
+                    messageId = messageId,
+                    subject = subject,
+                    sender = from,
+                    historyId = it.historyId?.toLong() ?: 0L
+                ))
+            }
+        } catch (e: Exception) {
+            log.warn("Failed to process batch message $messageId: ${e.message}")
+        }
+    }
+
+    override fun onFailure(e: GoogleJsonError?, headers: HttpHeaders?) {
+        log.warn("Batch request failed for message $messageId: ${e?.message}")
+    }
+}

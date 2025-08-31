@@ -68,8 +68,8 @@ class GmailWebhookController(
         }
     }
 
-    //   TODO: @Async
-    private fun processNotificationAsync(userId: UUID, historyId: Long) {
+    @Async
+    fun processNotificationAsync(userId: UUID, historyId: Long) {
         try {
             pushNotificationService.processGmailNotification(userId, historyId)
         } catch (e: Exception) {

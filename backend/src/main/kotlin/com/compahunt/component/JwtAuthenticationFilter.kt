@@ -18,7 +18,24 @@ class JwtAuthenticationFilter(
     private val userRepository: UserRepository
 ) : OncePerRequestFilter() {
 
+    companion object {
+        private val excludedPaths = listOf(
+            "/api/auth/register",
+            "/api/auth/validate-credentials",
+            "/api/auth/sync-google-user",
+            "/api/gmail/webhook",
+            "/api/auth/health",
+            "/swagger-ui",
+            "/v3/api-docs"
+        )
+    }
+
     private val log = LoggerFactory.getLogger(JwtAuthenticationFilter::class.java)
+
+    override fun shouldNotFilter(request: HttpServletRequest): Boolean {
+        val path = request.requestURI
+        return excludedPaths.any{ excludedPath -> path.startsWith(excludedPath) }
+    }
 
     override fun doFilterInternal(
         request: HttpServletRequest,
