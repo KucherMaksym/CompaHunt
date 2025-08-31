@@ -47,6 +47,10 @@ spring:
     compose:
       enabled: true
       lifecycle-management: start_only
+  data:
+    redis:
+      host: localhost
+      port: 6379
 
 app:
   encryption:
@@ -59,6 +63,12 @@ app:
 #      project-id: jobtracker-466021
       topic-name: "projects/jobtracker-466021/topics/gmail-notifications"
 #      subscription-name: "gmail-notifications-subscription"
+
+
+  limits:
+    ai:
+      weekly: 100
+      dayly: 20
 
   jwt:
     public-key: |

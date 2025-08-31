@@ -28,6 +28,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-quartz'
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
 	implementation("com.google.apis:google-api-services-gmail:v1-rev20240520-2.0.0")
 	implementation 'org.jsoup:jsoup:1.17.2'
@@ -57,9 +58,16 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-testcontainers'
 	testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
 	testImplementation 'org.springframework.security:spring-security-test'
-	testImplementation 'org.testcontainers:junit-jupiter'
-	testImplementation 'org.testcontainers:postgresql'
+
+	testImplementation("org.assertj:assertj-core")
+	testImplementation(platform("org.testcontainers:testcontainers-bom:1.19.3"))
+	testImplementation("org.testcontainers:junit-jupiter")
+	testImplementation("com.redis:testcontainers-redis:2.2.2")
+	testImplementation("org.springframework.boot:spring-boot-testcontainers")
+
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+
 }
 
 kotlin {
@@ -77,5 +85,3 @@ allOpen {
 tasks.named('test') {
 	useJUnitPlatform()
 }
-
-
