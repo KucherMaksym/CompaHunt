@@ -13,7 +13,7 @@ import java.util.UUID
 data class Vacancy(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    val id: UUID = UUID.randomUUID(),
+    val id: UUID? = null,
 
     @Column(nullable = false)
     val title: String,

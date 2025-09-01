@@ -391,7 +391,7 @@ class VacancyService(
     }
 
     private fun createAuditRecord(
-        vacancyId: UUID,
+        vacancyId: UUID?,
         userId: UUID,
         action: AuditAction,
         fieldName: String? = null,

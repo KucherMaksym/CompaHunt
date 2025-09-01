@@ -64,15 +64,41 @@ class GmailPushNotificationService(
                 return true
             }
 
+            // I give up.
+            // The problem with watch() is that labelld filters do not affect which messages are sent.
+            // This is a common problem that has been around for MORE THAN 10 YEARS! Forum: https://issuetracker.google.com/issues/36759803?pli=1
+            // TODO: Get a job at Google and fix the error
+            // Fuck you, Google.
+
             // Create new subscription for INBOX messages
-            val watchRequest = WatchRequest().apply {
-                topicName = pubSubTopicName
-                labelIds = listOf("INBOX")
-                labelFilterAction = "include"
+            val labelsResp = service.users().labels().list("me").execute()
+            val systemLabelIds = labelsResp.labels?.filter { it.type == "system" }?.map { it.id } ?: emptyList()
+            log.info("Found ${systemLabelIds.size} system labels for user $userId")
+
+            // Exclude all labels
+            if (systemLabelIds.isNotEmpty()) {
+                val excludeWatch = WatchRequest().apply {
+                    topicName = pubSubTopicName
+                    labelIds = systemLabelIds
+                    labelFilterBehavior = "exclude"
+                }
+                try {
+                    service.users().watch("me", excludeWatch).execute()
+                    log.info("Issued exclude watch for ${systemLabelIds.size} system labels")
+                } catch (e: Exception) {
+                    log.warn("Exclude-watch failed (non-fatal): ${e.message}")
+                }
             }
 
-            val watchResponse = service.users().watch("me", watchRequest).execute()
+            // Include ONLY "UNREAD" (new) messages
+            val includeWatch = WatchRequest().apply {
+                topicName = pubSubTopicName
+                labelIds = listOf("UNREAD")
+                labelFilterBehavior = "include"
+            }
+            log.info("Setting up Gmail watch with labels: ${includeWatch.labelIds}")
 
+            val watchResponse = service.users().watch("me", includeWatch).execute()
             saveWatchSubscription(userId, watchResponse)
 
             log.info("Successfully enabled Gmail push notifications for user $userId. History ID: ${watchResponse.historyId}")
@@ -153,7 +179,7 @@ class GmailPushNotificationService(
 
             val changes = getGmailHistoryChanges(accessToken, subscription.historyId, newHistoryId)
 
-            if (changes.isNotEmpty()) {
+//            if (changes.isNotEmpty()) {
                 log.info("Found ${changes.size} new email changes for user $userId")
 
                 // Process only new emails
@@ -178,9 +204,9 @@ class GmailPushNotificationService(
                     log.info("New email saved for user $userId: '${change.subject}' from ${change.sender}")
                     // TODO: aiAnalysisService.vectorAnalyzeJobEmail(userId, change)
                 }
-            } else {
-                log.warn("No email changes found for user $userId between history IDs ${subscription.historyId} and $newHistoryId")
-            }
+//            } else {
+//                log.warn("No email changes found for user $userId between history IDs ${subscription.historyId} and $newHistoryId")
+//            }
 
             // update history ID
             subscription.historyId = newHistoryId
