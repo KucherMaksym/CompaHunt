@@ -215,7 +215,7 @@ export function VacancyDetailModal({ vacancy, isOpen, onClose, onEdit }: Vacancy
                               Experience Required
                             </Text>
                             <Text size="base">
-                              {vacancy.experience || "N/A"}
+                              {vacancy.experienceLevel || "N/A"}
                             </Text>
                           </div>
                         </div>

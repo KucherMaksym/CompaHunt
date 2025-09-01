@@ -47,7 +47,7 @@ export function VacancyKanbanCard({vacancy, onClick, isUpdating}: VacancyKanbanC
             style={style}
             {...attributes}
             {...listeners}
-            className={`py-2 cursor-grab active:cursor-grabbing hover:shadow-md hover:border-primary/30 transition-all mb-3 group ${
+            className={`py-2 cursor-grab active:cursor-grabbing hover:shadow-md hover:border-primary/30 transition-all group ${
                 isUpdating ? "animate-pulse border-primary" : ""
             }`}
         >

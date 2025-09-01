@@ -9,10 +9,10 @@ import java.util.UUID
 data class VacancyAudit(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    val id: UUID = UUID.randomUUID(),
+    val id: UUID? = null,
 
     @Column(nullable = false)
-    val vacancyId: UUID,
+    val vacancyId: UUID?,
 
     @Column(nullable = false)
     val userId: UUID,

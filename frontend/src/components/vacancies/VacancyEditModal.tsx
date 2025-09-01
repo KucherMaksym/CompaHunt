@@ -51,7 +51,7 @@ interface VacancyFormData {
   requirements: string
   benefits: string
   remoteness: 'Remote' | 'On-site' | 'Hybrid' | ''
-  experience: string
+  experienceLevel: string
   url: string
 }
 
@@ -73,7 +73,7 @@ export function VacancyEditModal({ isOpen, onClose, vacancy, mode }: VacancyModa
     requirements: '',
     benefits: '',
     remoteness: '',
-    experience: '',
+    experienceLevel: '',
     url: ''
   })
 
@@ -111,7 +111,7 @@ export function VacancyEditModal({ isOpen, onClose, vacancy, mode }: VacancyModa
         requirements: vacancy.requirements || '',
         benefits: vacancy.benefits || '',
         remoteness: vacancy.remoteness || '',
-        experience: vacancy.experience || '',
+        experienceLevel: vacancy.experienceLevel || '',
         url: vacancy.url || ''
       })
     } else {
@@ -126,7 +126,7 @@ export function VacancyEditModal({ isOpen, onClose, vacancy, mode }: VacancyModa
         requirements: '',
         benefits: '',
         remoteness: '',
-        experience: '',
+        experienceLevel: '',
         url: ''
       })
     }
@@ -147,7 +147,7 @@ export function VacancyEditModal({ isOpen, onClose, vacancy, mode }: VacancyModa
         requirements: data.requirements || null,
         benefits: data.benefits || null,
         remoteness: data.remoteness || null,
-        experience: data.experience || null,
+        experienceLevel: data.experienceLevel || null,
         url: data.url,
         manual: true, // manually added
       }
@@ -174,13 +174,14 @@ export function VacancyEditModal({ isOpen, onClose, vacancy, mode }: VacancyModa
         requirements: data.requirements || null,
         benefits: data.benefits || null,
         remoteness: data.remoteness || null,
-        experience: data.experience || null
+        experienceLevel: data.experienceLevel || null
       }
       
       return await apiClient.put(`/api/vacancies/${vacancy.id}`, payload)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['applications'] })
+      onClose();
     }
   })
 
@@ -188,9 +189,9 @@ export function VacancyEditModal({ isOpen, onClose, vacancy, mode }: VacancyModa
     e.preventDefault()
     
     if (mode === 'create') {
-      createMutation.mutate(formData)
+      createMutation.mutate(formData);
     } else {
-      updateMutation.mutate(formData)
+      updateMutation.mutate(formData);
     }
   }
 
@@ -393,11 +394,11 @@ export function VacancyEditModal({ isOpen, onClose, vacancy, mode }: VacancyModa
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="experience" className="text-sm font-medium">Experience Level</Label>
+                      <Label htmlFor="experienceLevel" className="text-sm font-medium">Experience Level</Label>
                       <Input
-                        id="experience"
-                        value={formData.experience}
-                        onChange={(e) => handleInputChange('experience', e.target.value)}
+                        id="experienceLevel"
+                        value={formData.experienceLevel}
+                        onChange={(e) => handleInputChange('experienceLevel', e.target.value)}
                         placeholder="e.g. 3-5 years, Senior, Mid-level"
                         className="h-10"
                       />

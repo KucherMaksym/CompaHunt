@@ -16,6 +16,11 @@ import {VacancyEditModal} from "@/components/vacancies/VacancyEditModal";
 
 const kanbanColumns = [
     {
+        status: "REJECTED" as VacancyStatus,
+        title: "Rejected",
+        color: "bg-red-600"
+    },
+    {
         status: "WISHLIST" as VacancyStatus,
         title: "Wishlist",
         color: "bg-purple-600"
@@ -39,11 +44,6 @@ const kanbanColumns = [
         status: "OFFER" as VacancyStatus,
         title: "Offer",
         color: "bg-green-600"
-    },
-    {
-        status: "REJECTED" as VacancyStatus,
-        title: "Rejected",
-        color: "bg-red-600"
     },
 ]
 
@@ -286,11 +286,14 @@ export default function VacanciesKanbanPage() {
                     <div className="flex gap-6 h-full overflow-x-auto p-0 ">
                         <div className={"p-6 flex gap-6 overflow-y-hidden"}>
                             {kanbanColumns.map(column => {
-                                // Give more space to columns with more items
+                                // Give more space to columns with grid layout (2 cards per row)
                                 const columnVacancies = getVacanciesByStatus(column.status)
-                                const columnWidth = columnVacancies.length > 5 || ['APPLIED', 'REJECTED'].includes(column.status)
-                                    ? 'w-80 flex-shrink-0'
-                                    : 'w-72 flex-shrink-0'
+                                const isGridColumn = ['WISHLIST', 'APPLIED', 'REJECTED'].includes(column.status)
+                                const columnWidth = isGridColumn 
+                                    ? 'w-[500px] flex-shrink-0'  // Wider for 2-column grid
+                                    : columnVacancies.length > 5 
+                                        ? 'w-80 flex-shrink-0' 
+                                        : 'w-72 flex-shrink-0'
 
                                 return (
                                     <div key={column.status} className={columnWidth}>

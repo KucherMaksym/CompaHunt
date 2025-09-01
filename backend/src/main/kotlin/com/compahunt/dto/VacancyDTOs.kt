@@ -108,8 +108,8 @@ data class CompanyResponse(
 )
 
 data class VacancyAuditResponse(
-    val id: UUID,
-    val vacancyId: UUID,
+    val id: UUID?,
+    val vacancyId: UUID?,
     val userId: UUID,
     val action: String,
     val fieldName: String?,
@@ -157,7 +157,7 @@ data class VacancyPageResponse(
 )
 
 data class VacancySearchItem(
-    val id: UUID,
+    val id: UUID?,
     val title: String,
     val companyName: String,
     val location: String,

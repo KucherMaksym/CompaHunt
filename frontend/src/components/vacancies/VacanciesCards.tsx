@@ -111,9 +111,9 @@ function VacancyCard({ vacancy, onEditVacancy, onArchiveVacancy, onViewVacancy }
         )}
 
         {/* Experience */}
-        {vacancy.experience && (
+        {vacancy.experienceLevel && (
           <div className="text-sm text-muted-foreground">
-            <span className="font-medium">Experience:</span> {vacancy.experience}
+            <span className="font-medium">Experience:</span> {vacancy.experienceLevel}
           </div>
         )}
 
@@ -145,14 +145,14 @@ function VacancyCard({ vacancy, onEditVacancy, onArchiveVacancy, onViewVacancy }
           )}
           
           <div className="flex items-center gap-1">
-            {vacancy.jobUrl && (
+            {vacancy.url && (
               <Button 
                 variant="ghost" 
                 size="sm" 
                 asChild
                 className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0"
               >
-                <a href={vacancy.jobUrl} target="_blank" rel="noopener noreferrer">
+                <a href={vacancy.url} target="_blank" rel="noopener noreferrer">
                   <ExternalLink className="h-4 w-4" />
                 </a>
               </Button>

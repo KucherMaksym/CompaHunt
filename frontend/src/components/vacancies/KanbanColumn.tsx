@@ -1,7 +1,7 @@
 "use client"
 
 import {useDroppable} from "@dnd-kit/core"
-import {SortableContext, verticalListSortingStrategy} from "@dnd-kit/sortable"
+import {SortableContext, verticalListSortingStrategy, rectSortingStrategy} from "@dnd-kit/sortable"
 import {Vacancy, VacancyStatus} from "@/types/vacancy"
 import {VacancyKanbanCard} from "./VacancyKanbanCard"
 
@@ -59,8 +59,15 @@ export function KanbanColumn({
                 </div>
             </div>
 
-            <SortableContext items={vacancies.map(v => v.id)} strategy={verticalListSortingStrategy}>
-                <div className="space-y-3 min-h-full">
+            <SortableContext 
+                items={vacancies.map(v => v.id)} 
+                strategy={['WISHLIST', 'APPLIED', 'REJECTED'].includes(status) ? rectSortingStrategy : verticalListSortingStrategy}
+            >
+                <div className={`${
+                    ['WISHLIST', 'APPLIED', 'REJECTED'].includes(status) 
+                        ? 'grid grid-cols-2 gap-3 auto-rows-max' 
+                        : 'space-y-3'
+                }`}>
                     {vacancies.map((vacancy) => (
                         <VacancyKanbanCard
                             key={vacancy.id}
@@ -70,7 +77,11 @@ export function KanbanColumn({
                         />
                     ))}
                     {vacancies.length === 0 && (
-                        <div className="text-center py-12 px-4">
+                        <div className={`text-center py-12 px-4 ${
+                            ['WISHLIST', 'APPLIED', 'REJECTED'].includes(status) 
+                                ? 'col-span-2' 
+                                : ''
+                        }`}>
                             <div
                                 className={`w-12 h-12 rounded-full ${color}/10 flex items-center justify-center mx-auto mb-3`}/>
                             <p className="text-sm text-muted-foreground font-medium mb-1">
