@@ -90,7 +90,7 @@ class OAuthTokenService(
             val newAccessToken = response.accessToken
             val expiresIn = response.expiresInSeconds ?: 3600L
 
-            saveGmailToken(token.user.id, newAccessToken, token.refreshToken, expiresIn)
+            saveGmailToken(token.user.id!!, newAccessToken, token.refreshToken, expiresIn)
 
             log.info("Refreshed Gmail token for user: ${token.user.id}")
             newAccessToken

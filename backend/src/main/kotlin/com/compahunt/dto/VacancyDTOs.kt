@@ -73,7 +73,7 @@ data class UpdateVacancyRequest(
 )
 
 data class VacancyResponse(
-    val id: UUID,
+    val id: UUID?,
     val title: String,
     val company: CompanyResponse,
     val location: String,
@@ -100,7 +100,7 @@ data class VacancyResponse(
 )
 
 data class CompanyResponse(
-    val id: UUID,
+    val id: UUID?,
     val name: String,
     val description: String?,
     val websiteUrl: String?,
@@ -110,7 +110,7 @@ data class CompanyResponse(
 data class VacancyAuditResponse(
     val id: UUID?,
     val vacancyId: UUID?,
-    val userId: UUID,
+    val userId: UUID?,
     val action: String,
     val fieldName: String?,
     val oldValue: String?,

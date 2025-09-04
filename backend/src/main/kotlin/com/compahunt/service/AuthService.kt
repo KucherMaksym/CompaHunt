@@ -28,7 +28,7 @@ class AuthService(
         }
 
         return UserResponse(
-            id = user.id,
+            id = user.id ?: throw IllegalArgumentException("User ID cannot be null"),
             email = user.email,
             name = user.name,
             provider = user.provider.name.lowercase()
@@ -49,7 +49,7 @@ class AuthService(
             }
 
             SyncGoogleUserResponse(
-                userId = existingUser.id,
+                userId = existingUser.id ?: throw IllegalArgumentException("User ID cannot be null"),
                 message = "User synced successfully"
             )
         } else {
@@ -62,7 +62,7 @@ class AuthService(
             val savedUser = userRepository.save(newUser)
 
             SyncGoogleUserResponse(
-                userId = savedUser.id,
+                userId = savedUser.id ?: throw IllegalArgumentException("User ID cannot be null"),
                 message = "New user created and synced"
             )
         }
@@ -83,7 +83,7 @@ class AuthService(
         val savedUser = userRepository.save(user)
 
         return UserResponse(
-            id = savedUser.id,
+            id = savedUser.id ?: throw IllegalArgumentException("User ID cannot be null"),
             email = savedUser.email,
             name = savedUser.name,
             provider = savedUser.provider.name.lowercase()

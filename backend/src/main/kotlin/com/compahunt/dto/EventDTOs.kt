@@ -6,7 +6,7 @@ import java.time.Instant
 import java.util.UUID
 
 data class PendingEventDTO(
-    val id: UUID,
+    val id: UUID?,
     val eventType: EventType,
     val eventSubtype: String?,
     val title: String,
@@ -24,7 +24,7 @@ data class PendingEventDTO(
     val vacancyInfo: VacancyInfo?
 ) {
     data class InterviewInfo(
-        val id: UUID,
+        val id: UUID?,
         val scheduledAt: Instant,
         val type: String,
         val interviewerName: String?,
@@ -33,7 +33,7 @@ data class PendingEventDTO(
     )
     
     data class VacancyInfo(
-        val id: UUID,
+        val id: UUID?,
         val title: String,
         val companyName: String?,
         val location: String?,
@@ -68,7 +68,7 @@ data class EventStatsDTO(
 }
 
 data class ResolveEventRequest(
-    val eventIds: List<UUID>
+    val eventIds: List<UUID?>
 )
 
 data class CreateEventRequest(
@@ -85,5 +85,5 @@ data class CreateEventRequest(
 
 data class BulkResolveResponse(
     val resolvedCount: Int,
-    val failedEventIds: List<UUID> = emptyList()
+    val failedEventIds: List<UUID?> = emptyList()
 )

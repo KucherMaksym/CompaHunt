@@ -28,7 +28,8 @@ class InterviewService(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     fun createInterview(request: CreateInterviewRequest, userId: UUID): InterviewResponse {
-        val vacancy = vacancyRepository.findById(request.vacancyId)
+        val vacancyId = request.vacancyId ?: throw IllegalArgumentException("Vacancy ID is required")
+        val vacancy = vacancyRepository.findById(vacancyId)
             .orElseThrow { IllegalArgumentException("Vacancy not found") }
         
         val user = userRepository.findById(userId)
@@ -98,7 +99,7 @@ class InterviewService(
             try {
                 if (statusChanged && savedInterview.status.isCompletedOrCancelled()) {
                     // Cancel feedback job if interview is completed/cancelled
-                    pendingEventService.cancelInterviewFeedbackJob(savedInterview.id)
+                    savedInterview.id?.let { pendingEventService.cancelInterviewFeedbackJob(it) }
                 } else if (timeChanged || durationChanged) {
                     // Reschedule feedback job with new time
                     pendingEventService.scheduleInterviewFeedbackJob(savedInterview)

@@ -22,7 +22,8 @@ class VacancyNoteService(
 ) {
 
     fun createNote(request: CreateNoteRequest, userId: UUID): VacancyNote {
-        val vacancy = vacancyRepository.findById(request.vacancyId)
+        val vacancyId = request.vacancyId ?: throw IllegalArgumentException("Vacancy ID is required")
+        val vacancy = vacancyRepository.findById(vacancyId)
             .orElseThrow { IllegalArgumentException("Vacancy not found") }
         
         val user = userRepository.findById(userId)
@@ -34,7 +35,7 @@ class VacancyNoteService(
         }
 
         // Check if a note already exists for this vacancy (allowing only 1 note per vacancy)
-        val existingNotes = vacancyNoteRepository.findByVacancyIdOrderByCreatedAtDesc(request.vacancyId)
+        val existingNotes = vacancyNoteRepository.findByVacancyIdOrderByCreatedAtDesc(vacancyId)
         if (existingNotes.isNotEmpty()) {
             throw IllegalArgumentException("A note already exists for this vacancy. Only one note per vacancy is allowed.")
         }

@@ -148,7 +148,7 @@ class VacancyController(
         return ResponseEntity.status(HttpStatus.CREATED).body(mapOf(
             "success" to true,
             "message" to "Application saved successfully",
-            "id" to vacancy.id,
+            "id" to (vacancy.id ?: ""),
             "vacancy" to vacancy
         ))
     }

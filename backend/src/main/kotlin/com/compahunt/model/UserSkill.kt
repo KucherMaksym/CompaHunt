@@ -11,7 +11,7 @@ import java.util.*
 data class UserSkill(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    val id: UUID = UUID.randomUUID(),
+    val id: UUID? = null,
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)

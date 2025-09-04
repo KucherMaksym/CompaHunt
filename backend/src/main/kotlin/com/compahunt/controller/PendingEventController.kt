@@ -62,7 +62,8 @@ class PendingEventController(
         @CurrentUser userPrincipal: UserPrincipal
     ): ResponseEntity<BulkResolveResponse> {
         return try {
-            val resolvedCount = pendingEventService.resolveEvents(request.eventIds, userPrincipal.id)
+            val validEventIds = request.eventIds.filterNotNull()
+            val resolvedCount = pendingEventService.resolveEvents(validEventIds, userPrincipal.id)
             ResponseEntity.ok(BulkResolveResponse(resolvedCount = resolvedCount))
         } catch (e: IllegalArgumentException) {
             ResponseEntity.badRequest().body(

@@ -27,7 +27,7 @@ data class UserPrincipal(
             val authorities = listOf(SimpleGrantedAuthority("ROLE_${user.role.name}"))
 
             return UserPrincipal(
-                id = user.id,
+                id = user.id ?: throw IllegalArgumentException("User ID cannot be null"),
                 email = user.email,
                 name = user.name,
                 role = user.role,

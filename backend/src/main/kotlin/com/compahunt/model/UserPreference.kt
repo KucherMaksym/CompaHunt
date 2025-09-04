@@ -12,7 +12,7 @@ import java.util.*
 data class UserPreference(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    val id: UUID = UUID.randomUUID(),
+    val id: UUID? = null,
 
     @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)

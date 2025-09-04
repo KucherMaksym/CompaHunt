@@ -101,7 +101,7 @@ class AuthController(
             // Save gmail access token
             if (request.accessToken != null && request.refreshToken != null) {
                 oauthTokenService.saveGmailToken(
-                    userId = user.id,
+                    userId = user.id!!,
                     accessToken = request.accessToken,
                     refreshToken = request.refreshToken,
                     expiresIn = request.expiresIn ?: 3600L

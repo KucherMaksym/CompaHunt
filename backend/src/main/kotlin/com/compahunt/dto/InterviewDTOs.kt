@@ -8,7 +8,7 @@ import java.util.UUID
 
 data class CreateInterviewRequest(
     @field:NotNull(message = "Vacancy ID is required")
-    val vacancyId: UUID,
+    val vacancyId: UUID?,
     
     @field:NotNull(message = "Scheduled time is required")
     val scheduledAt: Instant,
@@ -38,8 +38,8 @@ data class UpdateInterviewRequest(
 )
 
 data class InterviewResponse(
-    val id: UUID,
-    val vacancyId: UUID,
+    val id: UUID?,
+    val vacancyId: UUID?,
     val vacancyTitle: String,
     val companyName: String,
     val scheduledAt: String,
@@ -57,7 +57,7 @@ data class InterviewResponse(
 )
 
 data class InterviewWithVacancyResponse(
-    val id: UUID,
+    val id: UUID?,
     val vacancy: VacancyResponse,
     val companyName: String,
     val scheduledAt: String,
@@ -75,7 +75,7 @@ data class InterviewWithVacancyResponse(
 )
 
 data class UserResponse(
-    val id: UUID,
+    val id: UUID?,
     val email: String,
     val firstName: String?,
     val lastName: String?

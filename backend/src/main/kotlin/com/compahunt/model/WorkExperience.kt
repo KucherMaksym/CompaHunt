@@ -13,7 +13,7 @@ import java.util.*
 data class WorkExperience(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    val id: UUID = UUID.randomUUID(),
+    val id: UUID,
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)

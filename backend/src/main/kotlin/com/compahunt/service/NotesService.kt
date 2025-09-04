@@ -26,7 +26,8 @@ class NotesService(
 
     // Vacancy Notes Operations
     fun createVacancyNote(request: CreateVacancyNoteRequest, userId: UUID): Note {
-        val vacancy = vacancyRepository.findById(request.vacancyId)
+        val vacancyId = request.vacancyId ?: throw IllegalArgumentException("Vacancy ID is required")
+        val vacancy = vacancyRepository.findById(vacancyId)
             .orElseThrow { IllegalArgumentException("Vacancy not found") }
         
         val user = userRepository.findById(userId)
@@ -85,7 +86,8 @@ class NotesService(
 
     // Interview Notes Operations
     fun createInterviewNote(request: CreateInterviewNoteRequest, userId: UUID): Note {
-        val interview = interviewRepository.findById(request.interviewId)
+        val interviewId = request.interviewId ?: throw IllegalArgumentException("Interview ID is required")
+        val interview = interviewRepository.findById(interviewId)
             .orElseThrow { IllegalArgumentException("Interview not found") }
         
         val user = userRepository.findById(userId)

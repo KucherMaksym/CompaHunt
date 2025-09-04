@@ -26,7 +26,7 @@ async function fetchApplications(): Promise<Vacancy[]> {
 
 function Home() {
     const {data: applications, isLoading, error} = useQuery({
-        queryKey: ['applications'],
+        queryKey: ['vacancies'],
         queryFn: fetchApplications,
     })
 
@@ -49,7 +49,7 @@ function Home() {
             })
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['applications']})
+            queryClient.invalidateQueries({queryKey: ['vacancies']})
         }
     })
 

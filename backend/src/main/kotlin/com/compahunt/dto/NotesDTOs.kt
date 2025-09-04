@@ -3,7 +3,7 @@ package com.compahunt.dto
 import java.util.UUID
 
 data class CreateVacancyNoteRequest(
-    val vacancyId: UUID,
+    val vacancyId: UUID?,
     val content: String,
     val type: String,
     val priority: String = "MEDIUM",
@@ -12,7 +12,7 @@ data class CreateVacancyNoteRequest(
 )
 
 data class CreateInterviewNoteRequest(
-    val interviewId: UUID,
+    val interviewId: UUID?,
     val content: String,
     val type: String,
     val priority: String = "MEDIUM",
@@ -23,7 +23,7 @@ data class CreateInterviewNoteRequest(
 data class CreateNoteRequest(
     val content: String,
     val type: String,
-    val vacancyId: UUID,
+    val vacancyId: UUID?,
     val priority: String,
     val tags: String,
     val isPrivate: Boolean
@@ -38,7 +38,7 @@ data class UpdateNoteRequest(
 )
 
 data class VacancyNoteResponse(
-    val id: UUID,
+    val id: UUID?,
     val content: String,
     val type: String,
     val priority: String,
@@ -49,7 +49,7 @@ data class VacancyNoteResponse(
 )
 
 data class InterviewNoteResponse(
-    val id: UUID,
+    val id: UUID?,
     val content: String,
     val type: String,
     val priority: String,

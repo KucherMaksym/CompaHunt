@@ -154,7 +154,7 @@ export function VacancyEditModal({ isOpen, onClose, vacancy, mode }: VacancyModa
       return await apiClient.post('/api/vacancies', payload)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['applications'] })
+      queryClient.invalidateQueries({ queryKey: ['vacancies'] })
       onClose()
     }
   })
@@ -180,7 +180,7 @@ export function VacancyEditModal({ isOpen, onClose, vacancy, mode }: VacancyModa
       return await apiClient.put(`/api/vacancies/${vacancy.id}`, payload)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['applications'] })
+      queryClient.invalidateQueries({ queryKey: ['vacancies'] })
       onClose();
     }
   })
