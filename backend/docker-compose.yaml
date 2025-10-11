@@ -9,9 +9,22 @@ services:
     volumes:
       - redis_data:/data
 
-
-
-
+  embedding-service:
+    build:
+      context: ../embedding_service
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - TRANSFORMERS_CACHE=/app/models
+    volumes:
+      - ./models:/app/models
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
 
 volumes:
   redis_data:

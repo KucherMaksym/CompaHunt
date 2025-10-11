@@ -73,6 +73,7 @@ class SecurityConfig(
                         "/actuator/**",
                         "/swagger-ui/**",
                         "/v3/api-docs/**",
+                        "/embeddings"
                     ).permitAll()
 
                     .anyRequest().authenticated()

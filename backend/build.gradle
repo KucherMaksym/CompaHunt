@@ -46,7 +46,7 @@ dependencies {
 	implementation 'org.flywaydb:flyway-database-postgresql'
 	implementation 'org.jetbrains.kotlin:kotlin-reflect'
 
-	implementation("com.openai:openai-java:4.2.0")
+	implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter:1.0.0-M6'
 	implementation("com.pgvector:pgvector:0.1.6")
 	implementation 'com.opencsv:opencsv:5.12.0'
 	implementation 'org.jsoup:jsoup:1.21.2'

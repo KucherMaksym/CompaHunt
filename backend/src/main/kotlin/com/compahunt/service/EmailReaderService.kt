@@ -1,7 +1,6 @@
 package com.compahunt.service
 
 import com.compahunt.model.EmailCSV
-import com.openai.models.beta.chatkit.threads.ChatKitResponseOutputText
 import com.opencsv.bean.CsvToBeanBuilder
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -24,8 +23,8 @@ class EmailReaderService(
             throw IllegalArgumentException("File does not exist or is not a file: ${file.canonicalPath}")
         }
 
-        return try {
-            return file.reader().use { reader ->
+         return try {
+            val emails = file.reader().use { reader ->
                 val csvReader = CsvToBeanBuilder<EmailCSV>(reader)
                     .withType(EmailCSV::class.java)
                     .withIgnoreLeadingWhiteSpace(true)
@@ -35,15 +34,15 @@ class EmailReaderService(
 //                    .also { emails ->
 //                    log.info("Successfully parsed ${emails.size} emails")
 //                    emails.forEach { println(it) }
-//                }
-            }
+                }
+//            }
 
 //            // TODO: replace
-//            val firstMail = emails[0];
-//            return listOf<EmailCSV>(firstMail);
+            val firstMail = emails[0];
+             listOf<EmailCSV>(firstMail);
         } catch (e: Exception) {
             log.error("Error reading CSV file: ${file.canonicalPath}", e)
-            emptyList()
+             emptyList()
         }
     }
 

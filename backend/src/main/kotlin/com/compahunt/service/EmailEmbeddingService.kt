@@ -1,22 +1,38 @@
 package com.compahunt.service
 
+import com.compahunt.model.EmailCSV
 import com.compahunt.model.EmailEmbedding
 import com.compahunt.repository.EmailEmbeddingRepository
+import org.slf4j.LoggerFactory
+import org.springframework.ai.embedding.EmbeddingModel
+import org.springframework.ai.embedding.EmbeddingResponse
 import org.springframework.stereotype.Service
 
 @Service
 class EmailEmbeddingService(
-    val emailEmbeddingRepository: EmailEmbeddingRepository
+    val emailEmbeddingRepository: EmailEmbeddingRepository,
+    val embeddingModel: EmbeddingModel
 ) {
 
-//    fun generateEmbedding(email: EmailData): EmailEmbedding {
-//
-//        return EmailEmbedding(
-//            id = 0,
-//            body = email.body,
-//            subject = email.subject,
-//            embedding = FloatArray(1536) { 0.0f } // Placeholder for actual embedding generation
-//        )
-//    }
+    val log = LoggerFactory.getLogger(this::class.java)
+
+    init {
+        log.info("EmbeddingModel initialized: ${embeddingModel.javaClass.name}")
+    }
+
+    fun generateEmbedding(email: EmailCSV): EmbeddingResponse {
+
+        val fullText = """
+                Subject: ${email.subject}
+                
+                ${email.body}
+        """.trimIndent()
+
+        val embeddingResponse = embeddingModel.embedForResponse(listOf(fullText))
+
+        log.info("Embedding created: $embeddingResponse")
+
+        return embeddingResponse;
+    }
 
 }
