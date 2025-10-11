@@ -18,7 +18,7 @@ services:
     environment:
       - TRANSFORMERS_CACHE=/app/models
     volumes:
-      - ./models:/app/models
+      - ../embedding_service/models:/app/models
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8000/health" ]
       interval: 30s
