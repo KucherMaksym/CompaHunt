@@ -24,22 +24,14 @@ class EmailReaderService(
         }
 
          return try {
-            val emails = file.reader().use { reader ->
+             file.reader().use { reader ->
                 val csvReader = CsvToBeanBuilder<EmailCSV>(reader)
                     .withType(EmailCSV::class.java)
                     .withIgnoreLeadingWhiteSpace(true)
                     .build()
 
                 csvReader.parse()
-//                    .also { emails ->
-//                    log.info("Successfully parsed ${emails.size} emails")
-//                    emails.forEach { println(it) }
-                }
-//            }
-
-//            // TODO: replace
-            val firstMail = emails[0];
-             listOf<EmailCSV>(firstMail);
+             }
         } catch (e: Exception) {
             log.error("Error reading CSV file: ${file.canonicalPath}", e)
              emptyList()

@@ -1,26 +1,23 @@
 package com.compahunt.service
 
+import com.compahunt.annotation.LocalModelEmbedding
 import com.compahunt.model.EmailCSV
 import com.compahunt.model.EmailEmbedding
 import com.compahunt.repository.EmailEmbeddingRepository
+import com.compahunt.service.embedding.EmbeddingService
+import com.pgvector.PGvector
 import org.slf4j.LoggerFactory
-import org.springframework.ai.embedding.EmbeddingModel
-import org.springframework.ai.embedding.EmbeddingResponse
 import org.springframework.stereotype.Service
 
 @Service
 class EmailEmbeddingService(
     val emailEmbeddingRepository: EmailEmbeddingRepository,
-    val embeddingModel: EmbeddingModel
+    @LocalModelEmbedding val embeddingService: EmbeddingService
 ) {
 
     val log = LoggerFactory.getLogger(this::class.java)
 
-    init {
-        log.info("EmbeddingModel initialized: ${embeddingModel.javaClass.name}")
-    }
-
-    fun generateEmbedding(email: EmailCSV): EmbeddingResponse {
+    fun generateEmbedding(email: EmailCSV): EmailEmbedding {
 
         val fullText = """
                 Subject: ${email.subject}
@@ -28,11 +25,18 @@ class EmailEmbeddingService(
                 ${email.body}
         """.trimIndent()
 
-        val embeddingResponse = embeddingModel.embedForResponse(listOf(fullText))
+        val embedding: List<Float>  = embeddingService.generateEmbedding(fullText)
+        log.info("Embedding generated: $embedding")
 
-        log.info("Embedding created: $embeddingResponse")
+        val emailEmbedding = EmailEmbedding(
+            embedding = PGvector(embedding.toFloatArray()),
+            body = email.body,
+            subject = email.subject,
+        )
 
-        return embeddingResponse;
+        emailEmbeddingRepository.save(emailEmbedding)
+
+        return emailEmbedding;
     }
 
 }

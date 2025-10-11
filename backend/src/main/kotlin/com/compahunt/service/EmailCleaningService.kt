@@ -41,44 +41,42 @@ class EmailCleaningService {
     // Main email cleaning method
     fun cleanEmailBody(rawBody: String): String {
         val originalSize = rawBody.length
-        log.info("Original length: $originalSize")
+        log.debug("Original length: $originalSize")
 
         // Step 1: Parse HTML with Jsoup and extract clean text
         var content = extractTextFromHtml(rawBody)
-        log.info("After extractTextFromHtml: ${content.length}")
-        log.info("Sample: ${content.take(500)}")
+        log.debug("After extractTextFromHtml: ${content.length}")
 
         // Step 2: Normalize line breaks
         content = normalizeLineBreaks(content)
-        log.info("After normalizeLineBreaks: ${content.length}")
+        log.debug("After normalizeLineBreaks: ${content.length}")
 
         // Step 3: Remove tracking URLs
         content = removeTrackingUrls(content)
-        log.info("After removeTrackingUrls: ${content.length}")
+        log.debug("After removeTrackingUrls: ${content.length}")
 
         // Step 4: Remove footers and service information
         content = removeFooters(content)
-        log.info("After removeFooters: ${content.length}")
+        log.debug("After removeFooters: ${content.length}")
 
         // Step 5: Remove promotional blocks
         content = removePromotionalContent(content)
-        log.info("After removePromotionalContent: ${content.length}")
+        log.debug("After removePromotionalContent: ${content.length}")
 
         // Step 6: Find content boundaries
         val emailType = detectEmailType(rawBody)
         val coreContentBounds = findContentBounds(content, emailType)
         content = content.substring(coreContentBounds.first, coreContentBounds.second).trim()
-        log.info("After extractCoreContent: ${content.length}")
+        log.debug("After extractCoreContent: ${content.length}")
 
         // Step 7: Final formatting cleanup
         val finalContent = removeExcessiveWhitespace(content)
-        log.info("After removeExcessiveWhitespace: ${finalContent.length}")
-        log.info("Final sample: ${finalContent.take(500)}")
+        log.debug("After removeExcessiveWhitespace: ${finalContent.length}")
 
         // Log compression statistics
         val compressionRatio = finalContent.length.toFloat() / originalSize
         val formattedRatio = String.format("%.2f", compressionRatio)
-        log.info("Email cleaned: originalSize=$originalSize, finalSize=${finalContent.length}, compressionRatio=$formattedRatio")
+        log.debug("Email cleaned: originalSize=$originalSize, finalSize=${finalContent.length}, compressionRatio=$formattedRatio")
 
         return finalContent
     }

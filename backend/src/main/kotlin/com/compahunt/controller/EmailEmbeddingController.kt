@@ -1,6 +1,7 @@
 package com.compahunt.controller
 
 import com.compahunt.model.EmailCSV
+import com.compahunt.model.EmailEmbedding
 import com.compahunt.service.EmailEmbeddingService
 import com.compahunt.service.EmailReaderService
 import org.springframework.http.ResponseEntity
@@ -19,15 +20,14 @@ class EmailEmbeddingController(
     @PostMapping("/{file}")
     fun getEmailData(@PathVariable file:  String): ResponseEntity<List<EmailCSV>> {
         val emails = emailReaderService.getEmailsFromCsv(file);
-        println(emails)
         return ResponseEntity.ok(emails)
     }
 
     @PostMapping("/{file}/clean")
-    fun getCleanEmailData(@PathVariable file:  String): ResponseEntity<List<EmailCSV>> {
+    fun getCleanEmailData(@PathVariable file:  String): ResponseEntity<List<EmailEmbedding>> {
         val emails = emailReaderService.getCleanEmailsFromCsv(file);
-        println(emails)
-        return ResponseEntity.ok(emails)
+        val embeddings = emails.map { email -> emailEmbeddingService.generateEmbedding(email) }
+        return ResponseEntity.ok(embeddings)
     }
 
 }
