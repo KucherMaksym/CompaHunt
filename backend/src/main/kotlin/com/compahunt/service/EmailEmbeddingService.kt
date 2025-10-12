@@ -47,9 +47,14 @@ class EmailEmbeddingService(
         val datasetEmails = emailEmbeddingRepository.findAll();
 
         val maxSim = datasetEmails.maxOfOrNull { datasetEmail ->
-            embeddingService.cosineSimilarity(
+            val curSim = embeddingService.cosineSimilarity(
                 datasetEmail.embedding.toArray(),
                 emailEmbedding)
+
+            // TODO: delete logging or change to debug
+            log.info("Cosine similarity with email id ${datasetEmail.id} is $curSim")
+
+            curSim;
        } ?: 0.0
 
         return maxSim > SIMILARITY_THRESHOLD;

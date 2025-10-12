@@ -1,10 +1,14 @@
 package com.compahunt.service
 
+import com.compahunt.annotation.LocalModelEmbedding
 import com.compahunt.enums.GmailMessageFormat
+import com.compahunt.model.EmailCSV
 import com.compahunt.model.GmailNotificationEvent
 import com.compahunt.model.GmailWatchSubscription
+import com.compahunt.model.Priority
 import com.compahunt.repository.GmailNotificationEventRepository
 import com.compahunt.repository.GmailWatchSubscriptionRepository
+import com.compahunt.service.embedding.EmbeddingService
 import com.google.api.client.googleapis.batch.BatchCallback
 import com.google.api.client.googleapis.batch.json.JsonBatchCallback
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
@@ -32,7 +36,9 @@ class GmailPushNotificationService(
     private val gmailWatchRepository: GmailWatchSubscriptionRepository,
     private val oauthTokenService: OAuthTokenService,
     private val gmailService: GmailService,
-    private val notificationEventRepository: GmailNotificationEventRepository
+    private val notificationEventRepository: GmailNotificationEventRepository,
+    @LocalModelEmbedding private val embeddingService: EmbeddingService,
+    private val emailEmbeddingService: EmailEmbeddingService
 ) {
 
     private val log = LoggerFactory.getLogger(GmailPushNotificationService::class.java)
@@ -202,7 +208,19 @@ class GmailPushNotificationService(
                     notificationEventRepository.save(event)
 
                     log.info("New email saved for user $userId: '${change.subject}' from ${change.sender}")
-                    // TODO: aiAnalysisService.vectorAnalyzeJobEmail(userId, change)
+
+                    val emailObject = EmailCSV(
+                        subject = change.subject,
+                        body = change.body,
+                    )
+                    val newEmailEmbedding = emailEmbeddingService.generateEmbedding(emailObject)
+
+                    val isJobRelated = emailEmbeddingService.isJobRelated(newEmailEmbedding.embedding.toArray());
+                    if (isJobRelated) {
+                        log.info("Email '${change.subject}' from ${change.sender} is job-related for user $userId")
+                    } else {
+                        log.info("Email '${change.subject}' from ${change.sender} is NOT job-related for user $userId")
+                    }
                 }
 //            } else {
 //                log.warn("No email changes found for user $userId between history IDs ${subscription.historyId} and $newHistoryId")
@@ -264,8 +282,7 @@ class GmailPushNotificationService(
                     callbacks[messageId] = callback
 
                     service.users().messages().get("me", messageId)
-                        .setFormat(GmailMessageFormat.METADATA.value)
-                        .setMetadataHeaders(listOf("Subject", "From"))
+                        .setFormat(GmailMessageFormat.FULL.value)
                         .queue(batchRequest, callback)
                 }
 
@@ -302,7 +319,7 @@ class GmailPushNotificationService(
 }
 
 data class EmailChange(
-    val messageId: String, val subject: String, val sender: String, val historyId: Long
+    val messageId: String, val subject: String, val sender: String, val historyId: Long, val body: String
 )
 
 class MessageBatchCallback(
@@ -318,17 +335,42 @@ class MessageBatchCallback(
                 val headers = it.payload?.headers ?: emptyList()
                 val subject = headers.find { h -> h.name.equals("Subject", true) }?.value ?: "No Subject"
                 val from = headers.find { h -> h.name.equals("From", true) }?.value ?: "Unknown Sender"
+                val body = extractBody(it.payload)
 
                 changes.add(EmailChange(
                     messageId = messageId,
                     subject = subject,
                     sender = from,
-                    historyId = it.historyId?.toLong() ?: 0L
+                    historyId = it.historyId?.toLong() ?: 0L,
+                    body = body
                 ))
             }
         } catch (e: Exception) {
             log.warn("Failed to process batch message $messageId: ${e.message}")
         }
+    }
+
+    private fun extractBody(payload: com.google.api.services.gmail.model.MessagePart?): String {
+        if (payload == null) return ""
+
+        payload.body?.data?.let {
+            return String(java.util.Base64.getUrlDecoder().decode(it))
+        }
+
+        payload.parts?.forEach { part ->
+            if (part.mimeType == "text/plain") {
+                part.body?.data?.let {
+                    return String(java.util.Base64.getUrlDecoder().decode(it))
+                }
+            }
+        }
+
+        payload.parts?.forEach { part ->
+            val nested = extractBody(part)
+            if (nested.isNotEmpty()) return nested
+        }
+
+        return ""
     }
 
     override fun onFailure(e: GoogleJsonError?, headers: HttpHeaders?) {
