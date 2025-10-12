@@ -240,3 +240,4 @@ CLAUDE.md
 
 application.yaml
 application.yml
+embedding_service/models/

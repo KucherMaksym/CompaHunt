@@ -1,6 +1,7 @@
 package com.compahunt.service
 
 import com.compahunt.annotation.LocalModelEmbedding
+import com.compahunt.annotation.LogExecutionTime
 import com.compahunt.model.EmailCSV
 import com.compahunt.model.EmailEmbedding
 import com.compahunt.repository.EmailEmbeddingRepository
@@ -16,6 +17,7 @@ class EmailEmbeddingService(
 ) {
 
     val log = LoggerFactory.getLogger(this::class.java)
+    val SIMILARITY_THRESHOLD = 0.8
 
     fun generateEmbedding(email: EmailCSV): EmailEmbedding {
 
@@ -38,5 +40,20 @@ class EmailEmbeddingService(
 
         return emailEmbedding;
     }
+
+    @LogExecutionTime
+    fun isJobRelated(emailEmbedding: FloatArray): Boolean {
+
+        val datasetEmails = emailEmbeddingRepository.findAll();
+
+        val maxSim = datasetEmails.maxOfOrNull { datasetEmail ->
+            embeddingService.cosineSimilarity(
+                datasetEmail.embedding.toArray(),
+                emailEmbedding)
+       } ?: 0.0
+
+        return maxSim > SIMILARITY_THRESHOLD;
+    }
+
 
 }
