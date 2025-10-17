@@ -1,15 +1,11 @@
 package com.compahunt.service
 
-import com.compahunt.annotation.LocalModelEmbedding
 import com.compahunt.enums.GmailMessageFormat
 import com.compahunt.model.EmailCSV
 import com.compahunt.model.GmailNotificationEvent
 import com.compahunt.model.GmailWatchSubscription
-import com.compahunt.model.Priority
 import com.compahunt.repository.GmailNotificationEventRepository
 import com.compahunt.repository.GmailWatchSubscriptionRepository
-import com.compahunt.service.embedding.EmbeddingService
-import com.google.api.client.googleapis.batch.BatchCallback
 import com.google.api.client.googleapis.batch.json.JsonBatchCallback
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.googleapis.json.GoogleJsonError
@@ -37,7 +33,6 @@ class GmailPushNotificationService(
     private val oauthTokenService: OAuthTokenService,
     private val gmailService: GmailService,
     private val notificationEventRepository: GmailNotificationEventRepository,
-    @LocalModelEmbedding private val embeddingService: EmbeddingService,
     private val emailEmbeddingService: EmailEmbeddingService
 ) {
 

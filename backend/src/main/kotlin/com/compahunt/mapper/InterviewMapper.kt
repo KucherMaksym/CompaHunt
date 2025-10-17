@@ -1,30 +1,53 @@
 package com.compahunt.mapper
 
-import com.compahunt.dto.CreateInterviewRequest
 import com.compahunt.dto.InterviewResponse
 import com.compahunt.dto.InterviewWithVacancyResponse
-import com.compahunt.dto.UpdateInterviewRequest
 import com.compahunt.model.Interview
-import com.compahunt.model.User
-import com.compahunt.model.Vacancy
-import org.mapstruct.Mapper
-import org.mapstruct.Mapping
-import org.mapstruct.Named
 import org.springframework.stereotype.Component
-import java.time.Instant
-import java.time.format.DateTimeFormatter
-import java.util.UUID
 
-@Mapper(componentModel = "spring", uses = [VacancyMapper::class])
 @Component
-interface InterviewMapper {
+class InterviewMapper(
+    private val vacancyMapper: VacancyMapper
+) {
 
-    @Mapping(target = "vacancyId", source = "vacancy.id")
-    @Mapping(target = "vacancyTitle", source = "vacancy.title")
-    @Mapping(target = "companyName", source = "vacancy.company.name")
-    fun toResponse(interview: Interview): InterviewResponse;
+    fun toResponse(interview: Interview): InterviewResponse {
+        return InterviewResponse(
+            id = interview.id,
+            vacancyId = interview.vacancy.id,
+            vacancyTitle = interview.vacancy.title,
+            companyName = interview.vacancy.company.name,
+            scheduledAt = interview.scheduledAt.toString(),
+            type = interview.type,
+            status = interview.status,
+            notes = interview.notes,
+            feedback = interview.feedback,
+            duration = interview.duration,
+            meetingLink = interview.meetingLink,
+            location = interview.location,
+            interviewerName = interview.interviewerName,
+            interviewerEmail = interview.interviewerEmail,
+            createdAt = interview.createdAt.toString(),
+            updatedAt = interview.updatedAt.toString()
+        )
+    }
 
-    @Mapping(target = "companyName", source = "vacancy.company.name")
-    @Mapping(target = "vacancy", source = "vacancy")
-    fun toResponseWithVacancy(interview: Interview): InterviewWithVacancyResponse;
+    fun toResponseWithVacancy(interview: Interview): InterviewWithVacancyResponse {
+        return InterviewWithVacancyResponse(
+            id = interview.id,
+            vacancy = vacancyMapper.toResponse(interview.vacancy),
+            companyName = interview.vacancy.company.name,
+            scheduledAt = interview.scheduledAt.toString(),
+            type = interview.type,
+            status = interview.status,
+            notes = interview.notes,
+            feedback = interview.feedback,
+            duration = interview.duration,
+            meetingLink = interview.meetingLink,
+            location = interview.location,
+            interviewerName = interview.interviewerName,
+            interviewerEmail = interview.interviewerEmail,
+            createdAt = interview.createdAt.toString(),
+            updatedAt = interview.updatedAt.toString()
+        )
+    }
 }

@@ -2,6 +2,7 @@ package com.compahunt.service
 
 import com.compahunt.annotation.LocalModelEmbedding
 import com.compahunt.annotation.LogExecutionTime
+import com.compahunt.annotation.OpenAIEmbedding
 import com.compahunt.model.EmailCSV
 import com.compahunt.model.EmailEmbedding
 import com.compahunt.repository.EmailEmbeddingRepository
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Service
 @Service
 class EmailEmbeddingService(
     val emailEmbeddingRepository: EmailEmbeddingRepository,
-    @LocalModelEmbedding val embeddingService: EmbeddingService
+    @OpenAIEmbedding val embeddingService: EmbeddingService
 ) {
 
     val log = LoggerFactory.getLogger(this::class.java)

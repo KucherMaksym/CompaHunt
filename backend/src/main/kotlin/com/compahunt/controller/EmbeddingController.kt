@@ -1,6 +1,7 @@
 package com.compahunt.controller
 
 import com.compahunt.annotation.LocalModelEmbedding
+import com.compahunt.annotation.OpenAIEmbedding
 import com.compahunt.service.embedding.EmbeddingService
 import com.compahunt.service.embedding.EmbeddingServiceOpenAI
 import org.springframework.ai.embedding.EmbeddingResponse
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class EmbeddingController(
-    @LocalModelEmbedding val embeddingService: EmbeddingService
+    @OpenAIEmbedding val embeddingService: EmbeddingService
 ) {
     @PostMapping("/embeddings")
     fun getEmbeddings(@RequestBody text: String): ResponseEntity<Any?> {

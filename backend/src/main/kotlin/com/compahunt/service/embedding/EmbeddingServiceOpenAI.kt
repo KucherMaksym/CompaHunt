@@ -7,8 +7,6 @@ import org.springframework.ai.embedding.EmbeddingResponse
 import org.springframework.ai.openai.OpenAiEmbeddingModel
 import org.springframework.stereotype.Service
 
-// DON'T USE THIS SERVICE. For unknown reasons, the OpenAI API returns 429 even when there are sufficient
-// credits. Most likely, the error is on OpenAI's side. Use EmbeddingServiceLocalModel instead.
 @Service
 @OpenAIEmbedding
 class EmbeddingServiceOpenAI(

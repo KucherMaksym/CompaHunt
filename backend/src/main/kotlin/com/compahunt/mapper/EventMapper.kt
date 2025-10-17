@@ -5,40 +5,63 @@ import com.compahunt.dto.GroupedPendingEventsDTO
 import com.compahunt.model.PendingEvent
 import com.compahunt.model.Vacancy
 import com.compahunt.model.Interview
-import com.compahunt.model.InterviewType
-import com.compahunt.model.VacancyStatus
-import org.mapstruct.*
-import java.util.UUID
+import org.springframework.stereotype.Component
 
-@Mapper(componentModel = "spring")
-interface EventMapper {
+@Component
+class EventMapper {
 
-    @Mapping(target = "interviewId", source = "interview.id")
-    @Mapping(target = "vacancyId", source = "vacancy.id")
-    @Mapping(target = "interviewInfo", source = "interview", qualifiedByName = ["toInterviewInfo"])
-    @Mapping(target = "vacancyInfo", source = "vacancy", qualifiedByName = ["toVacancyInfo"])
-    fun toPendingEventDTO(event: PendingEvent): PendingEventDTO
+    fun toPendingEventDTO(event: PendingEvent): PendingEventDTO {
+        return PendingEventDTO(
+            id = event.id,
+            eventType = event.eventType,
+            eventSubtype = event.eventSubtype,
+            title = event.title,
+            description = event.description,
+            priority = event.priority,
+            interviewId = event.interview?.id,
+            vacancyId = event.vacancy?.id,
+            metadata = event.metadata,
+            scheduledFor = event.scheduledFor,
+            createdAt = event.createdAt,
+            updatedAt = event.updatedAt,
+            interviewInfo = toInterviewInfo(event.interview),
+            vacancyInfo = toVacancyInfo(event.vacancy)
+        )
+    }
 
-    @Named("toInterviewInfo")
-    @Mapping(target = "type", source = "type", qualifiedByName = ["interviewTypeToString"])
-    fun toInterviewInfo(interview: Interview?): PendingEventDTO.InterviewInfo?
+    fun toInterviewInfo(interview: Interview?): PendingEventDTO.InterviewInfo? {
+        return interview?.let {
+            PendingEventDTO.InterviewInfo(
+                id = it.id,
+                scheduledAt = it.scheduledAt,
+                type = it.type.name,
+                interviewerName = it.interviewerName,
+                location = it.location,
+                meetingLink = it.meetingLink
+            )
+        }
+    }
 
-    @Named("toVacancyInfo")
-    @Mapping(target = "companyName", source = "company.name")
-    @Mapping(target = "status", source = "status", qualifiedByName = ["vacancyStatusToString"])
-    fun toVacancyInfo(vacancy: Vacancy?): PendingEventDTO.VacancyInfo?
+    fun toVacancyInfo(vacancy: Vacancy?): PendingEventDTO.VacancyInfo? {
+        return vacancy?.let {
+            PendingEventDTO.VacancyInfo(
+                id = it.id,
+                title = it.title,
+                companyName = it.company.name,
+                location = it.location,
+                status = it.status.name
+            )
+        }
+    }
 
-    @Named("interviewTypeToString")
-    fun interviewTypeToString(type: InterviewType?): String? = type?.name
-
-    @Named("vacancyStatusToString") 
-    fun vacancyStatusToString(status: VacancyStatus?): String? = status?.name
-
-    @Mapping(target = "vacancy", source = "vacancy", qualifiedByName = ["toVacancyInfo"])
-    @Mapping(target = "events", source = "events")
-    @Mapping(target = "totalCount", expression = "java(events.size())")
     fun toGroupedPendingEventsDTO(
         vacancy: Vacancy?,
         events: List<PendingEvent>
-    ): GroupedPendingEventsDTO
+    ): GroupedPendingEventsDTO {
+        return GroupedPendingEventsDTO(
+            vacancy = toVacancyInfo(vacancy),
+            events = events.map { toPendingEventDTO(it) },
+            totalCount = events.size
+        )
+    }
 }
