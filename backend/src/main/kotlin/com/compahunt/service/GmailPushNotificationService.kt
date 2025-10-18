@@ -33,7 +33,9 @@ class GmailPushNotificationService(
     private val oauthTokenService: OAuthTokenService,
     private val gmailService: GmailService,
     private val notificationEventRepository: GmailNotificationEventRepository,
-    private val emailEmbeddingService: EmailEmbeddingService
+    private val emailEmbeddingService: EmailEmbeddingService,
+    private val aiService: AIService,
+    private val vacancyUpdateService: VacancyUpdateService
 ) {
 
     private val log = LoggerFactory.getLogger(GmailPushNotificationService::class.java)
@@ -212,7 +214,11 @@ class GmailPushNotificationService(
 
                     val isJobRelated = emailEmbeddingService.isJobRelated(newEmailEmbedding.embedding.toArray());
                     if (isJobRelated) {
-                        log.info("Email '${change.subject}' from ${change.sender} is job-related for user $userId")
+                        aiService.extractEmailData(change.body).let { vacancyChanges ->
+                            if (vacancyChanges.isJobRelated) {
+                                log.info("Email '${change.subject}' from ${change.sender} is job-related and contains vacancy changes for user $userId: $vacancyChanges")
+                            }
+                        }
                     } else {
                         log.info("Email '${change.subject}' from ${change.sender} is NOT job-related for user $userId")
                     }

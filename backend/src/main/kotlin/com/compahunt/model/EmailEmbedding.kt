@@ -16,7 +16,7 @@ data class EmailEmbedding(
     @Id
     val id: UUID? = null,
 //    val emailId: String,
-    @Column(columnDefinition = "vector(768)")
+    @Column(columnDefinition = "vector(1536)")
     @Type(VectorType::class)
     val embedding: PGvector,
     @Column(columnDefinition = "TEXT")

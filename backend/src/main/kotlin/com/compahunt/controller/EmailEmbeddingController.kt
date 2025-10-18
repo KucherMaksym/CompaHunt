@@ -1,5 +1,6 @@
 package com.compahunt.controller
 
+import com.compahunt.annotation.LogExecutionTime
 import com.compahunt.model.EmailCSV
 import com.compahunt.model.EmailEmbedding
 import com.compahunt.service.EmailEmbeddingService
@@ -24,9 +25,10 @@ class EmailEmbeddingController(
     }
 
     @PostMapping("/{file}/clean")
+    @LogExecutionTime
     fun getCleanEmailData(@PathVariable file:  String): ResponseEntity<List<EmailEmbedding>> {
         val emails = emailReaderService.getCleanEmailsFromCsv(file);
-        val embeddings = emails.map { email -> emailEmbeddingService.generateEmbedding(email) }
+        val embeddings = emails.take(250).map { email -> emailEmbeddingService.generateEmbedding(email) }
         return ResponseEntity.ok(embeddings)
     }
 
