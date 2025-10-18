@@ -10,6 +10,7 @@ import com.compahunt.service.embedding.EmbeddingService
 import com.pgvector.PGvector
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.util.UUID
 
 @Service
 class EmailEmbeddingService(
@@ -37,28 +38,71 @@ class EmailEmbeddingService(
             subject = email.subject,
         )
 
+//        emailEmbeddingRepository.save(emailEmbedding)
+
+        return emailEmbedding;
+    }
+
+    fun generateBatchEmbeddings(emails: List<EmailCSV>): List<EmailEmbedding> {
+        val formattedTexts = emails.map { email ->
+            """
+                Subject: ${email.subject}
+
+                ${email.body}
+            """.trimIndent()
+        }
+
+        val embeddings: List<List<Float>> = embeddingService.generateBatchEmbeddings(formattedTexts)
+
+        return emails.zip(embeddings).map { (email, embedding) ->
+            EmailEmbedding(
+                embedding = PGvector(embedding.toFloatArray()),
+                body = email.body,
+                subject = email.subject
+            )
+        }
+    }
+
+    fun generateAndSaveEmbedding(email: EmailCSV): EmailEmbedding {
+
+        val emailEmbedding = generateEmbedding(email)
+
         emailEmbeddingRepository.save(emailEmbedding)
 
         return emailEmbedding;
     }
 
+    fun generateAndSaveBatchEmbedding(emails: List<EmailCSV>): List<EmailEmbedding> {
+
+        val emailEmbeddings = generateBatchEmbeddings(emails)
+
+        emailEmbeddingRepository.saveAll(emailEmbeddings)
+
+        return emailEmbeddings;
+    }
+
     @LogExecutionTime
     fun isJobRelated(emailEmbedding: FloatArray): Boolean {
 
-        val datasetEmails = emailEmbeddingRepository.findAll();
+        val datasetEmails = emailEmbeddingRepository.findAll()
 
-        val maxSim = datasetEmails.maxOfOrNull { datasetEmail ->
+        var maxSim = 0.0
+        var mostSimilarEmailId: UUID? = null
+
+        datasetEmails.forEach { datasetEmail ->
             val curSim = embeddingService.cosineSimilarity(
                 datasetEmail.embedding.toArray(),
                 emailEmbedding)
 
-            // TODO: delete logging or change to debug
-            log.info("Cosine similarity with email id ${datasetEmail.id} is $curSim")
+            if (curSim > maxSim) {
+                maxSim = curSim
+                mostSimilarEmailId = datasetEmail.id
+            }
+        }
 
-            curSim;
-       } ?: 0.0
+        log.info("Most similar email id: $mostSimilarEmailId with similarity: $maxSim")
 
-        return maxSim > SIMILARITY_THRESHOLD;
+        return maxSim > SIMILARITY_THRESHOLD
     }
 
 

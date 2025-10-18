@@ -31,7 +31,11 @@ class VectorType : UserType<PGvector> {
         owner: Any?
     ): PGvector? {
         val value = rs.getObject(position) ?: return null
-        return PGvector(value as String)
+        return when (value) {
+            is org.postgresql.util.PGobject -> PGvector(value.value ?: return null)
+            is String -> PGvector(value)
+            else -> throw IllegalArgumentException("Unexpected type for vector: ${value::class.java}")
+        }
     }
 
     override fun nullSafeSet(

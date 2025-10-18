@@ -35,7 +35,8 @@ class GmailPushNotificationService(
     private val notificationEventRepository: GmailNotificationEventRepository,
     private val emailEmbeddingService: EmailEmbeddingService,
     private val aiService: AIService,
-    private val vacancyUpdateService: VacancyUpdateService
+    private val vacancyUpdateService: VacancyUpdateService,
+    private val pendingEventService: PendingEventService
 ) {
 
     private val log = LoggerFactory.getLogger(GmailPushNotificationService::class.java)
@@ -160,6 +161,76 @@ class GmailPushNotificationService(
         log.info("Saved Gmail watch subscription for user $userId with history ID: ${watchResponse.historyId}")
     }
 
+    fun processGmailChanges(changes: List<EmailChange>, userId: UUID): Unit {
+
+        log.info("Found ${changes.size} new email changes for user $userId")
+
+        // Process only new emails
+        // It seems like 1+N problem, but logic assumes that changes > 1 is rare
+        val newEmails = changes.filter { change ->
+            notificationEventRepository.findByUserIdAndMessageId(userId, change.messageId).isEmpty()
+        }
+
+        log.info("Processing ${newEmails.size} new emails (${changes.size - newEmails.size} duplicates filtered)")
+
+        newEmails.forEach { change ->
+            try {
+                // Save notification event with duplicate handling
+                try {
+                    val event = GmailNotificationEvent(
+                        userId = userId,
+                        historyId = change.historyId,
+                        messageId = change.messageId,
+                        emailSubject = change.subject,
+                        emailSender = change.sender
+                    )
+                    notificationEventRepository.save(event)
+                    log.info("New email saved for user $userId: '${change.subject}' from ${change.sender}")
+                } catch (e: org.springframework.dao.DataIntegrityViolationException) {
+                    // Duplicate entry - another concurrent request already saved this email
+                    log.debug("Email ${change.messageId} already saved by concurrent request, skipping")
+                    return@forEach
+                }
+
+                // Check email length - OpenAI embedding model has 8192 token limit
+                // Approximate: 1 token ≈ 4 characters, so ~32,000 characters max
+                val emailText = "${change.subject}\n${change.body}"
+                val maxLength = 30000 // Conservative limit to account for subject + body
+
+                if (emailText.length > maxLength) {
+                    log.warn("Email '${change.subject}' from ${change.sender} is too long (${emailText.length} chars), skipping AI processing")
+                    return@forEach
+                }
+
+                val emailObject = EmailCSV(
+                    subject = change.subject,
+                    body = change.body,
+                )
+                val newEmailEmbedding = emailEmbeddingService.generateEmbedding(emailObject)
+
+                val isJobRelated = emailEmbeddingService.isJobRelated(newEmailEmbedding.embedding.toArray())
+                if (isJobRelated) {
+                    aiService.extractEmailData(change.body, userId).let { vacancyChanges ->
+                        if (vacancyChanges.isJobRelated) {
+                            log.info("Email '${change.subject}' from ${change.sender} is job-related and contains vacancy changes for user $userId: $vacancyChanges")
+                            pendingEventService.createVacancyUpdateEventConfirmation(vacancyChanges)
+                        } else {
+                            log.info("LLM determined email ${change.subject} as not job related")
+                            // TODO: add audit to analyze why embedding said job-related, but LLM disagreed
+                        }
+                    }
+                } else {
+                    log.info("Email '${change.subject}' from ${change.sender} is NOT job-related for user $userId")
+                }
+            } catch (e: Exception) {
+                // Catch any errors during email processing to prevent blocking other emails
+                log.error("Failed to process email '${change.subject}' from ${change.sender} for user $userId: ${e.message}", e)
+                // Continue with next email
+            }
+        }
+    }
+
+
     fun processGmailNotification(userId: UUID, newHistoryId: Long) {
         try {
             log.info("Processing Gmail notification for user $userId with history ID: $newHistoryId")
@@ -182,50 +253,7 @@ class GmailPushNotificationService(
 
             val changes = getGmailHistoryChanges(accessToken, subscription.historyId, newHistoryId)
 
-//            if (changes.isNotEmpty()) {
-                log.info("Found ${changes.size} new email changes for user $userId")
-
-                // Process only new emails
-                // It seems like 1+N problem, but logic assumes that changes > 1 is rare
-                val newEmails = changes.filter { change ->
-                    notificationEventRepository.findByUserIdAndMessageId(userId, change.messageId) == null
-                }
-
-                log.info("Processing ${newEmails.size} new emails (${changes.size - newEmails.size} duplicates filtered)")
-
-                newEmails.forEach { change ->
-                    // Save notification event
-                    val event = GmailNotificationEvent(
-                        userId = userId,
-                        historyId = change.historyId,
-                        messageId = change.messageId,
-                        emailSubject = change.subject,
-                        emailSender = change.sender
-                    )
-                    notificationEventRepository.save(event)
-
-                    log.info("New email saved for user $userId: '${change.subject}' from ${change.sender}")
-
-                    val emailObject = EmailCSV(
-                        subject = change.subject,
-                        body = change.body,
-                    )
-                    val newEmailEmbedding = emailEmbeddingService.generateEmbedding(emailObject)
-
-                    val isJobRelated = emailEmbeddingService.isJobRelated(newEmailEmbedding.embedding.toArray());
-                    if (isJobRelated) {
-                        aiService.extractEmailData(change.body, userId).let { vacancyChanges ->
-                            if (vacancyChanges.isJobRelated) {
-                                log.info("Email '${change.subject}' from ${change.sender} is job-related and contains vacancy changes for user $userId: $vacancyChanges")
-                            }
-                        }
-                    } else {
-                        log.info("Email '${change.subject}' from ${change.sender} is NOT job-related for user $userId")
-                    }
-                }
-//            } else {
-//                log.warn("No email changes found for user $userId between history IDs ${subscription.historyId} and $newHistoryId")
-//            }
+            processGmailChanges(changes, userId)
 
             // update history ID
             subscription.historyId = newHistoryId

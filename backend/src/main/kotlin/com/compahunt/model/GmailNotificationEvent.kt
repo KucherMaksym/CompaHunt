@@ -6,7 +6,16 @@ import java.time.Instant
 import java.util.UUID
 
 @Entity
-@Table(name = "gmail_notification_events")
+@Table(
+    name = "gmail_notification_events",
+    indexes = [
+        Index(
+            name = "uk_gmail_notification_user_message",
+            columnList = "user_id, message_id",
+            unique = true
+        )
+    ]
+)
 data class GmailNotificationEvent(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

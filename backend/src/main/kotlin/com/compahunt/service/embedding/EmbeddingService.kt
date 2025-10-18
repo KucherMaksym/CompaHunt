@@ -20,4 +20,6 @@ interface EmbeddingService {
 
         return dotProduct / (sqrt(norm1) * sqrt(norm2))
     }
+
+    fun generateBatchEmbeddings(texts: List<String>): List<List<Float>>
 }

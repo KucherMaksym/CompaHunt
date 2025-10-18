@@ -8,6 +8,7 @@ import com.compahunt.repository.UserRepository
 import com.compahunt.repository.VacancyRepository
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.ser.std.UUIDSerializer
 import org.quartz.*
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -195,68 +196,51 @@ class PendingEventService(
         }
     }
 
-    // Create AI-detected status change event
-    fun createAIStatusChangeEvent(
-        userId: UUID,
-        vacancyId: UUID,
-        newStatus: String,
-        confidence: Double,
-        emailSubject: String?,
-        aiReasoning: String?
-    ): PendingEvent {
-        val metadata = objectMapper.createObjectNode().apply {
-            put("newStatus", newStatus)
-            put("confidence", confidence)
-            put("emailSubject", emailSubject)
-            put("aiReasoning", aiReasoning)
-            put("requiresConfirmation", confidence < 0.9) // High confidence changes need less confirmation
+    fun createVacancyUpdateEventConfirmation(vacancyUpdate: VacancyFieldChanges): PendingEvent {
+        if (vacancyUpdate.vacancyId.isBlank()) {
+            log.warn("Vacancy ID is blank, cannot create vacancy update event")
+            // TODO: create audit for vacancies with no ID for further review
+        }
+        val vacancyId = runCatching {
+            UUID.fromString(vacancyUpdate.vacancyId)
+        } .onFailure {
+            log.warn("Invalid vacancy ID format: ${vacancyUpdate.vacancyId}")
+        } .getOrElse {
+            throw RuntimeException("Invalid vacancy ID format")
         }
 
-        log.info("Creating pending event (AI status change) for user $userId, vacancyId $vacancyId")
-
-        return createEvent(
-            userId = userId,
+        val newEvent = createEvent(
+            userId = vacancyRepository.findByIdOrNull(vacancyId)?.user?.id
+                ?: throw IllegalArgumentException("Vacancy not found: $vacancyId"),
             eventType = EventType.AI_STATUS_CHANGE,
-            eventSubtype = "EMAIL_ANALYSIS",
-            title = "Application Status Update Detected",
-            description = "AI detected a potential status change to '$newStatus' based on email analysis. Please review and confirm.",
+            title = "Confirm updates for your vacancy",
+            description = "AI detected ${vacancyUpdate.changes.size} changes for your vacancy. Please review and confirm.",
             vacancyId = vacancyId,
-            metadata = metadata
+            metadata = objectMapper.valueToTree(vacancyUpdate)
         )
-    }
 
-    // Create AI-scheduled interview event
-    fun createAIInterviewScheduledEvent(
-        userId: UUID,
-        vacancyId: UUID,
-        interviewDateTime: Instant,
-        interviewType: String,
-        location: String?,
-        meetingLink: String?
-    ): PendingEvent {
-        val metadata = objectMapper.createObjectNode().apply {
-            put("interviewDateTime", interviewDateTime.toString())
-            put("interviewType", interviewType)
-            put("location", location)
-            put("meetingLink", meetingLink)
+        log.info("Created vacancy update confirmation event for vacancy $vacancyId")
+
+        if (vacancyUpdate.interviewAssignment != null) {
+            log.info("Vacancy update includes interview assignment for vacancy $vacancyId")
+            createInterviewAssignmentConfirmation(vacancyUpdate.interviewAssignment)
         }
 
-        log.info("Creating pending event (interview assignment by AI) for user $userId, vacancyId $vacancyId")
-
-        return createEvent(
-            userId = userId,
-            eventType = EventType.AI_INTERVIEW_SCHEDULED,
-            eventSubtype = "EMAIL_PARSING",
-            title = "Interview Scheduled",
-            description = "AI detected a new interview scheduled for ${interviewDateTime}. Please review and confirm the details.",
-            vacancyId = vacancyId,
-            metadata = metadata
-        )
+        return newEvent
     }
 
-    // Cleanup old resolved events (maintenance task)
-    fun cleanupOldResolvedEvents(daysOld: Long = 30): Int {
-        val cutoffDate = Instant.now().minusSeconds(daysOld * 24 * 60 * 60)
-        return pendingEventRepository.deleteResolvedEventsBefore(cutoffDate)
+    private fun createInterviewAssignmentConfirmation(interview: Interview): PendingEvent {
+        return createEvent(
+            userId = interview.user.id ?: throw IllegalArgumentException("Interview user ID is null"),
+            eventType = EventType.AI_INTERVIEW_SCHEDULED,
+            title = "Confirm interview assignment",
+            description = "AI detected a new interview for ${interview.vacancy.company.name}. Please review and confirm.",
+            vacancyId = interview.vacancy.id,
+            metadata = objectMapper.valueToTree(mapOf(
+                "scheduledAt" to interview.scheduledAt,
+                "duration" to interview.duration,
+                "location" to interview.location
+            ))
+        )
     }
 }

@@ -41,6 +41,10 @@ class EmbeddingServiceLocalModel(
         return generateEmbedding(text, "passage")
     }
 
+    override fun generateBatchEmbeddings(texts: List<String>): List<List<Float>> {
+        TODO("Not yet implemented")
+    }
+
     fun generateEmbedding(text: String, type: String): List<Float> {
         val response = webClient
             .post()

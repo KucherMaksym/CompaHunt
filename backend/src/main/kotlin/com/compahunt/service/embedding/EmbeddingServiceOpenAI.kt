@@ -23,4 +23,15 @@ class EmbeddingServiceOpenAI(
         val result = response.result.output;
         return result.toList();
     }
+
+    override fun generateBatchEmbeddings(formatedEmails: List<String>): List<List<Float>> {
+        val embeddingOptions = EmbeddingOptionsBuilder.builder().withModel("text-embedding-3-small").build()
+
+        val request = EmbeddingRequest(formatedEmails, embeddingOptions)
+        val response: EmbeddingResponse = embeddingModel.call(request)
+
+        return response.results.map { embeddingResult ->
+            embeddingResult.output.toList()
+        }
+    }
 }
