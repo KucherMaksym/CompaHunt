@@ -2,6 +2,7 @@ package com.compahunt.mapper
 
 import com.compahunt.dto.CompanyResponse
 import com.compahunt.dto.VacancyResponse
+import com.compahunt.dto.VacancyShort
 import com.compahunt.model.Vacancy
 import com.compahunt.util.formatSalaryToString
 import org.springframework.stereotype.Component
@@ -35,6 +36,14 @@ class VacancyMapper {
             createdAt = vacancy.createdAt.toString(),
             updatedAt = vacancy.updatedAt.toString(),
             lastUpdated = vacancy.updatedAt.toString()
+        )
+    }
+
+    fun toShort(vacancy: Vacancy): VacancyShort {
+        return VacancyShort(
+            id = vacancy.id,
+            title = vacancy.title,
+            companyName = vacancy.company.name,
         )
     }
 

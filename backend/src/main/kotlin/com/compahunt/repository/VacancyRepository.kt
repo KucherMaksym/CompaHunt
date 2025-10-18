@@ -27,6 +27,8 @@ interface VacancyRepository : JpaRepository<Vacancy, UUID> {
 
     fun findByUserId(userId: UUID, pageable: Pageable): Page<Vacancy>
 
+    fun findByUserIdAndStatusIn(userId: UUID, activeStatuses: List<VacancyStatus>): List<Vacancy>
+
     @Query("""
         SELECT v FROM Vacancy v 
         WHERE v.user.id = :userId 

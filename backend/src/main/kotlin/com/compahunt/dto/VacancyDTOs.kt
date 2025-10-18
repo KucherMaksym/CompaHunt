@@ -122,8 +122,6 @@ data class VacancyAuditResponse(
     val ipAddress: String?
 )
 
-
-
 data class UpdateStatusRequest(
     val status: VacancyStatus
 )
@@ -174,4 +172,10 @@ data class VacancySearchResponse(
     val hasPrevious: Boolean,
     val isFirst: Boolean,
     val isLast: Boolean
+)
+
+data class VacancyShort(
+    val id: UUID?,
+    val title: String,
+    val companyName: String,
 )

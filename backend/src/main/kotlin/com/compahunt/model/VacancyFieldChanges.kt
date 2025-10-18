@@ -1,6 +1,7 @@
 package com.compahunt.model
 
 data class VacancyFieldChanges(
+    val vacancyId: String,
     val isJobRelated: Boolean = false,
     val changes: List<FieldChange> = listOf(),
     val interviewAssignment: Interview? = null
