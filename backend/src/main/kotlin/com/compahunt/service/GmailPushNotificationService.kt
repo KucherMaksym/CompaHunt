@@ -214,7 +214,7 @@ class GmailPushNotificationService(
 
                     val isJobRelated = emailEmbeddingService.isJobRelated(newEmailEmbedding.embedding.toArray());
                     if (isJobRelated) {
-                        aiService.extractEmailData(change.body).let { vacancyChanges ->
+                        aiService.extractEmailData(change.body, userId).let { vacancyChanges ->
                             if (vacancyChanges.isJobRelated) {
                                 log.info("Email '${change.subject}' from ${change.sender} is job-related and contains vacancy changes for user $userId: $vacancyChanges")
                             }
