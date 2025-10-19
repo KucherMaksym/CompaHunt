@@ -274,4 +274,55 @@ class GmailController(
             )
         )
     }
+
+    @PostMapping("/test/process-email")
+    fun testProcessEmail(
+        principal: Authentication,
+        @RequestBody request: TestEmailRequest
+    ): ResponseEntity<*> {
+        val userPrincipal = principal.principal as UserPrincipal
+
+        log.info("Testing email processing for user ${userPrincipal.id}")
+
+        return try {
+            val testEmailChange = com.compahunt.service.EmailChange(
+                messageId = "test-message-${System.currentTimeMillis()}",
+                subject = request.subject,
+                sender = request.sender ?: "test@example.com",
+                historyId = System.currentTimeMillis(),
+                body = request.body
+            )
+
+            pushNotificationService.processGmailChanges(listOf(testEmailChange), userPrincipal.id)
+
+            log.info("Test email processed successfully for user ${userPrincipal.id}")
+
+            ResponseEntity.ok(
+                mapOf(
+                    "success" to true,
+                    "message" to "Email processed successfully. Check logs for embedding and LLM processing details.",
+                    "processedEmail" to mapOf(
+                        "subject" to request.subject,
+                        "sender" to (request.sender ?: "test@example.com"),
+                        "bodyLength" to request.body.length
+                    )
+                )
+            )
+        } catch (e: Exception) {
+            log.error("Failed to process test email for user ${userPrincipal.id}", e)
+            ResponseEntity.internalServerError().body(
+                mapOf(
+                    "error" to "PROCESSING_FAILED",
+                    "message" to "Failed to process test email: ${e.message}",
+                    "details" to e.stackTraceToString()
+                )
+            )
+        }
+    }
 }
+
+data class TestEmailRequest(
+    val subject: String,
+    val body: String,
+    val sender: String? = null
+)

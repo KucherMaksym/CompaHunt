@@ -208,14 +208,18 @@ class GmailPushNotificationService(
                 )
                 val newEmailEmbedding = emailEmbeddingService.generateEmbedding(emailObject)
 
-                val isJobRelated = emailEmbeddingService.isJobRelated(newEmailEmbedding.embedding.toArray())
+                val isJobRelated = emailEmbeddingService.isJobRelated(
+                    newEmailEmbedding.embedding.toArray(),
+                    change.subject,
+                    change.body
+                )
                 if (isJobRelated) {
                     aiService.extractEmailData(change.body, userId).let { vacancyChanges ->
                         if (vacancyChanges.isJobRelated) {
                             log.info("Email '${change.subject}' from ${change.sender} is job-related and contains vacancy changes for user $userId: $vacancyChanges")
                             pendingEventService.createVacancyUpdateEventConfirmation(vacancyChanges)
                         } else {
-                            log.info("LLM determined email ${change.subject} as not job related")
+                            log.info("LLM determined email ${change.subject} as NOT job related")
                             // TODO: add audit to analyze why embedding said job-related, but LLM disagreed
                         }
                     }

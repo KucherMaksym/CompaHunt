@@ -4,6 +4,7 @@ import com.compahunt.annotation.LocalModelEmbedding
 import com.compahunt.annotation.LogExecutionTime
 import com.compahunt.annotation.OpenAIEmbedding
 import com.compahunt.model.EmailCSV
+import com.compahunt.model.EmailCategory
 import com.compahunt.model.EmailEmbedding
 import com.compahunt.repository.EmailEmbeddingRepository
 import com.compahunt.service.embedding.EmbeddingService
@@ -19,13 +20,71 @@ class EmailEmbeddingService(
 ) {
 
     val log = LoggerFactory.getLogger(this::class.java)
+
+    // Scoring thresholds
     val SIMILARITY_THRESHOLD = 0.8
+    val COMBINED_SCORE_THRESHOLD = 0.70  // Lower threshold since we're adding boost directly
+
+    // Keyword patterns with boost values (directly added to embedding similarity)
+    private val jobRelatedKeywords = mapOf(
+        // High confidence phrases - strong indicators
+        "thank you for your interest in" to 0.10,
+        "we received your application" to 0.10,
+        "your application for" to 0.10,
+        "interview invitation" to 0.12,
+        "screening call" to 0.10,
+        "technical interview" to 0.12,
+        "final round" to 0.12,
+        "job offer" to 0.15,
+        "offer letter" to 0.15,
+        "background check" to 0.10,
+        "start date" to 0.08,
+        "onboarding" to 0.08,
+
+        // Medium confidence keywords
+        "application" to 0.05,
+        "position" to 0.04,
+        "interview" to 0.06,
+        "resume" to 0.05,
+        "cv" to 0.05,
+        "candidate" to 0.05,
+        "recruitment" to 0.05,
+        "hiring" to 0.05,
+        "hr team" to 0.05,
+        "recruiter" to 0.05,
+        "talent acquisition" to 0.05,
+        "hiring manager" to 0.06,
+
+        // Lower confidence keywords - can appear in non-job emails too
+        "job" to 0.03,
+        "vacancy" to 0.04,
+        "role" to 0.03,
+        "career" to 0.03,
+        "opportunity" to 0.02,
+        "qualified" to 0.02,
+        "skills" to 0.02,
+        "experience" to 0.02
+    )
+
+    // Negative keywords (spam/marketing indicators) - penalties
+    private val negativeKeywords = mapOf(
+        "unsubscribe" to -0.15,
+        "click here" to -0.08,
+        "limited time offer" to -0.12,
+        "buy now" to -0.12,
+        "free trial" to -0.08,
+        "discount" to -0.06,
+        "promotion" to -0.06,
+        "newsletter" to -0.08,
+        "marketing" to -0.06,
+        "advertisement" to -0.08
+    )
 
     fun generateEmbedding(email: EmailCSV): EmailEmbedding {
 
         val fullText = """
-                Subject: ${email.subject}
-                
+                ${email.subject}
+
                 ${email.body}
         """.trimIndent()
 
@@ -36,6 +95,7 @@ class EmailEmbeddingService(
             embedding = PGvector(embedding.toFloatArray()),
             body = email.body,
             subject = email.subject,
+            category = EmailCategory.fromString(email.status)
         )
 
 //        emailEmbeddingRepository.save(emailEmbedding)
@@ -46,7 +106,7 @@ class EmailEmbeddingService(
     fun generateBatchEmbeddings(emails: List<EmailCSV>): List<EmailEmbedding> {
         val formattedTexts = emails.map { email ->
             """
-                Subject: ${email.subject}
+                ${email.subject}
 
                 ${email.body}
             """.trimIndent()
@@ -58,7 +118,8 @@ class EmailEmbeddingService(
             EmailEmbedding(
                 embedding = PGvector(embedding.toFloatArray()),
                 body = email.body,
-                subject = email.subject
+                subject = email.subject,
+                category = EmailCategory.fromString(email.status)
             )
         }
     }
@@ -81,8 +142,46 @@ class EmailEmbeddingService(
         return emailEmbeddings;
     }
 
+    private fun calculateKeywordBoost(subject: String, body: String): Double {
+        val fullText = "$subject $body".lowercase()
+        var boost = 0.0
+        val foundKeywords = mutableListOf<String>()
+
+        // Add points for job-related keywords
+        jobRelatedKeywords.forEach { (keyword, points) ->
+            if (fullText.contains(keyword)) {
+                boost += points
+                foundKeywords.add("+$keyword")
+            }
+        }
+
+        // Subtract points for spam/marketing keywords
+        negativeKeywords.forEach { (keyword, points) ->
+            if (fullText.contains(keyword)) {
+                boost += points
+                foundKeywords.add("-$keyword")
+            }
+        }
+
+        // Cap the boost to reasonable limits
+        val cappedBoost = boost.coerceIn(-0.3, 0.3)
+
+        if (foundKeywords.isNotEmpty()) {
+            log.info("Keywords found: ${foundKeywords.joinToString(", ")} | Boost: ${"%+.3f".format(cappedBoost)}")
+        }
+
+        return cappedBoost
+    }
+
+    private fun calculateCombinedScore(
+        embeddingSimilarity: Double,
+        keywordBoost: Double
+    ): Double {
+        return embeddingSimilarity + keywordBoost
+    }
+
     @LogExecutionTime
-    fun isJobRelated(emailEmbedding: FloatArray): Boolean {
+    fun isJobRelated(emailEmbedding: FloatArray, subject: String, body: String): Boolean {
 
         val datasetEmails = emailEmbeddingRepository.findAll()
 
@@ -100,10 +199,23 @@ class EmailEmbeddingService(
             }
         }
 
-        log.info("Most similar email id: $mostSimilarEmailId with similarity: $maxSim")
+        // Calculate keyword-based boost (can be positive or negative)
+        val keywordBoost = calculateKeywordBoost(subject, body)
 
-        return maxSim > SIMILARITY_THRESHOLD
+        // Calculate combined score by adding boost to embedding similarity
+        val combinedScore = calculateCombinedScore(maxSim, keywordBoost)
+
+        log.info(
+            "Email classification - " +
+            "Subject: '$subject' | " +
+            "Most similar: $mostSimilarEmailId | " +
+            "Embedding: ${"%.3f".format(maxSim)} | " +
+            "Keyword boost: ${"%+.3f".format(keywordBoost)} | " +
+            "Combined: ${"%.3f".format(combinedScore)} | " +
+            "Threshold: ${"%.3f".format(COMBINED_SCORE_THRESHOLD)} | " +
+            "Result: ${if (combinedScore > COMBINED_SCORE_THRESHOLD) "JOB-RELATED" else "NOT job-related"}"
+        )
+
+        return combinedScore > COMBINED_SCORE_THRESHOLD
     }
-
-
 }

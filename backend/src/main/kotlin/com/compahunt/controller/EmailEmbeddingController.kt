@@ -34,7 +34,7 @@ class EmailEmbeddingController(
     @PostMapping("/{file}/generate-batch-embeddings")
     @LogExecutionTime
     fun generateEmbeddingsFromEmailData(@PathVariable file:  String): ResponseEntity<List<EmailEmbedding>> {
-        val emails = emailReaderService.getCleanEmailsFromCsv(file);
+        val emails = emailReaderService.getCleanEmailsFromCsv(file).take(65);
         val embeddings = emailEmbeddingService.generateAndSaveBatchEmbedding(emails)
         return ResponseEntity.ok(embeddings)
     }

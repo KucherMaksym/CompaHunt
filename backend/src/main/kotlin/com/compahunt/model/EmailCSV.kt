@@ -8,4 +8,7 @@ data class EmailCSV(
 
     @CsvBindByName(column = "Subject")
     val subject: String = "",
+
+    @CsvBindByName(column = "status", required = false)
+    val status: String? = null,
 )
