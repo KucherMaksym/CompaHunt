@@ -214,10 +214,10 @@ class GmailPushNotificationService(
                     change.body
                 )
                 if (isJobRelated) {
-                    aiService.extractEmailData(change.body, userId).let { vacancyChanges ->
-                        if (vacancyChanges.isJobRelated) {
+                    aiService.extractEmailData(change.body, userId, change.subject).let { vacancyChanges ->
+                        if (vacancyChanges.jobRelated) {
                             log.info("Email '${change.subject}' from ${change.sender} is job-related and contains vacancy changes for user $userId: $vacancyChanges")
-                            pendingEventService.createVacancyUpdateEventConfirmation(vacancyChanges)
+                            pendingEventService.createVacancyUpdateEventConfirmation(vacancyChanges, userId)
                         } else {
                             log.info("LLM determined email ${change.subject} as NOT job related")
                             // TODO: add audit to analyze why embedding said job-related, but LLM disagreed

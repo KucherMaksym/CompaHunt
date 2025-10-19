@@ -104,12 +104,14 @@ enum class EventType {
     INTERVIEW_FEEDBACK,
     AI_STATUS_CHANGE,
     AI_INTERVIEW_SCHEDULED,
+    AI_VACANCY_CREATION,
     SYSTEM_NOTIFICATION;
 
     fun getDisplayName(): String = when (this) {
         INTERVIEW_FEEDBACK -> "Interview Feedback Required"
         AI_STATUS_CHANGE -> "Application Status Update"
         AI_INTERVIEW_SCHEDULED -> "Interview Scheduled"
+        AI_VACANCY_CREATION -> "Create New Vacancy"
         SYSTEM_NOTIFICATION -> "System Notification"
     }
 
@@ -117,6 +119,7 @@ enum class EventType {
         INTERVIEW_FEEDBACK -> 1 // Highest priority
         AI_STATUS_CHANGE -> 2
         AI_INTERVIEW_SCHEDULED -> 2
+        AI_VACANCY_CREATION -> 2
         SYSTEM_NOTIFICATION -> 3
     }
 }

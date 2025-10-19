@@ -1,8 +1,8 @@
 package com.compahunt.model
 
 data class VacancyFieldChanges(
-    val vacancyId: String,
-    val isJobRelated: Boolean = false,
+    val vacancyId: String = "",
+    val jobRelated: Boolean,  // Renamed from isJobRelated to avoid Jackson serialization issues
     val changes: List<FieldChange> = listOf(),
     val interviewAssignment: Interview? = null
 )

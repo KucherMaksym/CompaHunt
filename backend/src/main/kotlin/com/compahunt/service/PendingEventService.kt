@@ -196,22 +196,40 @@ class PendingEventService(
         }
     }
 
-    fun createVacancyUpdateEventConfirmation(vacancyUpdate: VacancyFieldChanges): PendingEvent {
+    fun createVacancyUpdateEventConfirmation(vacancyUpdate: VacancyFieldChanges, userId: UUID): PendingEvent {
+        // Create vacancy event if vacancyId is blank
         if (vacancyUpdate.vacancyId.isBlank()) {
-            log.warn("Vacancy ID is blank, cannot create vacancy update event")
-            // TODO: create audit for vacancies with no ID for further review
+            log.warn("Vacancy ID is blank for user $userId. Creating vacancy creation event instead.")
+            return createVacancyCreationEvent(vacancyUpdate, userId)
         }
+
         val vacancyId = runCatching {
             UUID.fromString(vacancyUpdate.vacancyId)
-        } .onFailure {
-            log.warn("Invalid vacancy ID format: ${vacancyUpdate.vacancyId}")
-        } .getOrElse {
-            throw RuntimeException("Invalid vacancy ID format")
+        }.onFailure {
+            log.warn("Invalid vacancy ID format for user $userId: '${vacancyUpdate.vacancyId}'. Creating vacancy creation event instead.")
+        }.getOrNull()
+
+        // If parsing failed or vacancy doesn't exist -> create vacancy creation event
+        if (vacancyId == null) {
+            log.warn("Failed to parse vacancy ID for user $userId. Creating vacancy creation event instead.")
+            return createVacancyCreationEvent(vacancyUpdate, userId)
+        }
+
+        // Vacancy exists
+        val vacancy = vacancyRepository.findByIdOrNull(vacancyId)
+        if (vacancy == null) {
+            log.warn("Vacancy not found: $vacancyId for user $userId. Creating vacancy creation event instead.")
+            return createVacancyCreationEvent(vacancyUpdate, userId)
+        }
+
+        // Vacancy belongs to the user
+        if (vacancy.user.id != userId) {
+            log.error("Vacancy $vacancyId does not belong to user $userId. Cannot create update event.")
+            throw IllegalArgumentException("Vacancy does not belong to user")
         }
 
         val newEvent = createEvent(
-            userId = vacancyRepository.findByIdOrNull(vacancyId)?.user?.id
-                ?: throw IllegalArgumentException("Vacancy not found: $vacancyId"),
+            userId = userId,
             eventType = EventType.AI_STATUS_CHANGE,
             title = "Confirm updates for your vacancy",
             description = "AI detected ${vacancyUpdate.changes.size} changes for your vacancy. Please review and confirm.",
@@ -219,11 +237,32 @@ class PendingEventService(
             metadata = objectMapper.valueToTree(vacancyUpdate)
         )
 
-        log.info("Created vacancy update confirmation event for vacancy $vacancyId")
+        log.info("Created vacancy update confirmation event for vacancy $vacancyId and user $userId")
 
         if (vacancyUpdate.interviewAssignment != null) {
             log.info("Vacancy update includes interview assignment for vacancy $vacancyId")
             createInterviewAssignmentConfirmation(vacancyUpdate.interviewAssignment)
+        }
+
+        return newEvent
+    }
+
+    private fun createVacancyCreationEvent(vacancyUpdate: VacancyFieldChanges, userId: UUID): PendingEvent {
+        log.info("Creating vacancy creation event for user $userId with ${vacancyUpdate.changes.size} detected changes")
+
+        val newEvent = createEvent(
+            userId = userId,
+            eventType = EventType.AI_VACANCY_CREATION,
+            title = "Create new vacancy from email",
+            description = "AI detected a job-related email with ${vacancyUpdate.changes.size} potential vacancy fields. Would you like to create a new vacancy?",
+            metadata = objectMapper.valueToTree(vacancyUpdate)
+        )
+
+        log.info("Created vacancy creation event ${newEvent.id} for user $userId")
+
+        // Interview assignment will be handled after vacancy is created
+        if (vacancyUpdate.interviewAssignment != null) {
+            log.info("Vacancy creation includes interview assignment, which will be processed after vacancy creation")
         }
 
         return newEvent
